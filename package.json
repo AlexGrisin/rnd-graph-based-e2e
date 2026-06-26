@@ -1,0 +1,25 @@
+{
+  "name": "rnd-graph-based-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "POC for E2E model-based testing with Playwright and XState",
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "playwright test",
+    "test:mbt": "playwright test tests/mbt",
+    "test:app": "playwright test --project=app",
+    "test:ui": "playwright test --ui"
+  },
+  "dependencies": {
+    "xstate": "^5.19.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^22.13.10",
+    "dotenv": "^16.4.7",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  }
+}
