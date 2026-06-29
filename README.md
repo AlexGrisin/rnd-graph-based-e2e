@@ -299,6 +299,190 @@ This POC uses **`getShortestPaths`** — one minimal path per reachable state.
 
 For exhaustive or alternate-path coverage, extend `src/mbt/graph/path-generator.ts` (e.g. `getSimplePaths`, adjacency-guided walks) or use [`getPathsFromEvents`](#2-define-a-journey-as-an-event-sequence-getpathsfromevents) for a single named journey. The default spec layer stays the same.
 
+## Coverage-driven exploration loop
+
+An alternative to the static `getShortestPaths` suite. Instead of pre-generating a fixed list of paths, the loop inspects which edges in the machine graph are still uncovered after each path execution and generates the next path on demand — iterating until either the coverage target is reached or the iteration budget runs out.
+
+This mirrors the feedback-loop pattern used in LLM-based exploration (generate → run → measure gaps → regenerate), but entirely without an LLM: the gap detection and path generation are computed directly from the graph.
+
+```mermaid
+flowchart TD
+    A([start]) --> B[build AdjacencyMap\nfrom machine]
+    B --> C[CoverageTracker\ngaps = all edges]
+    C --> D{gaps\nempty?}
+    D -- yes --> Z([done])
+    D -- no --> E[pick first uncovered\nedge: sourceState → EVENT]
+    E --> F[getShortestPaths\ntoState = sourceState]
+    F --> G[append EVENT\nto event sequence]
+    G --> H[getPathsFromEvents\nresolve full path]
+    H --> I[testPath\nexecute + verify]
+    I --> J[tracker.record\nupdate edge counts]
+    J --> K{isComplete\nor budget done?}
+    K -- no --> D
+    K -- yes --> Z
+
+    style A fill:#1a2a3a,stroke:#60a5fa,color:#e0f2fe
+    style B fill:#1a3a2a,stroke:#4ade80,color:#e8f5e9
+    style C fill:#1a3a2a,stroke:#4ade80,color:#e8f5e9
+    style D fill:#3a3a1a,stroke:#facc15,color:#fef9c3
+    style E fill:#2a1a3a,stroke:#c084fc,color:#f3e8ff
+    style F fill:#2a1a3a,stroke:#c084fc,color:#f3e8ff
+    style G fill:#2a1a3a,stroke:#c084fc,color:#f3e8ff
+    style H fill:#2a1a3a,stroke:#c084fc,color:#f3e8ff
+    style I fill:#1a3a3a,stroke:#2dd4bf,color:#ccfbf1
+    style J fill:#1a3a2a,stroke:#4ade80,color:#e8f5e9
+    style K fill:#3a3a1a,stroke:#facc15,color:#fef9c3
+    style Z fill:#1a2a3a,stroke:#60a5fa,color:#e0f2fe
+```
+
+### XState APIs used
+
+| API                                      | Role in the loop                                                                                                                                                                                      |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `getAdjacencyMap(machine)`               | Builds the complete edge universe `{ sourceState → { event → targetState } }` at startup. The tracker uses this as the coverage denominator.                                                          |
+| `getShortestPaths(machine, { toState })` | For each uncovered edge, finds the minimal event sequence that reaches the edge's source state.                                                                                                       |
+| `getPathsFromEvents(machine, events[])`  | Appends the gap event to the sequence above and resolves the full path. This handles **back-edges** (e.g. `LOGOUT → home`) that `getSimplePaths` cannot reach because they revisit the initial state. |
+| `testPath(path, ctx, options)`           | Executes the path: dispatches each event to the action map and calls the state verifier at each step.                                                                                                 |
+
+#### Why `getPathsFromEvents` instead of `getSimplePaths`
+
+`getSimplePaths` returns all acyclic paths — it never visits the same state twice. This means back-edges that loop back to the initial state (like `myAccount → LOGOUT → home`) are unreachable because `home` appears at both start and end of the path.
+
+`getPathsFromEvents` takes an explicit event sequence and resolves it against the machine regardless of cycles, so the loop can exercise any edge including transitions that form cycles.
+
+```
+Gap: myAccount:LOGOUT → targetState=home
+
+1. getShortestPaths({ toState: s => s === 'myAccount' })
+   → steps: [GO_LOGIN, SUBMIT]
+
+2. append gap event
+   → events: [GO_LOGIN, SUBMIT, LOGOUT]
+
+3. getPathsFromEvents(machine, [GO_LOGIN, SUBMIT, LOGOUT])
+   → path: home → login → myAccount → home  ✓
+```
+
+### Persona support
+
+When multiple personas are provided, each iteration cycles through them and skips paths whose event sequences fall outside a persona's `allowedEvents`. This lets you partition coverage responsibility across personas without losing overall coverage.
+
+```typescript
+const personas: PersonaConfig[] = [
+  { name: 'happy_path', allowedEvents: ['GO_LOGIN', 'SUBMIT', 'LOGOUT'] },
+  { name: 'error_path', allowedEvents: ['GO_LOGIN', 'FAIL'] },
+];
+```
+
+`happy_path` covers the success branch; `error_path` covers the failure branch. Together they satisfy 100% edge coverage.
+
+### Weights
+
+The `weights` option controls two independent things with one `Weights` object:
+
+```typescript
+type Weights = {
+  edges?:  Record<string, number>;  // "sourceState:EVENT" → minimum visit count + sort priority
+  states?: Record<string, number>;  // stateName → priority boost for gaps targeting this state
+};
+```
+
+#### Edge weights — repeat visits and priority
+
+`edges` maps an edge key (`"sourceState:EVENT"`) to a **minimum visit count**. An edge is not removed from the gap list until it has been traversed at least that many times. Higher values also sort the edge earlier in the gap list, so it is addressed before lower-weight edges.
+
+```typescript
+// login:SUBMIT must be traversed 3 times before the loop moves on.
+// Because its weight (3) exceeds all others (1), it is picked first every time
+// it still has remaining visits.
+const weights: Weights = {
+  edges: { 'login:SUBMIT': 3 },
+};
+```
+
+Iteration log with edge weight 3 on `login:SUBMIT`:
+
+```
+[iteration 1] gap="login:SUBMIT" visits=0/3 path="→ myAccount: GO_LOGIN → SUBMIT"  coverage=0%
+[iteration 2] gap="login:SUBMIT" visits=1/3 path="→ myAccount: GO_LOGIN → SUBMIT"  coverage=25%
+[iteration 3] gap="login:SUBMIT" visits=2/3 path="→ myAccount: GO_LOGIN → SUBMIT"  coverage=25%
+[iteration 4] gap="login:FAIL"   visits=0/1 path="→ error: GO_LOGIN → FAIL"        coverage=50%
+[iteration 5] gap="myAccount:LOGOUT" visits=0/1 path="→ home: GO_LOGIN → SUBMIT → LOGOUT" coverage=75%
+```
+
+The coverage percentage stays at 25% during iterations 2 and 3 because `visitedEdges` counts edges that have **met** their minimum, not edges touched at least once.
+
+#### State weights — gap ordering priority
+
+`states` maps a state name to a **priority boost** applied when sorting gaps. It does not change the minimum visit count — it only affects which gap is addressed first when multiple gaps have equal edge weights.
+
+```typescript
+// Gaps whose targetState is myAccount get score = edgeWeight(1) + stateBoost(10) = 11.
+// Gaps to other states get score = 1. So login:SUBMIT is always before login:FAIL.
+const weights: Weights = {
+  states: { myAccount: 10 },
+};
+```
+
+#### Sort score formula
+
+```
+score(gap) = (edges[gap.sourceState:gap.event] ?? 1) + (states[gap.targetState] ?? 0)
+```
+
+Gaps are sorted descending by score — highest score is addressed first each iteration.
+
+### Usage
+
+```typescript
+import { runCoverageLoop } from '../../src/mbt/graph/exploration-loop.js';
+
+const report = await runCoverageLoop(appAuthMachine, mbtContext, {
+  actions,
+  verifyState: stateVerifier,
+  budget: {
+    maxIterations: 10, // max path executions before stopping
+    targetEdgePct: 100, // stop early once this weighted-coverage % is reached
+  },
+  // optional:
+  personas: [...],
+  weights: {
+    edges:  { 'login:SUBMIT': 3 },
+    states: { myAccount: 10 },
+  },
+});
+
+// report: { totalEdges, visitedEdges, edgesPct, totalStates, visitedStates, statesPct }
+// visitedEdges = edges that have met their weighted minimum visit count
+```
+
+Each path execution logs iteration number, persona, gap key, current/minimum visit count, resolved path, and weighted coverage:
+
+```
+[iteration 1] persona="default" gap="home:GO_LOGIN"    visits=0/1 path="→ login: GO_LOGIN"                  coverage=0%
+[iteration 2] persona="default" gap="login:SUBMIT"     visits=0/1 path="→ myAccount: GO_LOGIN → SUBMIT"      coverage=25%
+[iteration 3] persona="default" gap="login:FAIL"       visits=0/1 path="→ error: GO_LOGIN → FAIL"            coverage=50%
+[iteration 4] persona="default" gap="myAccount:LOGOUT" visits=0/1 path="→ home: GO_LOGIN → SUBMIT → LOGOUT"  coverage=75%
+```
+
+The sample spec lives at `tests/mbt/coverage-loop.spec.ts`. Run it:
+
+```bash
+npm test -- --project=stub --grep "Coverage Loop"
+```
+
+### Comparison with static shortest-paths
+
+|                          | `getShortestPaths` (default)                      | Coverage loop                                             |
+| ------------------------ | ------------------------------------------------- | --------------------------------------------------------- |
+| Path count               | Fixed — one per reachable state                   | Dynamic — one per uncovered edge                          |
+| Back-edge coverage       | Only if it creates a new shortest path to a state | Always — `getPathsFromEvents` resolves any valid sequence |
+| Coverage guarantee       | All states reachable from initial                 | All edges in the machine, provably                        |
+| Iteration                | Single pass                                       | Iterative until gaps closed or budget exhausted           |
+| Persona support          | No                                                | Yes — per-persona `allowedEvents` filtering               |
+| Repeat visits            | No                                                | Yes — `weights.edges` sets per-edge minimum visit count   |
+| Gap ordering / priority  | No                                                | Yes — `weights.edges` + `weights.states` sort score       |
+
 ## Execution flow
 
 ```mermaid

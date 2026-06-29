@@ -24,7 +24,7 @@ export default defineConfig({
   projects: [
     {
       name: 'stub',
-      testMatch: /graph-driven\.spec\.ts/,
+      testMatch: /\/(graph-driven|coverage-loop)\.spec\.ts/,
     },
     {
       name: 'app',
