@@ -7,6 +7,7 @@ Application model and MBT engine — no Playwright imports.
 ### src/machines/
 
 - `app-auth.machine.ts` — app auth state model
+- `app-purchase.machine.ts` — purchase happy-path model
 - `walk-strategy.machine.ts` — path orchestration model
 
 ### src/mbt/
@@ -19,27 +20,32 @@ Application model and MBT engine — no Playwright imports.
 
 ## tests/
 
-Playwright infrastructure and the single graph-driven spec.
+Playwright infrastructure and graph-driven specs.
 
 ### tests/support/pages/
 
-- `home.page.ts`, `login.page.ts`, `my-account.page.ts` — page objects
+- `home.page.ts`, `login.page.ts`, `my-account.page.ts` — auth page objects
+- `pdp.page.ts`, `cart.page.ts`, `checkout.page.ts` — purchase page objects
 - `page-fixtures.ts` — shared `PageFixtures` type
 - `state-verifier.ts` — state name → `should*` assertion registry
 
 ### tests/support/actions/
 
 - `stub-actions.ts` — log-only actions + `createLoggingContext`
-- `app-auth.actions.ts` — event→POM wiring
+- `app-auth.actions.ts` — auth event→POM wiring
+- `app-purchase.actions.ts` — purchase event→POM wiring
 
 ### tests/support/ (other)
 
-- `app/overlays.ts` — `dismissAppOverlays` (OneTrust / push prompts)
+- `app/overlays.ts` — `dismissAppOverlays` (OneTrust / push / Exponea)
 - `config/app-credentials.ts` — `APP_EMAIL` / `APP_PASSWORD` loader
+- `config/app-product.ts` — `PRODUCT_PATH` loader
 
 ### tests/mbt/
 
-- `graph-driven.spec.ts` — one test per shortest path (the only spec)
+- `graph-driven.spec.ts` — auth shortest paths
+- `purchase-graph-driven.spec.ts` — purchase shortest paths
+- `coverage-loop.spec.ts` — coverage-loop experiments (stub)
 
 ### tests/
 

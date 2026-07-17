@@ -7,6 +7,9 @@ export function createStateVerifier(pages: PageFixtures): StateVerifier {
     login: () => pages.loginPage.shouldBeOnPage(),
     myAccount: () => pages.myAccountPage.shouldBeOnPage(),
     error: () => pages.loginPage.shouldShowError(),
+    pdp: () => pages.pdpPage.shouldBeOnPage(),
+    cart: () => pages.cartPage.shouldBeOnPage(),
+    checkout: () => pages.checkoutPage.shouldBeOnPage(),
   };
 
   return async (expectedState) => {

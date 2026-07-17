@@ -3,8 +3,6 @@ import { getAppCredentials } from '../config/app-credentials.js';
 import type { PageFixtures } from '../pages/page-fixtures.js';
 
 export function createAppAuthActions(pages: PageFixtures): ActionMap {
-  const credentials = getAppCredentials();
-
   return {
     GO_LOGIN: async (ctx: MbtContext) => {
       ctx.log('GO_LOGIN');
@@ -12,6 +10,7 @@ export function createAppAuthActions(pages: PageFixtures): ActionMap {
     },
     SUBMIT: async (ctx: MbtContext) => {
       ctx.log('SUBMIT');
+      const credentials = getAppCredentials();
       await pages.loginPage.submit(credentials.email, credentials.password);
     },
     FAIL: async (ctx: MbtContext) => {

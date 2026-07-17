@@ -53,12 +53,14 @@ src/
 
 tests/
   mbt/
-    graph-driven.spec.ts   # Single spec — generates all tests from the graph
-  fixtures.ts              # Playwright fixtures (stub vs live)
+    graph-driven.spec.ts            # Auth graph — one test per shortest path
+    purchase-graph-driven.spec.ts   # Purchase graph — home→pdp→cart→checkout
+  fixtures.ts                       # Playwright fixtures (stub vs live)
   support/
-    actions/                 # Event → page method adapters
-    pages/                   # Page objects + should*() assertions per state
-    app/                   # Site-specific overlay helpers
+    actions/                        # Event → page method adapters
+    pages/                          # Page objects + should*() assertions per state
+    app/                            # Site-specific overlay helpers
+    config/                         # Credentials + PRODUCT_PATH
 ```
 
 | Layer             | Location                         | Role                                                                 |
@@ -289,7 +291,7 @@ Copy `.env.example` to `.env` and fill in credentials for live runs.
 
 ## Coverage model
 
-This POC uses **`getShortestPaths`** — one minimal path per reachable state.
+This POC uses `getShortestPaths` — one minimal path per reachable state.
 
 | Model change                          | Test impact                                    |
 | ------------------------------------- | ---------------------------------------------- |
@@ -297,7 +299,7 @@ This POC uses **`getShortestPaths`** — one minimal path per reachable state.
 | Alternate route to existing state     | Often no new test (shortest path unchanged)    |
 | New loop (e.g. logout → home → login) | May add paths to states reachable via the loop |
 
-For exhaustive or alternate-path coverage, extend `src/mbt/graph/path-generator.ts` (e.g. `getSimplePaths`, adjacency-guided walks) or use [`getPathsFromEvents`](#2-define-a-journey-as-an-event-sequence-getpathsfromevents) for a single named journey. The default spec layer stays the same.
+For exhaustive or alternate-path coverage, extend `src/mbt/graph/path-generator.ts` (e.g. `getSimplePaths`, adjacency-guided walks) or use `[getPathsFromEvents](#2-define-a-journey-as-an-event-sequence-getpathsfromevents)` for a single named journey. The default spec layer stays the same.
 
 ## Coverage-driven exploration loop
 
@@ -382,8 +384,8 @@ The `weights` option controls two independent things with one `Weights` object:
 
 ```typescript
 type Weights = {
-  edges?:  Record<string, number>;  // "sourceState:EVENT" → minimum visit count + sort priority
-  states?: Record<string, number>;  // stateName → priority boost for gaps targeting this state
+  edges?: Record<string, number>; // "sourceState:EVENT" → minimum visit count + sort priority
+  states?: Record<string, number>; // stateName → priority boost for gaps targeting this state
 };
 ```
 
@@ -473,15 +475,15 @@ npm test -- --project=stub --grep "Coverage Loop"
 
 ### Comparison with static shortest-paths
 
-|                          | `getShortestPaths` (default)                      | Coverage loop                                             |
-| ------------------------ | ------------------------------------------------- | --------------------------------------------------------- |
-| Path count               | Fixed — one per reachable state                   | Dynamic — one per uncovered edge                          |
-| Back-edge coverage       | Only if it creates a new shortest path to a state | Always — `getPathsFromEvents` resolves any valid sequence |
-| Coverage guarantee       | All states reachable from initial                 | All edges in the machine, provably                        |
-| Iteration                | Single pass                                       | Iterative until gaps closed or budget exhausted           |
-| Persona support          | No                                                | Yes — per-persona `allowedEvents` filtering               |
-| Repeat visits            | No                                                | Yes — `weights.edges` sets per-edge minimum visit count   |
-| Gap ordering / priority  | No                                                | Yes — `weights.edges` + `weights.states` sort score       |
+|                         | `getShortestPaths` (default)                      | Coverage loop                                             |
+| ----------------------- | ------------------------------------------------- | --------------------------------------------------------- |
+| Path count              | Fixed — one per reachable state                   | Dynamic — one per uncovered edge                          |
+| Back-edge coverage      | Only if it creates a new shortest path to a state | Always — `getPathsFromEvents` resolves any valid sequence |
+| Coverage guarantee      | All states reachable from initial                 | All edges in the machine, provably                        |
+| Iteration               | Single pass                                       | Iterative until gaps closed or budget exhausted           |
+| Persona support         | No                                                | Yes — per-persona `allowedEvents` filtering               |
+| Repeat visits           | No                                                | Yes — `weights.edges` sets per-edge minimum visit count   |
+| Gap ordering / priority | No                                                | Yes — `weights.edges` + `weights.states` sort score       |
 
 ## Execution flow
 

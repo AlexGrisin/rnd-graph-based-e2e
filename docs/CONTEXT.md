@@ -13,4 +13,9 @@ Validate whether XState state machines plus `@xstate/graph` path utilities can d
 
 ## Scope
 
-POC targeting application auth flows — stub project for graph smoke, live `app` project for browser E2E.
+POC targeting two separate journeys against live `g-star.com` (NL):
+
+- **Auth** — `home → login → myAccount | error`
+- **Purchase** — `home → pdp → cart → checkout` (guest, no payment)
+
+Stub project for graph smoke; live `app` project for browser E2E.

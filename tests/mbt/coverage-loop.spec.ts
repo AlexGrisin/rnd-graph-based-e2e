@@ -1,6 +1,9 @@
 import { appAuthMachine } from '../../src/machines/app-auth.machine.js';
 import { runCoverageLoop } from '../../src/mbt/graph/exploration-loop.js';
-import type { PersonaConfig, Weights } from '../../src/mbt/graph/exploration-loop.js';
+import type {
+  PersonaConfig,
+  Weights,
+} from '../../src/mbt/graph/exploration-loop.js';
 import { test, expect } from '../fixtures.js';
 
 /**

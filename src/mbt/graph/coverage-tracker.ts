@@ -75,7 +75,10 @@ export class CoverageTracker {
     this.knownEdges = edges;
   }
 
-  record(path: StatePath<unknown, EventObject>, initialStateValue: string): void {
+  record(
+    path: StatePath<unknown, EventObject>,
+    initialStateValue: string,
+  ): void {
     if (path.steps.length === 0) {
       this.stateVisits.set(
         initialStateValue,
@@ -91,7 +94,10 @@ export class CoverageTracker {
         this.edgeVisits.set(key, (this.edgeVisits.get(key) ?? 0) + 1);
       }
       prevState = getSnapshotStateValue(step.state);
-      this.stateVisits.set(prevState, (this.stateVisits.get(prevState) ?? 0) + 1);
+      this.stateVisits.set(
+        prevState,
+        (this.stateVisits.get(prevState) ?? 0) + 1,
+      );
     }
   }
 
@@ -106,7 +112,9 @@ export class CoverageTracker {
     return this.knownEdges
       .filter(({ sourceState, event }) => {
         const minVisits = edgeW[`${sourceState}:${event}`] ?? 1;
-        return (this.edgeVisits.get(`${sourceState}:${event}`) ?? 0) < minVisits;
+        return (
+          (this.edgeVisits.get(`${sourceState}:${event}`) ?? 0) < minVisits
+        );
       })
       .sort((a, b) => {
         const scoreA =
@@ -144,9 +152,7 @@ export class CoverageTracker {
           ? 100
           : Math.round((visitedStates / totalStates) * 100),
       edgesPct:
-        totalEdges === 0
-          ? 100
-          : Math.round((visitedEdges / totalEdges) * 100),
+        totalEdges === 0 ? 100 : Math.round((visitedEdges / totalEdges) * 100),
     };
   }
 

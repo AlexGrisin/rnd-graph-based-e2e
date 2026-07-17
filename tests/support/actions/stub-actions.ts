@@ -14,6 +14,15 @@ export function createStubActions(): ActionMap {
     LOGOUT: async ({ log }) => {
       log('LOGOUT → sign out');
     },
+    OPEN_PDP: async ({ log }) => {
+      log('OPEN_PDP → open product detail page');
+    },
+    ADD_TO_CART: async ({ log }) => {
+      log('ADD_TO_CART → select size and add to bag');
+    },
+    GO_CHECKOUT: async ({ log }) => {
+      log('GO_CHECKOUT → proceed to checkout (no payment)');
+    },
   };
 }
 

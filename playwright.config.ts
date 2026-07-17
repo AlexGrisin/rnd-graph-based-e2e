@@ -24,11 +24,12 @@ export default defineConfig({
   projects: [
     {
       name: 'stub',
-      testMatch: /\/(graph-driven|coverage-loop)\.spec\.ts/,
+      testMatch:
+        /\/(graph-driven|purchase-graph-driven|coverage-loop)\.spec\.ts/,
     },
     {
       name: 'app',
-      testMatch: /graph-driven\.spec\.ts/,
+      testMatch: /\/(graph-driven|purchase-graph-driven)\.spec\.ts/,
     },
   ],
   tsconfig: './tsconfig.json',

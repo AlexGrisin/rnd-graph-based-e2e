@@ -59,3 +59,12 @@ Implementation changelog for rnd-graph-based-e2e.
 - Playwright project `gstar` → `app`; `test:gstar` → `test:app`
 - `tests/support/gstar/` → `tests/support/app/` (`dismissAppOverlays`)
 - `gstar-credentials.ts` → `app-credentials.ts`; `GSTAR_*` env → `APP_*`
+
+## 2026-07-17 — Purchase journey MBT POC
+
+- Added `app-purchase.machine.ts` (`home → pdp → cart → checkout`, final at checkout)
+- Events: `OPEN_PDP`, `ADD_TO_CART`, `GO_CHECKOUT`; live PDP via `PRODUCT_PATH`
+- Page objects: `PdpPage`, `CartPage`, `CheckoutPage`; guest checkout to shipping (no payment)
+- Spec: `purchase-graph-driven.spec.ts`; stub + app `testMatch` updated
+- Merged auth + purchase action maps; lazy-load auth credentials in `SUBMIT`
+- `dismissAppOverlays` also removes Exponea subscription modals

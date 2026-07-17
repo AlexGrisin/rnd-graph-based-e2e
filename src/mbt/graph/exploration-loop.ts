@@ -140,7 +140,10 @@ export async function runCoverageLoop(
         const { edgesPct } = tracker.coverage(weights);
         const edgeKey = `${gap.sourceState}:${gap.event}`;
         const minVisits = weights?.edges?.[edgeKey] ?? 1;
-        const currentVisits = tracker.edgeVisitCount(gap.sourceState, gap.event);
+        const currentVisits = tracker.edgeVisitCount(
+          gap.sourceState,
+          gap.event,
+        );
         ctx.log(
           `[iteration ${iteration + 1}] persona="${persona.name}" gap="${edgeKey}" visits=${currentVisits}/${minVisits} path="${describePath(path)}" coverage=${edgesPct}%`,
         );

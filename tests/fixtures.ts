@@ -4,11 +4,15 @@ import type { ActionMap } from '../src/mbt/types.js';
 import { appAuthMachine } from '../src/machines/app-auth.machine.js';
 import { MbtRunner } from '../src/mbt/runner/mbt-runner.js';
 import { createAppAuthActions } from './support/actions/app-auth.actions.js';
+import { createAppPurchaseActions } from './support/actions/app-purchase.actions.js';
 import { createStubActions } from './support/actions/stub-actions.js';
 import { createLoggingContext } from './support/actions/stub-actions.js';
 import { HomePage } from './support/pages/home.page.js';
 import { LoginPage } from './support/pages/login.page.js';
 import { MyAccountPage } from './support/pages/my-account.page.js';
+import { PdpPage } from './support/pages/pdp.page.js';
+import { CartPage } from './support/pages/cart.page.js';
+import { CheckoutPage } from './support/pages/checkout.page.js';
 import type { PageFixtures } from './support/pages/page-fixtures.js';
 import {
   createStateVerifier,
@@ -26,7 +30,17 @@ function createMockLocator(): Locator {
   return {
     click: async () => undefined,
     fill: async () => undefined,
+    first: () => createMockLocator(),
+    nth: () => createMockLocator(),
+    filter: () => createMockLocator(),
+    count: async () => 0,
+    isEnabled: async () => false,
+    isVisible: async () => false,
+    evaluate: async () => undefined,
     getByRole: () => createMockLocator(),
+    getByTestId: () => createMockLocator(),
+    getByText: () => createMockLocator(),
+    locator: () => createMockLocator(),
   } as unknown as Locator;
 }
 
@@ -35,6 +49,9 @@ function createMockPage(): Page {
     goto: async () => undefined,
     url: () => 'about:blank',
     getByRole: () => createMockLocator(),
+    getByTestId: () => createMockLocator(),
+    getByText: () => createMockLocator(),
+    locator: () => createMockLocator(),
     waitForURL: async () => undefined,
   } as unknown as Page;
 }
@@ -62,21 +79,45 @@ export const test = base.extend<MbtFixtures>({
   myAccountPage: async ({ page }, use) => {
     await use(new MyAccountPage(page));
   },
+  pdpPage: async ({ page }, use) => {
+    await use(new PdpPage(page));
+  },
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
+  },
+  checkoutPage: async ({ page }, use) => {
+    await use(new CheckoutPage(page));
+  },
   mbtRunner: async ({}, use) => {
     await use(new MbtRunner(appAuthMachine));
   },
   mbtContext: async ({ page }, use) => {
     await use(createLoggingContext(page));
   },
-  actions: async ({ homePage, loginPage, myAccountPage }, use, testInfo) => {
+  actions: async (
+    { homePage, loginPage, myAccountPage, pdpPage, cartPage, checkoutPage },
+    use,
+    testInfo,
+  ) => {
     if (testInfo.project.name === 'stub') {
       await use(createStubActions());
       return;
     }
-    await use(createAppAuthActions({ homePage, loginPage, myAccountPage }));
+    const pages = {
+      homePage,
+      loginPage,
+      myAccountPage,
+      pdpPage,
+      cartPage,
+      checkoutPage,
+    };
+    await use({
+      ...createAppAuthActions(pages),
+      ...createAppPurchaseActions(pages),
+    });
   },
   stateVerifier: async (
-    { homePage, loginPage, myAccountPage },
+    { homePage, loginPage, myAccountPage, pdpPage, cartPage, checkoutPage },
     use,
     testInfo,
   ) => {
@@ -84,7 +125,16 @@ export const test = base.extend<MbtFixtures>({
       await use(noopStateVerifier);
       return;
     }
-    await use(createStateVerifier({ homePage, loginPage, myAccountPage }));
+    await use(
+      createStateVerifier({
+        homePage,
+        loginPage,
+        myAccountPage,
+        pdpPage,
+        cartPage,
+        checkoutPage,
+      }),
+    );
   },
 });
 

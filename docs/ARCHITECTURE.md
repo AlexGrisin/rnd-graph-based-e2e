@@ -17,9 +17,13 @@ tests/mbt/        → Playwright spec files
 
 ## Key components
 
-### Application model (`app-auth.machine.ts`)
+### Auth model (`app-auth.machine.ts`)
 
 States: `home → login → myAccount → error` (`error` is a `final` state). Events: `GO_LOGIN`, `SUBMIT`, `FAIL`, `LOGOUT`.
+
+### Purchase model (`app-purchase.machine.ts`)
+
+States: `home → pdp → cart → checkout` (`checkout` is a `final` state). Events: `OPEN_PDP`, `ADD_TO_CART`, `GO_CHECKOUT`. MVP opens a fixed PDP via `PRODUCT_PATH` (no search/catalog UI).
 
 ### Graph layer (`src/mbt/graph/`)
 
@@ -38,10 +42,13 @@ Orchestrates sequential path execution; tracks `pathIndex` and `visitedStates`.
 
 ## Testing architecture
 
-Playwright fixtures expose `mbtRunner`, action maps, and one fixture per page object (`homePage`, `loginPage`, `myAccountPage`). Specs remain thin orchestration layers.
+Playwright fixtures expose action maps (auth + purchase merged), and one fixture per page object (`homePage`, `loginPage`, `myAccountPage`, `pdpPage`, `cartPage`, `checkoutPage`). Specs remain thin orchestration layers:
+
+- `graph-driven.spec.ts` — auth machine paths
+- `purchase-graph-driven.spec.ts` — purchase machine paths
 
 ## Non-functional
 
 - Headless by default, trace on first retry
 - Single worker (MBT paths are sequential)
-- `baseURL` configurable via env
+- `baseURL` configurable via env; `PRODUCT_PATH` for purchase PDP
