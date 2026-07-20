@@ -11,3 +11,8 @@ node_modules/
 .DS_Store
 
 .playwright-mcp/
+
+# Rosetta
+agents/TEMP/
+refsrc/
+!refsrc/INDEX.md

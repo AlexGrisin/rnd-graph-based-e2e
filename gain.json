@@ -1,0 +1,49 @@
+{
+  "description": "POC for graph-based end-to-end model testing with Playwright and XState.",
+  "servicesDescription": {
+    "e2e-mbt": "Generates and runs browser test paths from XState application models."
+  },
+  "codingAgents": [
+    "codex"
+  ],
+  "sdlc": {
+    "issue_tracker": "[ISSUE_TRACKER]",
+    "issue_tracker_project": "[ISSUE_TRACKER_URL]",
+    "wiki": "[WIKI]",
+    "wiki_project": "[WIKI_URL]",
+    "test_management": "[TEST_MANAGEMENT]",
+    "test_management_project": "[TEST_MANAGEMENT_PROJECT]",
+    "scm": "[SCM]",
+    "scm_project": "[SCM_URL]",
+    "build_management": "[BUILD_MANAGEMENT]",
+    "build_management_project": "[BUILD_MANAGEMENT_URL]",
+    "ux": "[UX_TOOL]",
+    "ux_project": "[UX_PROJECT]",
+    "infrastructure": "[INFRASTRUCTURE]",
+    "infrastructure_project": "[INFRASTRUCTURE_PROJECT]",
+    "iac": "[IAC_TOOL]",
+    "iac_project": "[IAC_PROJECT]",
+    "hosting": "[HOSTING]",
+    "hosting_project": "[HOSTING_PROJECT]",
+    "monitoring": "[MONITORING]",
+    "monitoring_project": "[MONITORING_PROJECT]",
+    "logging": "[LOGGING]",
+    "logging_project": "[LOGGING_PROJECT]",
+    "security": "[SECURITY_TOOL]",
+    "security_project": "[SECURITY_PROJECT]",
+    "collaboration_project": "[COLLABORATION_PROJECT]",
+    "unit_tests": "in-repository",
+    "integration_tests": "in-repository",
+    "e2e_tests": "in-repository",
+    "performance_tests": "[PERFORMANCE_TESTS_LOCATION]",
+    "testing_harness": "Playwright",
+    "code_graph": "[CODE_GRAPH_TOOL]"
+  },
+  "vocabulary": {
+    "MBT": "Model-based testing; tests are derived from a state-machine graph.",
+    "shortest path": "The minimum transition sequence from initial state to a target state."
+  },
+  "versions": {
+    "rosetta": "R3"
+  }
+}

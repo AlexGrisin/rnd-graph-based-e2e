@@ -1,56 +1,105 @@
-Code map for rnd-graph-based-e2e (3 levels).
+Code map for `rnd-graph-based-e2e`.
 
-## src/
+## Root (56 tracked docs, source, and config files) - Playwright and XState MBT POC
 
-Application model and MBT engine — no Playwright imports.
+- `.env.example`
+- `.gitignore`
+- `.prettierignore`
+- `.prettierrc.json`
+- `CLAUDE.md`
+- `README.md`
+- `gain.json`
+- `package-lock.json`
+- `package.json`
+- `playwright.config.ts`
+- `tsconfig.json`
 
-### src/machines/
+### src/ (10 files) - MBT engine and state machines
 
-- `app-auth.machine.ts` — app auth state model
-- `app-purchase.machine.ts` — purchase happy-path model
-- `walk-strategy.machine.ts` — path orchestration model
+#### src/machines/ (3 files) - XState journey models
 
-### src/mbt/
+- `app-auth.machine.ts`
+- `app-purchase.machine.ts`
+- `walk-strategy.machine.ts`
 
-- `types.ts` — ActionMap, MbtContext, StateVerifier contracts
-- `graph/path-generator.ts` — getShortestPaths / getAdjacencyMap wrappers
-- `graph/test-model-factory.ts` — testPath execution engine
-- `graph/path-label.ts` — describePath (human-readable test titles)
-- `runner/mbt-runner.ts` — high-level MBT runner (alternate programmatic API)
+#### src/mbt/ (7 files) - Graph traversal and runner logic
 
-## tests/
+- `types.ts`
 
-Playwright infrastructure and graph-driven specs.
+##### src/mbt/graph/ (5 files) - Path generation and execution helpers
 
-### tests/support/pages/
+- `coverage-tracker.ts`
+- `exploration-loop.ts`
+- `path-generator.ts`
+- `path-label.ts`
+- `test-model-factory.ts`
 
-- `home.page.ts`, `login.page.ts`, `my-account.page.ts` — auth page objects
-- `pdp.page.ts`, `cart.page.ts`, `checkout.page.ts` — purchase page objects
-- `page-fixtures.ts` — shared `PageFixtures` type
-- `state-verifier.ts` — state name → `should*` assertion registry
+##### src/mbt/runner/ (1 file) - High-level runner API
 
-### tests/support/actions/
+- `mbt-runner.ts`
 
-- `stub-actions.ts` — log-only actions + `createLoggingContext`
-- `app-auth.actions.ts` — auth event→POM wiring
-- `app-purchase.actions.ts` — purchase event→POM wiring
+### tests/ (18 files) - Playwright specs and support layer
 
-### tests/support/ (other)
+#### tests/mbt/ (3 files) - Graph-driven specs
 
-- `app/overlays.ts` — `dismissAppOverlays` (OneTrust / push / Exponea)
-- `config/app-credentials.ts` — `APP_EMAIL` / `APP_PASSWORD` loader
-- `config/app-product.ts` — `PRODUCT_PATH` loader
+- `coverage-loop.spec.ts`
+- `graph-driven.spec.ts`
+- `purchase-graph-driven.spec.ts`
 
-### tests/mbt/
+#### tests/support/ (14 files) - Page objects, adapters, and config
 
-- `graph-driven.spec.ts` — auth shortest paths
-- `purchase-graph-driven.spec.ts` — purchase shortest paths
-- `coverage-loop.spec.ts` — coverage-loop experiments (stub)
+##### tests/support/actions/ (3 files) - Event-to-action bindings
 
-### tests/
+- `app-auth.actions.ts`
+- `app-purchase.actions.ts`
+- `stub-actions.ts`
 
-- `fixtures.ts` — Playwright custom fixtures (stub vs app wiring)
+##### tests/support/app/ (1 file) - App-specific helpers
 
-## Root configs
+- `overlays.ts`
 
-- `package.json`, `tsconfig.json`, `playwright.config.ts`, `README.md`, `.prettierrc.json`
+##### tests/support/config/ (2 files) - Runtime test config loaders
+
+- `app-credentials.ts`
+- `app-product.ts`
+
+##### tests/support/pages/ (8 files) - Page objects and state assertions
+
+- `cart.page.ts`
+- `checkout.page.ts`
+- `home.page.ts`
+- `login.page.ts`
+- `my-account.page.ts`
+- `page-fixtures.ts`
+- `pdp.page.ts`
+- `state-verifier.ts`
+
+#### tests/ (1 file) - Shared Playwright fixtures
+
+- `fixtures.ts`
+
+### docs/ (15 files) - Current project documentation
+
+- `ARCHITECTURE.md`
+- `ASSUMPTIONS.md`
+- `CODEMAP.md`
+- `CONTEXT.md`
+- `DEPENDENCIES.md`
+- `TECHSTACK.md`
+- `TODO.md`
+- `exploration-loop-investigation.md`
+
+#### docs/PATTERNS/ (7 files) - Reusable patterns
+
+- `CHANGES.md`
+- `INDEX.md`
+- `action-map.md`
+- `config-loader.md`
+- `machine-model.md`
+- `page-object.md`
+- `test-spec.md`
+
+### agents/ (2 files) - Rosetta memory and implementation log
+
+- `IMPLEMENTATION.md`
+- `MEMORY.md`
