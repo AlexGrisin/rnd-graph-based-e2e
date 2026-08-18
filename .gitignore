@@ -4,6 +4,9 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /dist/
+
+# Exploration run outputs (graph/report/evidence + transient agent channel)
+/artifacts/
 .env
 .env.*
 !.env.example

@@ -31,6 +31,17 @@ export default defineConfig({
       name: 'app',
       testMatch: /\/(graph-driven|purchase-graph-driven)\.spec\.ts/,
     },
+    {
+      // Browser-free: exercises the exploration telemetry core (src/exploration).
+      name: 'exploration',
+      testMatch: /\/exploration\/.*\.spec\.ts/,
+    },
+    {
+      // Live: drives real Chromium against BASE_URL via the PlaywrightHost.
+      // Run explicitly: npm test -- --project=exploration-live
+      name: 'exploration-live',
+      testMatch: /\/exploration-live\/.*\.spec\.ts/,
+    },
   ],
   tsconfig: './tsconfig.json',
 });

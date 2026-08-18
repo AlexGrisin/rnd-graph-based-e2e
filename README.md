@@ -50,17 +50,26 @@ src/
   mbt/
     graph/              # Path generation, labeling, testPath executor
     runner/             # MbtRunner (optional bulk execution API)
+  exploration/        # Autonomous-exploration core (browser-independent, no Playwright imports)
 
 tests/
   mbt/
     graph-driven.spec.ts            # Auth graph — one test per shortest path
     purchase-graph-driven.spec.ts   # Purchase graph — home→pdp→cart→checkout
+  exploration/                      # Browser-free exploration specs + in-memory fixture site
+  exploration-live/                 # Live exploration specs (real Chromium against BASE_URL)
   fixtures.ts                       # Playwright fixtures (stub vs live)
   support/
     actions/                        # Event → page method adapters
     pages/                          # Page objects + should*() assertions per state
     app/                            # Site-specific overlay helpers
     config/                         # Credentials + PRODUCT_PATH
+    exploration/                    # Live PlaywrightHost + file-channel decider
+
+config/
+  app-context.md      # Authored per-app profile fed to the exploration decider
+.claude/commands/
+  explore.md          # /explore <target> agent-driven exploration command
 ```
 
 | Layer             | Location                         | Role                                                                 |
@@ -514,6 +523,59 @@ sequenceDiagram
 | `npm run test:mbt` | Run MBT specs only          |
 | `npm run test:app` | Live app E2E project        |
 | `npm run test:ui`  | Playwright UI mode          |
+
+## Autonomous exploration (POC)
+
+A second, **independent** subsystem (it does not reuse the MBT engine). Given only a **semantic target** — an intent such as `pdp`, `cart`, or `guest checkout`, never a URL — an agent explores the live storefront (`BASE_URL`), records a state/transition graph plus telemetry, and emits a report. Entry page, budget, safety policy, and stop conditions are all internal defaults; the target is the entire contract.
+
+The loop lives in `src/exploration/coordinator.ts` (`explore()`): resolve intent → open entry → observe → decide → consequence/scope gate → act or skip → record → continue/backtrack → stop with an explicit reason.
+
+### Two run modes
+
+| Mode         | Decider            | How it drives                                                          |
+| ------------ | ------------------ | ---------------------------------------------------------------------- |
+| Autonomous   | `HeuristicDecider` | Deterministic action ranking; self-driving, no LLM                     |
+| Agent-driven | `AgentDecider`     | The in-session Claude Code loop chooses each action via a file channel |
+
+There is **no AI SDK or API key**. In agent mode, a Node/Playwright loop writes `request.json` (candidate actions) and blocks polling for `response.json`; the in-session agent supplies each `{ actionId, rationale }`. The `/explore <target>` slash command (`.claude/commands/explore.md`) launches this run and drives every decision.
+
+### Safety
+
+Safety is **enforced in code, not delegated to the LLM**. `consequence-policy.ts` flags order/payment/account/destructive/personal-data/communication-send/content-publish actions, and off-origin navigations are treated as scope exits. Whatever the decider picks, the coordinator gates it — a consequential action is recorded as a skipped boundary, never executed, and the run never pauses for input. So an agent can explore freely for coverage without being able to cross a boundary.
+
+### Telemetry & artifacts
+
+Signals are captured passively (`pageError`, `consoleError`, `requestFailed`, `httpError`) and actively (`errorShown` — visible error UI after an action). Each is classified **first-party** (site domain) vs **third-party** (external vendor); the report separates site issues from vendor noise, and consent/overlay vendor noise is filtered out entirely. Issues are deduped by message with a total count and an affected-transitions tally.
+
+Each run writes to `artifacts/exploration/<run-id>/` (git-ignored): `manifest.json`, `routes.json`, `graph.json`, `errors.json`, `issues.json`, `report.md`, and `evidence/` screenshots.
+
+### Key files
+
+| File                                                | Role                                                        |
+| --------------------------------------------------- | ----------------------------------------------------------- |
+| `src/exploration/coordinator.ts`                    | The exploration loop (`explore()`)                          |
+| `src/exploration/decider.ts`                        | `HeuristicDecider` + `AgentDecider` seam                    |
+| `src/exploration/consequence-policy.ts`             | Site-agnostic safety rules                                  |
+| `src/exploration/recorder.ts` / `issues.ts`         | Step/graph/signal recording + issue dedup                   |
+| `src/exploration/report.ts`                         | `report.md` + full artifact set                             |
+| `tests/support/exploration/playwright-host.ts`      | Live `PlaywrightHost` (only component touching a real site) |
+| `tests/support/exploration/file-channel-decider.ts` | Keyless "LLM in the loop" via request/response files        |
+| `config/app-context.md`                             | Authored per-app profile passed as `appContext`             |
+
+### Running
+
+```bash
+# Browser-free exploration suite (unit-tests the core, no browser)
+npm test -- --project=exploration
+
+# Live autonomous run against BASE_URL (heuristic; real Chromium)
+npm test -- --project=exploration-live
+
+# Agent-driven run (you make each decision live)
+/explore pdp        # Claude Code slash command
+```
+
+`src/exploration/` stays Playwright-free (like `src/machines/`), so the whole telemetry core is testable without a browser. No new npm dependencies were added (`node:crypto` only, deliberately no schema library).
 
 ## Design constraints
 

@@ -12,13 +12,17 @@ Proof of concept for **model-based testing (MBT)**: application behavior is an X
 npm install
 npx playwright install chromium     # required before the `app` project can run
 
-npm test                            # both projects (stub + app)
+npm test                            # both MBT projects (stub + app)
 npm test -- --project=stub          # fast graph/wiring smoke — mock page, no browser, log-only actions
 npm test -- --project=app           # live E2E against BASE_URL (Chromium) — needs APP_EMAIL/APP_PASSWORD
 npm run test:mbt                    # specs under tests/mbt only
 npm run test:ui                     # Playwright UI mode
 npm run format                      # prettier --write
 npm run format:check                # prettier --check (CI gate)
+
+npm test -- --project=exploration       # browser-free autonomous-exploration core (no browser)
+npm test -- --project=exploration-live  # live heuristic exploration run against BASE_URL (Chromium)
+# /explore <target>                     # Claude Code slash command — agent-driven live run
 ```
 
 Run a **single** generated test by `--grep` on its auto-generated title (format: `→ <targetState>: <EVENT> → <EVENT>`):
@@ -92,6 +96,21 @@ Then `npm test -- --project=stub` confirms new paths generate. No edit to `graph
 - `workers: 1`, `fullyParallel: false` — MBT paths are stateful and run sequentially.
 - `src/machines/` stays pure (no Playwright imports) so the model is testable/serializable independent of the browser.
 - Coverage model is `getShortestPaths` — one minimal path per reachable state. For non-shortest or named journeys, use `getPathsFromEvents` (resolves an explicit event list into a path, validated by the graph) — see README "Specific journeys when needed". For exhaustive coverage, extend `src/mbt/graph/path-generator.ts` (e.g. `getSimplePaths`).
+
+## Autonomous exploration (second, independent subsystem)
+
+A separate subsystem from the MBT engine — they share no runtime code. Given only a **semantic target** (e.g. `pdp`, `cart`, `guest checkout`, never a URL), an agent explores the live storefront (`BASE_URL`), records a state/transition graph + telemetry, and emits a report. Entry, budget, safety policy, and stop conditions are internal defaults; the target is the whole input.
+
+Where it lives:
+
+- `src/exploration/` — pure, browser-independent core. **Must stay Playwright-free** (like `src/machines/`); import extensions are `.js` (ESM/NodeNext). `coordinator.ts` (`explore()`) is the loop; `decider.ts` is the choice seam; `consequence-policy.ts`/scope is the safety gate; `recorder.ts`/`graph.ts`/`issues.ts` are telemetry; `report.ts` writes artifacts.
+- `tests/support/exploration/` — `playwright-host.ts` (live `PlaywrightHost`, the only component that touches a real site) + `file-channel-decider.ts` (keyless LLM-in-the-loop via request/response JSON).
+- `tests/exploration/` (browser-free `exploration` project) and `tests/exploration-live/` (live `exploration-live` project).
+- `.claude/commands/explore.md` — the `/explore <target>` command. `.claude/commands/onboard-site.md` — the `/onboard-site <base-url>` command that recons a new target (robots/sitemap/cookie tech) and settles harness context. `config/app-context.md` — authored per-app profile passed to the decider as `appContext` (currently Beaverbrooks).
+
+Two run modes: **autonomous** (`HeuristicDecider`, self-driving) via `--project=exploration-live`; **agent-driven** (`AgentDecider`, in-session LLM via the file channel) via `/explore`. No AI SDK or API key.
+
+Safety is enforced **in code**, not by the LLM: the coordinator gates every chosen action through the consequence policy and on-origin scope regardless of what the decider picked, so an agent cannot cross a boundary — consequential actions are recorded as skipped, never executed. Run artifacts land in `artifacts/exploration/<run-id>/` (gitignored). No new npm deps (`node:crypto`, no schema library).
 
 ## Environment
 
