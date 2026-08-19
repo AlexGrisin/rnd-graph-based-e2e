@@ -32,15 +32,11 @@ export default defineConfig({
       testMatch: /\/(graph-driven|purchase-graph-driven)\.spec\.ts/,
     },
     {
-      // Browser-free: exercises the exploration telemetry core (src/exploration).
+      // Browser-free: exercises the exploration telemetry core (src/exploration)
+      // + the guardrail generator and post-hoc trace parser. The agent-driven
+      // live run is /explore (Playwright MCP), not a Playwright project.
       name: 'exploration',
       testMatch: /\/exploration\/.*\.spec\.ts/,
-    },
-    {
-      // Live: drives real Chromium against BASE_URL via the PlaywrightHost.
-      // Run explicitly: npm test -- --project=exploration-live
-      name: 'exploration-live',
-      testMatch: /\/exploration-live\/.*\.spec\.ts/,
     },
   ],
   tsconfig: './tsconfig.json',

@@ -36,7 +36,8 @@ Style: concise, factual, grep-friendly, no implementation changelog.
 - Shortest path: the minimum event sequence needed to reach a reachable journey state.
 - Coverage loop: iterative generation of paths for uncovered states or transitions until a target or budget is reached.
 - Exploration target: the single semantic input to an autonomous run (an intent such as `pdp` or `guest checkout`), not a URL; everything else is an internal default.
-- Decider: the pluggable "decide" step that chooses the next action — heuristic (deterministic ranking, self-driving) or agent (LLM-driven, in-session via a file channel).
-- Consequence policy: site-agnostic rules that flag order/payment/account/destructive/personal-data actions so the run skips and records them instead of executing.
+- Exploration driver: the in-session agent (Claude) drives Microsoft's Playwright MCP directly — observe (snapshot) → reason → act, one action per step — with tracing on; a post-hoc parser turns the recorded trace into the artifacts. (This replaced an earlier decider seam with heuristic/agent modes and a file channel.)
+- Consequence policy: site-agnostic rules that flag consequential actions (e.g. order, payment, purchase, personal-data, destructive, send, publish; login/sign-up/register are intentionally not flagged); their patterns feed the page-side guardrail (which neutralizes such controls) and the trace parser (which records them as skipped boundaries).
+- Guardrail: a page-side init-script injected into every page that dismisses the consent overlay and neutralizes consequential controls; safety is enforced here rather than in a tool gate, since the agent calls the browser directly.
 - First-/third-party signal: a telemetry signal classified by whether it originated on the site's own domain (first-party) or an external vendor (third-party).
-- appContext: an app profile (auto-derived structure + authored notes) handed to the decider so it can navigate to the target efficiently and honor known prerequisites.
+- appContext: an app profile (auto-derived structure + authored notes) that grounds the exploring agent so it can navigate to the target efficiently and honor known prerequisites.

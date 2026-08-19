@@ -7,7 +7,6 @@ import type {
   Manifest,
   SignalEvent,
 } from './types.js';
-import type { CoverageHints } from './sitemap.js';
 
 export type RunArtifacts = {
   manifest: Manifest;
@@ -15,7 +14,6 @@ export type RunArtifacts = {
   edges: GraphEdge[];
   issues: Issue[];
   signalEvents: SignalEvent[];
-  hints?: CoverageHints;
 };
 
 /**
@@ -23,7 +21,7 @@ export type RunArtifacts = {
  * timestamps or FS — so it is unit-testable without writing anything.
  */
 export function renderReport(a: RunArtifacts): string {
-  const { manifest, nodes, edges, issues } = a;
+  const { manifest, edges, issues } = a;
   const bugs = issues.filter((i) => i.potentialBug);
   const skipped = edges.filter((e) => e.skipped);
 
@@ -34,19 +32,6 @@ export function renderReport(a: RunArtifacts): string {
   lines.push(`- **Site:** ${manifest.baseUrl}`);
   lines.push(`- **Completion:** ${manifest.completionReason ?? 'unknown'}`);
   lines.push('');
-  lines.push('## Coverage');
-  lines.push('');
-  lines.push(`- States discovered: **${manifest.nodeCount}**`);
-  lines.push(`- Transitions recorded: **${manifest.edgeCount}**`);
-  lines.push(`- Consequence boundaries skipped: **${manifest.skippedCount}**`);
-  lines.push(`- Steps taken: **${manifest.totalSteps}**`);
-  if (a.hints) {
-    lines.push(
-      `- Sitemap hints: ${a.hints.urls.length} URLs (${a.hints.productUrls.length} product-like)${a.hints.truncated ? ', truncated' : ''}`,
-    );
-  }
-  lines.push('');
-
   // Third-party (external vendor) issues are separated from site issues so
   // real first-party problems aren't buried under analytics/CDN noise. Issues
   // with no party attribution are treated as site issues.
@@ -105,13 +90,6 @@ export function renderReport(a: RunArtifacts): string {
     lines.push('');
   }
 
-  lines.push('## States');
-  lines.push('');
-  for (const n of nodes) {
-    lines.push(`- \`${shortId(n.id)}\` — ${n.url} (${n.actionCount} actions)`);
-  }
-  lines.push('');
-
   return lines.join('\n');
 }
 
@@ -136,10 +114,6 @@ function truncate(s: string, max: number): string {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
 }
 
-function shortId(id: string): string {
-  return id.slice(0, 8);
-}
-
 function escapePipes(s: string): string {
   return s.replace(/\|/g, '\\|');
 }
@@ -161,7 +135,6 @@ export async function writeArtifacts(
     ['errors.json', json(a.signalEvents)],
     ['report.md', renderReport(a)],
   ];
-  if (a.hints) files.push(['routes.json', json(a.hints)]);
 
   const written: string[] = [];
   for (const [name, content] of files) {

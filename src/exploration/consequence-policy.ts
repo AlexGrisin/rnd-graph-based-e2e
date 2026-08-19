@@ -24,7 +24,10 @@ const RULES: ReadonlyArray<{ re: RegExp; reason: string }> = [
     reason: 'payment',
   },
   { re: /\b(buy now|purchase now)\b/, reason: 'purchase' },
-  { re: /\b(create account|sign up|register)\b/, reason: 'account creation' },
+  // Login / sign up / register are intentionally NOT blocked — auth flows are
+  // worth exploring. (Completing a real registration on a live site is bounded
+  // by the skill prompt, not this gate.) Deleting/closing an account IS blocked
+  // below as a destructive action.
   {
     re: /\b(delete|remove account|close account)\b/,
     reason: 'destructive action',
@@ -46,6 +49,22 @@ const RULES: ReadonlyArray<{ re: RegExp; reason: string }> = [
     reason: 'content publish',
   },
 ];
+
+/**
+ * The consequence rules as serializable pattern sources, so a page-side guardrail
+ * script can reconstruct the same matchers via `new RegExp(source, flags)`. This
+ * keeps the browser-injected neutralization list in lockstep with the semantics
+ * used everywhere else (report boundary marking, trace parsing).
+ */
+export const CONSEQUENCE_PATTERNS: ReadonlyArray<{
+  source: string;
+  flags: string;
+  reason: string;
+}> = RULES.map((r) => ({
+  source: r.re.source,
+  flags: r.re.flags.includes('i') ? r.re.flags : `${r.re.flags}i`,
+  reason: r.reason,
+}));
 
 export function classifyConsequence(action: VisibleAction): ConsequenceVerdict {
   if (action.consequential) {

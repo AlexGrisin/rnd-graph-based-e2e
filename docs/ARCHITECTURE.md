@@ -27,10 +27,9 @@ src/mbt/graph/        -> graph traversal, path labels, coverage tracking, path e
 src/mbt/runner/       -> high-level MBT runner API
 src/exploration/      -> browser-independent autonomous-exploration core (no Playwright imports)
 tests/support/        -> Playwright page objects, action maps, app helpers, runtime config loaders
-tests/support/exploration/ -> live PlaywrightHost + file-channel decider
+tests/support/exploration/ -> guardrail-script generator + post-hoc trace parser
 tests/mbt/            -> generated-path Playwright specs
-tests/exploration/    -> browser-free exploration specs
-tests/exploration-live/ -> live exploration specs (real Chromium against BASE_URL)
+tests/exploration/    -> browser-free exploration specs (core, guardrail, trace parser) + parse-run runner
 ```
 
 ## Journey Models
@@ -59,26 +58,25 @@ tests/exploration-live/ -> live exploration specs (real Chromium against BASE_UR
 ## Autonomous Exploration
 
 - A second, independent subsystem: given only a **semantic target** (e.g. `pdp`, `cart`, `guest checkout`), an agent explores the live storefront, records a state/transition graph plus telemetry, and emits a report. It does not reuse the MBT engine — the two coexist and share no runtime code.
-- `coordinator.ts` (`explore()`) runs the loop: resolve intent → open entry → observe → decide → consequence/scope gate → act or skip → record → continue/backtrack → stop with an explicit reason. It owns internal defaults (budget, entry, stop conditions); the single required input is the target.
-- **Decider seam** (`decider.ts`): the coordinator delegates action _choice_ to a `Decider`. `HeuristicDecider` is a deterministic baseline (ranks candidates via `action-ranker.ts`); `AgentDecider` fulfils each choice from an LLM via a `chooseFn`. No AI SDK or API key is used — in agent mode the in-session Claude Code loop supplies decisions through a file channel.
-- **Host boundary** (`host.ts`): `ExplorationHost` is an MCP-shaped `open`/`act` (+ optional `screenshot`/`close`) interface — the only browser seam. Tests drive an in-memory `FixtureHost`; live runs drive `tests/support/exploration/playwright-host.ts` (`PlaywrightHost`), the only component that touches a real site (navigation, ARIA snapshot, action extraction, visible-error detection, console/network/page signal capture, overlay dismissal, overlay-aware clicking, differentiated settle waits, screenshot evidence).
-- **Recorder/telemetry** (`recorder.ts`, `graph.ts`, `issues.ts`): `SessionRecorder` owns step counting, state identity (SHA-256 of normalized ARIA in `hash.ts`), dedup, signal correlation, and the run manifest. `IssueLog` keeps a raw event stream (→ `errors.json`) and message-level deduped issues (→ `issues.json`) with total `count` and distinct-`transitions` tallies, promoting bug-worthy kinds.
-- **Signals**: passive (`pageError`, `consoleError`, `requestFailed`, `httpError`) and active (`errorShown` visible-error UI). Each is classified first-party vs third-party (`signal-origin.ts`); reports separate site issues from external-vendor noise, and consent/overlay vendor noise is filtered out entirely.
-- **Safety is enforced in code, not delegated to the LLM**: `consequence-policy.ts` flags order/payment/account/destructive/personal-data/communication-send/content-publish actions, and off-origin navigations are scope exits. The coordinator gates every chosen action through this policy regardless of what the decider picked, so an agent cannot bypass a boundary. Consequential actions are recorded as skipped boundaries, never executed; the run never pauses for input.
-- **App context** (`app-profile.ts`): `deriveAppProfile` builds a structural profile from the homepage links + sitemap; `buildAppContext` merges it with authored notes from `config/app-context.md`, passed to the decider as `appContext`.
-- **Coverage hints** (`sitemap.ts`): a bounded robots/sitemap loader seeds the entry page only. Hints are advisory and never gate navigation.
-- **Run modes**: autonomous (heuristic, self-driving) via `explore.live.spec.ts`; agent-driven via `agent.live.spec.ts` + the file channel, invoked by the `/explore <target>` Claude Code slash command (`.claude/commands/explore.md`).
-- **Artifacts** per run under `artifacts/exploration/<run-id>/` (gitignored): `manifest.json`, `routes.json`, `graph.json`, `errors.json`, `issues.json`, `report.md`, and `evidence/` screenshots.
-- `src/exploration/` stays pure (no Playwright/browser imports), like `src/machines/`, so the whole telemetry core is unit-testable without a browser. No new npm dependencies — uses `node:crypto`, deliberately no runtime schema library.
+- **Driving**: the in-session agent (Claude) drives **Microsoft's Playwright MCP** (`@playwright/mcp`, registered in `.mcp.json`) directly: `browser_navigate` → `browser_snapshot` → reason → `browser_click`/`type`/`select`, with tracing on. The agent owns the loop (no Node coordinator); the budget (10 acting steps / 15 states, POC) is prompt-enforced by the `/explore` skill. There is no AI SDK or API key — the LLM is the session.
+- **Recording** (post-hoc): `tests/support/exploration/trace-parser.ts` is the only component that reads a real trace. It reads the raw, uncompressed `trace-<ts>.trace` the MCP writes (the skill picks the newest one, never the possibly-stale `trace.zip`; `unzip` is a fallback only for a bundled `.zip`), parses the line-ordered stream, and feeds the pure core (`SessionRecorder`/`report.ts`) to emit the artifacts. Layer split: `extractTrace` (path → `TraceModel`) and `traceModelToArtifacts` (pure transform), so the transform is unit-testable without a browser. Invoked via `tests/exploration/parse-run.spec.ts`.
+- **Recorder/telemetry** (`recorder.ts`, `graph.ts`, `issues.ts`): `SessionRecorder` owns step counting, state identity (SHA-256 of a normalized snapshot in `hash.ts`), dedup, signal correlation, and the run manifest. `IssueLog` keeps a raw event stream (→ `errors.json`) and message-level deduped issues (→ `issues.json`) with total `count` and distinct-`transitions` tallies, promoting bug-worthy kinds.
+- **Signals**: derived from the trace's console stream — `consoleError`, plus `httpError`/`requestFailed` (network 4xx/failures mirror into console) and `pageError`. Each is classified first-party vs third-party (`signal-origin.ts`); reports separate site issues from external-vendor noise.
+- **Safety is a page-side guardrail**, not a code-enforced tool gate (the agent calls `browser_click` directly, so it cannot be wrapped): `tests/support/exploration/guardrails.ts` generates an init-script (loaded via the MCP `--init-script`) that neutralizes the consequential controls in `consequence-policy.ts`'s shared patterns (e.g. order, payment, purchase, personal-data, destructive, send, publish; login/sign-up/register are deliberately not blocked) — and dismisses the consent overlay. The parser also marks consequential actions as skipped boundaries in the report. This is weaker than the retired in-code gate; a deliberate trade (see `ai-exploratory-architecture.md` → "Key decisions").
+- **App context**: the exploring agent is grounded by the authored `config/app-context.md` (page types, URL shapes, key flows, prerequisites). (The earlier auto-derive/merge helper `app-profile.ts` and the `intent-map.ts` resolver were pruned — coordinator-era code unused by the MCP flow.)
+- **Site data as context, not code** (`config/guardrails/<site>.json`): overlay selectors + extra consequential names parameterize the guardrail generator; adding a site is authoring data, not code.
+- **Entry**: every run starts from `BASE_URL` (the homepage) and the agent navigates to the target **on-page** (nav / categories / tiles), so the routing between pages is exercised and recorded — it never deep-links past it. `config/app-context.md` guides the route. (The earlier structured robots/sitemap loader, `sitemap.ts`, was pruned.)
+- **Run mode**: one — agent-driven via the `/explore <target>` Claude Code slash command (`.claude/commands/explore.md`), driving Playwright MCP. (The earlier self-driving heuristic mode, `PlaywrightHost`, decider seam, and file channel were removed — see `docs/ai-exploratory-architecture.md` → "Key decisions".)
+- **Artifacts** per run under `artifacts/exploration/<run-id>/` (gitignored): `manifest.json`, `graph.json`, `errors.json`, `issues.json`, `report.md`, and `evidence/`.
+- `src/exploration/` stays pure (no Playwright/browser imports), like `src/machines/`, so the telemetry core is unit-testable without a browser. The migration adds `@playwright/mcp` (via `npx`); the system `unzip` is used only as a fallback for a bundled `trace.zip` (the normal path reads the raw `.trace`). No runtime schema library.
 
 ## Test Suites
 
 - `graph-driven.spec.ts`: one Playwright test per auth shortest path.
 - `purchase-graph-driven.spec.ts`: one Playwright test per purchase shortest path.
 - `coverage-loop.spec.ts`: stub-only coverage-loop scenarios for default coverage, personas, weights, state priority, and budget exhaustion.
-- `tests/exploration/` (`exploration` project): browser-free `recorder.spec.ts` + `coordinator.spec.ts` exercising the exploration core against an in-memory fixture site.
-- `tests/exploration-live/` (`exploration-live` project): live runs against `BASE_URL` in real Chromium — `explore.live.spec.ts` (autonomous heuristic) and `agent.live.spec.ts` (agent-driven via file channel). Run explicitly.
-- Playwright config uses one worker, disables full parallelism, traces on first retry, and defines `stub`, `app`, `exploration`, and `exploration-live` projects.
+- `tests/exploration/` (`exploration` project): browser-free specs exercising the exploration core, the guardrail generator, and the trace parser — `recorder.spec.ts`, `guardrails.spec.ts`, `trace-parser.spec.ts` — plus `parse-run.spec.ts` (a runner, skipped unless `EXPLORE_TRACE` is set). Live exploration is the `/explore` slash command (Playwright MCP), not a Playwright project.
+- Playwright config uses one worker, disables full parallelism, traces on first retry, and defines `stub`, `app`, and `exploration` projects.
 - Live `app` runs are fail-fast at the test-result level: an observed storefront failure fails that run immediately.
 
 ## Contributor Patterns

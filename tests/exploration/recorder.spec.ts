@@ -6,17 +6,11 @@ import {
   IssueLog,
   ObservedGraph,
   SessionRecorder,
-  buildAppContext,
   classifyParty,
-  defaultIsProductUrl,
-  deriveAppProfile,
   hashState,
-  loadCoverageHints,
   registrableDomain,
   renderReport,
-  resolveIntent,
   writeArtifacts,
-  type FetchText,
   type Observation,
 } from '../../src/exploration/index.js';
 
@@ -73,78 +67,6 @@ test.describe('hashing', () => {
     );
     expect(b.id).toBe(a.id);
     expect(g.stats().nodeCount).toBe(1);
-  });
-});
-
-test.describe('intent resolution', () => {
-  test('maps semantic targets to entry strategies', () => {
-    expect(resolveIntent('explore pdp').strategy.kind).toBe('sitemapProduct');
-    expect(resolveIntent('explore cart').strategy.kind).toBe(
-      'addToCartThenCart',
-    );
-    expect(resolveIntent('explore guest checkout').strategy.kind).toBe(
-      'cartThenCheckoutGuest',
-    );
-    expect(resolveIntent('explore search flows').strategy.kind).toBe(
-      'homeSearch',
-    );
-  });
-
-  test('unknown targets fall back to homepage biased by keywords', () => {
-    const r = resolveIntent('explore wishlist gifting');
-    expect(r.strategy.kind).toBe('homepageBiased');
-    expect(r.keywords).toEqual(['wishlist', 'gifting']);
-  });
-});
-
-test.describe('app profile', () => {
-  test('derives page families from homepage links + sitemap', () => {
-    const root = obs('https://shop.test/en', 'heading Home', [
-      {
-        id: 'a',
-        role: 'link',
-        name: 'Men',
-        kind: 'navigate',
-        href: '/shop/men',
-      },
-      {
-        id: 'b',
-        role: 'link',
-        name: 'Jeans',
-        kind: 'navigate',
-        href: '/shop/men/jeans',
-      },
-      {
-        id: 'c',
-        role: 'link',
-        name: 'Help',
-        kind: 'navigate',
-        href: '/customer-service',
-      },
-      {
-        id: 'd',
-        role: 'link',
-        name: 'IG',
-        kind: 'navigate',
-        href: 'https://instagram.com/x',
-      },
-    ]);
-    const profile = deriveAppProfile('https://shop.test/en', root);
-    expect(profile).toContain('Site origin: https://shop.test');
-    expect(profile).toContain('/shop/men');
-    expect(profile).toContain('/customer-service');
-    expect(profile).not.toContain('instagram'); // off-origin excluded
-  });
-
-  test('buildAppContext merges authored notes ahead of derived structure', () => {
-    const merged = buildAppContext(
-      'AUTHORED RULES',
-      '# Auto-derived structure',
-    );
-    expect(merged.indexOf('AUTHORED RULES')).toBeLessThan(
-      merged.indexOf('Auto-derived'),
-    );
-    expect(buildAppContext(undefined, 'D')).toBe('D');
   });
 });
 
@@ -375,7 +297,7 @@ test.describe('report', () => {
     });
 
     expect(md).toContain('# Exploration report — explore pdp');
-    expect(md).toContain('States discovered: **2**');
+    expect(md).toContain('## Potential issues');
     expect(md).toContain('pageError');
     expect(md).toContain('targetCovered');
   });
@@ -414,57 +336,5 @@ test.describe('report', () => {
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
-  });
-});
-
-test.describe('sitemap hints (injected fetch, offline)', () => {
-  test('parses robots + sitemap and classifies product URLs', async () => {
-    const fixtures: Record<string, string> = {
-      'https://shop.test/robots.txt':
-        'User-agent: *\nSitemap: https://shop.test/sitemap.xml',
-      'https://shop.test/sitemap.xml': `
-        <urlset>
-          <url><loc>https://shop.test/shop/jeans-1234</loc></url>
-          <url><loc>https://shop.test/about</loc></url>
-        </urlset>`,
-    };
-    const fetchText: FetchText = async (url) => {
-      const body = fixtures[url];
-      if (body === undefined) throw new Error(`404 ${url}`);
-      return body;
-    };
-
-    const hints = await loadCoverageHints('https://shop.test/', { fetchText });
-    expect(hints.urls).toContain('https://shop.test/shop/jeans-1234');
-    expect(hints.productUrls).toEqual(['https://shop.test/shop/jeans-1234']);
-    expect(hints.errors).toHaveLength(0);
-  });
-
-  test('product-URL heuristic matches /p-suffix and id-segment PDPs', () => {
-    // Beaverbrooks PDP shape: /<id>/<name>/p
-    expect(
-      defaultIsProductUrl(
-        'https://www.beaverbrooks.co.uk/0149753/18ct-Gold-Ring/p',
-      ),
-    ).toBe(true);
-    // g-star shape: /shop/.../<code>
-    expect(
-      defaultIsProductUrl('https://www.g-star.com/en_nl/shop/men/jeans-1234'),
-    ).toBe(true);
-    // Category / listing pages are not products.
-    expect(
-      defaultIsProductUrl(
-        'https://www.beaverbrooks.co.uk/watches/gold-watches/mens-watches',
-      ),
-    ).toBe(false);
-  });
-
-  test('missing robots/sitemap degrades without throwing', async () => {
-    const fetchText: FetchText = async (url) => {
-      throw new Error(`unreachable ${url}`);
-    };
-    const hints = await loadCoverageHints('https://shop.test/', { fetchText });
-    expect(hints.urls).toHaveLength(0);
-    expect(hints.errors.length).toBeGreaterThan(0);
   });
 });

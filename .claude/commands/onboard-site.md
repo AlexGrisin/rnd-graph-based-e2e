@@ -74,7 +74,7 @@ Change these **only if** the site differs from the current defaults:
   phone/postcode/city/street for the site's country so form fills validate.
 - **⚠️ Language** — if the UI is **not English**, `consequence-policy.ts` `RULES`
   (and intent keywords) are English-pattern based and will **miss consequential
-  buttons** — a safety gap. Localize the order/pay/account/etc. terms first.
+  buttons** — a safety gap. Localize the order/pay/delete/etc. terms first.
 
 Leave `src/exploration/*` logic otherwise untouched — party classification,
 sitemap loading, and app-profile derive from `BASE_URL` automatically.

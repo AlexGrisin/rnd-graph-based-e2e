@@ -20,9 +20,8 @@ npm run test:ui                     # Playwright UI mode
 npm run format                      # prettier --write
 npm run format:check                # prettier --check (CI gate)
 
-npm test -- --project=exploration       # browser-free autonomous-exploration core (no browser)
-npm test -- --project=exploration-live  # live heuristic exploration run against BASE_URL (Chromium)
-# /explore <target>                     # Claude Code slash command — agent-driven live run
+npm test -- --project=exploration       # browser-free exploration core + guardrail + trace parser (no browser)
+# /explore <target>                     # Claude Code slash command — agent-driven live run via Playwright MCP
 ```
 
 Run a **single** generated test by `--grep` on its auto-generated title (format: `→ <targetState>: <EVENT> → <EVENT>`):
@@ -99,22 +98,24 @@ Then `npm test -- --project=stub` confirms new paths generate. No edit to `graph
 
 ## Autonomous exploration (second, independent subsystem)
 
-A separate subsystem from the MBT engine — they share no runtime code. Given only a **semantic target** (e.g. `pdp`, `cart`, `guest checkout`, never a URL), an agent explores the live storefront (`BASE_URL`), records a state/transition graph + telemetry, and emits a report. Entry, budget, safety policy, and stop conditions are internal defaults; the target is the whole input.
+A separate subsystem from the MBT engine — they share no runtime code. Given only a **semantic target** (e.g. `pdp`, `cart`, `guest checkout`, never a URL), an agent explores the live storefront (`BASE_URL`), records a state/transition graph + telemetry, and emits a report. Entry, budget, safety policy, and stop conditions are internal defaults; the input is the target plus an optional `:: <scope & risks>` note.
+
+The agent-driven run **drives Microsoft's Playwright MCP directly** (the in-session Claude is the LLM); a **post-hoc parser** turns the recorded trace into the artifacts. An earlier engine (Node `coordinator` loop, `PlaywrightHost`, `Heuristic`/`AgentDecider`, file channel, self-driving autonomous mode) was **removed** in favor of this — see `docs/ai-exploratory-architecture.md` → "Key decisions".
 
 Where it lives:
 
-- `src/exploration/` — pure, browser-independent core. **Must stay Playwright-free** (like `src/machines/`); import extensions are `.js` (ESM/NodeNext). `coordinator.ts` (`explore()`) is the loop; `decider.ts` is the choice seam; `consequence-policy.ts`/scope is the safety gate; `recorder.ts`/`graph.ts`/`issues.ts` are telemetry; `report.ts` writes artifacts.
-- `tests/support/exploration/` — `playwright-host.ts` (live `PlaywrightHost`, the only component that touches a real site) + `file-channel-decider.ts` (keyless LLM-in-the-loop via request/response JSON).
-- `tests/exploration/` (browser-free `exploration` project) and `tests/exploration-live/` (live `exploration-live` project).
-- `.claude/commands/explore.md` — the `/explore <target>` command. `.claude/commands/onboard-site.md` — the `/onboard-site <base-url>` command that recons a new target (robots/sitemap/cookie tech) and settles harness context. `config/app-context.md` — authored per-app profile passed to the decider as `appContext` (currently Beaverbrooks).
+- `src/exploration/` — pure, browser-independent core. **Must stay Playwright-free** (like `src/machines/`); import extensions are `.js` (ESM/NodeNext). `recorder.ts`/`graph.ts`/`issues.ts`/`hash.ts` are telemetry + state identity; `report.ts` writes artifacts; `consequence-policy.ts` holds the shared consequence patterns (`CONSEQUENCE_PATTERNS`); `signal-origin.ts` classifies first/third-party. Every run starts from `BASE_URL` (home) and the agent navigates to the target on-page (guided by `config/app-context.md`); it never deep-links past the routing. The coordinator-era `intent-map`/`app-profile`/`sitemap` helpers were pruned.
+- `tests/support/exploration/` — `guardrails.ts` (generates the page-side guardrail init-script) + `trace-parser.ts` (post-hoc trace → artifacts; the only component that reads a real trace; reads the raw uncompressed `.trace` directly, `unzip` only for a legacy `.zip`).
+- `tests/exploration/` (browser-free `exploration` project): `recorder.spec.ts`, `guardrails.spec.ts`, `trace-parser.spec.ts`, and `parse-run.spec.ts` (a runner, skipped unless `EXPLORE_TRACE` is set).
+- `.mcp.json` registers the `@playwright/mcp` server (isolated Chromium, `--caps=devtools` for tracing, `--init-script` guardrail). `.claude/commands/explore.md` — the `/explore <target>` command. `.claude/commands/onboard-site.md` — recons a new target. `config/app-context.md` — authored per-site profile that grounds the agent; `config/guardrails/<site>.json` — per-site guardrail data (+ generated `.init.js`). (There is currently **no cross-run learning store** — the former `config/app-context.learned.md` read/append was dropped; a replacement mechanism is TBD, so each run is self-contained.)
 
-Two run modes: **autonomous** (`HeuristicDecider`, self-driving) via `--project=exploration-live`; **agent-driven** (`AgentDecider`, in-session LLM via the file channel) via `/explore`. No AI SDK or API key.
+One run mode: **agent-driven** via `/explore`, driving Playwright MCP. No AI SDK or API key (the LLM is the session).
 
-Safety is enforced **in code**, not by the LLM: the coordinator gates every chosen action through the consequence policy and on-origin scope regardless of what the decider picked, so an agent cannot cross a boundary — consequential actions are recorded as skipped, never executed. Run artifacts land in `artifacts/exploration/<run-id>/` (gitignored). No new npm deps (`node:crypto`, no schema library).
+Safety is a **page-side guardrail**, not a code-enforced tool gate: the guardrail init-script neutralizes consequential controls (matched against `CONSEQUENCE_PATTERNS` — e.g. order, payment, purchase, personal-data, destructive, send, publish; login/sign-up/register are intentionally NOT blocked) and dismisses the consent overlay on every page; the parser also records consequential actions as skipped boundaries. The budget is prompt-enforced by the skill — 10 acting steps / 15 states (POC), declared once in the skill and mirrored by the parser's `STEP_BUDGET`/`STATE_BUDGET` (which only label completion `budgetExhausted` vs `targetCovered`). This is weaker than the retired in-code gate — a deliberate trade (see `docs/ai-exploratory-architecture.md` → "Key decisions"). Run artifacts land in `artifacts/exploration/<run-id>/` (gitignored). New dep: `@playwright/mcp` (via `npx`); the parser reads the raw `.trace` directly, using the system `unzip` only as a fallback for a bundled `.zip`.
 
 ## Environment
 
-`.env` (copy from `.env.example`): `BASE_URL` (default `https://www.g-star.com/en_nl`), `APP_EMAIL`, `APP_PASSWORD` (the latter two required for the `app` project). Loaded via `dotenv` in `playwright.config.ts`.
+`.env` (copy from `.env.example`): `BASE_URL` (default `https://www.g-star.com/en_nl`), `APP_EMAIL`, `APP_PASSWORD` (the latter two required for the `app` project). Loaded via `dotenv` in `playwright.config.ts`. `BB_EMAIL`/`BB_PASSWORD` are test-account credentials the `/explore` skill uses for real login / authenticated scenarios (optional — without them exploration does negative auth probes only). Treat them as secrets: never echo them into reports/debriefs or commit a trace (traces capture typed values and are git-ignored).
 
 ## Note on docs
 

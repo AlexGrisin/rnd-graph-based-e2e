@@ -6,3 +6,8 @@ blob-report/
 playwright/.cache/
 .playwright-mcp/
 package-lock.json
+
+# Generated guardrail init scripts (produced by buildGuardrailScript; format is
+# fixed by the generator and verified by tests/exploration/guardrails.spec.ts).
+config/guardrails/*.init.js
+artifacts/
