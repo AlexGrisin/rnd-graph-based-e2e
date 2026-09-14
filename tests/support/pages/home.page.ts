@@ -1,48 +1,58 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { dismissAppOverlays } from '../app/overlays.js';
 
+/** Beaverbrooks home is the bare origin — may render with or without a trailing slash. */
+export const isHomeUrl = (url: URL): boolean =>
+  url.pathname === '/' || url.pathname === '';
+
 export class HomePage {
   private readonly loginLink: Locator;
-  private readonly logoutLink: Locator;
+  private readonly myAccountLink: Locator;
 
   constructor(private readonly page: Page) {
-    const headerToolbar = page.getByRole('toolbar', { name: 'Header actions' });
-    this.loginLink = headerToolbar.getByRole('link', { name: 'login' });
-    this.logoutLink = page.getByRole('link', { name: /log out/i });
+    const header = page.locator('header');
+    this.loginLink = header.getByRole('link', { name: 'Sign in' }).first();
+    // Best-effort: not verified against a real signed-in session (no working
+    // test account was available). Adjust once a valid APP_EMAIL/APP_PASSWORD
+    // is confirmed to authenticate.
+    this.myAccountLink = header
+      .getByRole('link', { name: /my account/i })
+      .first();
   }
 
   async shouldBeOnPage(): Promise<void> {
-    await expect(this.page).toHaveURL(/\/en_nl\/?(\?.*)?$/);
+    await expect(this.page).toHaveURL(isHomeUrl);
+  }
+
+  /** Post-login home state: signed in, "My account" nav available. Unverified — see constructor note. */
+  async shouldBeSignedIn(): Promise<void> {
+    await expect(this.page).toHaveURL(isHomeUrl);
+    await expect(this.loginLink).toHaveCount(0);
+    await expect(this.myAccountLink).toBeVisible();
+  }
+
+  async openMyAccount(): Promise<void> {
+    await dismissAppOverlays(this.page);
+    await this.myAccountLink.click();
+    await this.myAccountLink.click();
+    await this.page.waitForURL(/\/my-account/, { timeout: 30_000 });
   }
 
   async goto(): Promise<void> {
     await this.page.goto('/');
     await dismissAppOverlays(this.page);
-    await this.page.waitForURL(/\/en_nl\/?(\?.*)?$/);
+    await this.page.waitForURL(isHomeUrl);
   }
 
   async openLogin(): Promise<void> {
-    await dismissAppOverlays(this.page);
-
-    const pathname = new URL(this.page.url()).pathname;
-    const onAccountDashboard = /\/account$/.test(pathname);
-    const onLoginPage = pathname.endsWith('/account/create');
-
-    if (onAccountDashboard) {
-      await this.logoutLink.click();
-      await this.page.waitForURL(/\/en_nl\/?(\?.*)?$/);
+    if (!isHomeUrl(new URL(this.page.url()))) {
+      await this.goto();
+    } else {
       await dismissAppOverlays(this.page);
     }
 
-    if (!onLoginPage || onAccountDashboard) {
-      if (!/\/en_nl\/?$/.test(pathname) || onAccountDashboard) {
-        await this.goto();
-      }
-
-      await this.loginLink.click();
-      await this.page.waitForURL(/\/account\/create/);
-    }
-
+    await this.loginLink.click();
+    await this.page.waitForURL(/\/login/);
     await dismissAppOverlays(this.page);
   }
 }

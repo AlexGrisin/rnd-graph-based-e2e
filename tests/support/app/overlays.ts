@@ -1,21 +1,14 @@
 import type { Page } from '@playwright/test';
 
-/** Dismiss OneTrust, push prompts, and Exponea modals that block interactions. */
+/** Dismiss the Cookiebot consent dialog that blocks interactions. */
 export async function dismissAppOverlays(page: Page): Promise<void> {
   await page.evaluate(() => {
-    document.getElementById('onetrust-accept-btn-handler')?.click();
-    document.querySelector('#onetrust-consent-sdk')?.remove();
-    document.querySelector('.onetrust-pc-dark-filter')?.remove();
     (
-      document.querySelector(
-        '.requestPushNotifications__rejectButton',
+      document.getElementById(
+        'CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll',
       ) as HTMLElement | null
     )?.click();
-    document.querySelector('.requestPushNotifications')?.remove();
-    document
-      .querySelectorAll(
-        '.exponea-subscription-dialog-overlay, .exponea-entrance-modal, [class*="exponea-subscription"]',
-      )
-      .forEach((el) => el.remove());
+    document.getElementById('CybotCookiebotDialog')?.remove();
+    document.getElementById('CybotCookiebotDialogBodyUnderlay')?.remove();
   });
 }

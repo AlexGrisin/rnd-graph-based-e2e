@@ -17,6 +17,10 @@ export function createAppAuthActions(pages: PageFixtures): ActionMap {
       ctx.log('FAIL');
       await pages.loginPage.failLogin();
     },
+    GO_MY_ACCOUNT: async (ctx: MbtContext) => {
+      ctx.log('GO_MY_ACCOUNT');
+      await pages.homePage.openMyAccount();
+    },
     LOGOUT: async (ctx: MbtContext) => {
       ctx.log('LOGOUT');
       await pages.myAccountPage.logout();

@@ -8,6 +8,7 @@ export type AppAuthEvent =
   | { type: 'GO_LOGIN' }
   | { type: 'SUBMIT' }
   | { type: 'FAIL' }
+  | { type: 'GO_MY_ACCOUNT' }
   | { type: 'LOGOUT' };
 
 export const appAuthMachine = setup({
@@ -31,10 +32,16 @@ export const appAuthMachine = setup({
     login: {
       on: {
         SUBMIT: {
-          target: 'myAccount',
+          target: 'homeAuth',
           actions: assign({ username: 'demo-user' }),
         },
         FAIL: 'error',
+      },
+    },
+    // Beaverbrooks redirects to home (signed in) after login; "My account" nav opens myAccount.
+    homeAuth: {
+      on: {
+        GO_MY_ACCOUNT: 'myAccount',
       },
     },
     myAccount: {
@@ -48,7 +55,12 @@ export const appAuthMachine = setup({
   },
 });
 
-export type AppAuthStateValue = 'home' | 'login' | 'myAccount' | 'error';
+export type AppAuthStateValue =
+  | 'home'
+  | 'login'
+  | 'homeAuth'
+  | 'myAccount'
+  | 'error';
 
 export function getStateValue(state: unknown): AppAuthStateValue {
   const value = (state as { value: AppAuthStateValue }).value;

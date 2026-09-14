@@ -5,6 +5,7 @@ export function createStateVerifier(pages: PageFixtures): StateVerifier {
   const assertions: Record<string, () => Promise<void>> = {
     home: () => pages.homePage.shouldBeOnPage(),
     login: () => pages.loginPage.shouldBeOnPage(),
+    homeAuth: () => pages.homePage.shouldBeSignedIn(),
     myAccount: () => pages.myAccountPage.shouldBeOnPage(),
     error: () => pages.loginPage.shouldShowError(),
     pdp: () => pages.pdpPage.shouldBeOnPage(),

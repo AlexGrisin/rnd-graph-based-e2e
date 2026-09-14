@@ -11,6 +11,9 @@ export function createStubActions(): ActionMap {
     FAIL: async ({ log }) => {
       log('FAIL → simulate login failure');
     },
+    GO_MY_ACCOUNT: async ({ log }) => {
+      log('GO_MY_ACCOUNT → open my account');
+    },
     LOGOUT: async ({ log }) => {
       log('LOGOUT → sign out');
     },

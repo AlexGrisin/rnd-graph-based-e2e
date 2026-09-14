@@ -3,48 +3,31 @@ import { dismissAppOverlays } from '../app/overlays.js';
 
 export class CartPage {
   private readonly proceedToCheckout: Locator;
-  private readonly shoppingBagHeading: Locator;
+  private readonly cartEntryName: Locator;
   private readonly guestEmail: Locator;
 
   constructor(private readonly page: Page) {
-    this.proceedToCheckout = page.getByRole('link', {
-      name: /Proceed to checkout/i,
-    });
-    this.shoppingBagHeading = page.getByRole('heading', {
-      name: 'Shopping Bag',
-      exact: true,
-    });
-    this.guestEmail = page.locator('#guestform\\.email');
+    this.proceedToCheckout = page.getByTestId('cart-summary-cta');
+    this.cartEntryName = page.getByTestId('cart-entry-name');
+    this.guestEmail = page.locator('#deliverySignInEmail');
   }
 
   async shouldBeOnPage(): Promise<void> {
-    await expect(this.page).toHaveURL(/\/checkout\/shopping-bag/);
-    await expect(this.shoppingBagHeading).toBeVisible();
-    await expect(
-      this.page.getByText(/Your shopping bag is empty/i),
-    ).toHaveCount(0);
-    await expect(this.proceedToCheckout.first()).toBeVisible();
+    await expect(this.page).toHaveURL(/\/checkout\/cart/);
+    await expect(this.page.getByText(/basket is currently empty/i)).toHaveCount(
+      0,
+    );
+    await expect(this.cartEntryName.first()).toBeVisible();
+    await expect(this.proceedToCheckout).toBeVisible();
   }
 
   /** Opens the login/guest checkout gate (no payment). */
   async proceedToCheckoutGate(): Promise<void> {
     await dismissAppOverlays(this.page);
-    await this.proceedToCheckout.first().click();
+    await this.proceedToCheckout.click();
 
-    const guestReady = await this.guestEmail
-      .waitFor({ state: 'visible', timeout: 8_000 })
-      .then(() => true)
-      .catch(() => false);
-
-    if (!guestReady && !/\/checkout\/shipping/.test(this.page.url())) {
-      await this.page.goto('/checkout/shipping');
-      await dismissAppOverlays(this.page);
-    }
-
-    await expect(
-      this.guestEmail.or(
-        this.page.getByRole('heading', { name: /Secure checkout/i }),
-      ),
-    ).toBeVisible({ timeout: 30_000 });
+    await this.page.waitForURL(/\/checkout\/delivery/, { timeout: 30_000 });
+    await dismissAppOverlays(this.page);
+    await expect(this.guestEmail).toBeVisible({ timeout: 30_000 });
   }
 }
