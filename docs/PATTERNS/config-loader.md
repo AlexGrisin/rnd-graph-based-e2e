@@ -47,4 +47,4 @@ export function getExampleConfig(): ExampleConfig {
 ## Reference implementations
 
 - `tests/support/config/app-credentials.ts` - required credential loader that throws when email or password is missing
-- `tests/support/config/app-product.ts` - optional PDP path loader with a module-local default
+- `tests/support/config/app-product.ts` - required PDP path loader for the configured live shopping target

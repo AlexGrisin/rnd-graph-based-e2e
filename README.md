@@ -292,13 +292,14 @@ See [Specific journeys when needed](#specific-journeys-when-needed) for `--grep`
 
 | Variable       | Default                        | Purpose                                     |
 | -------------- | ------------------------------ | ------------------------------------------- |
-| `BASE_URL`     | `https://www.g-star.com/en_nl` | Application under test                      |
+| `BASE_URL`     | —                              | Application under test (required for live runs) |
 | `APP_EMAIL`    | —                              | Login email (required for `app` project)    |
 | `APP_PASSWORD` | —                              | Login password (required for `app` project) |
 | `BB_EMAIL`     | —                              | Test-account email `/explore` uses for real login / authenticated scenarios (optional) |
 | `BB_PASSWORD`  | —                              | Test-account password for the above (optional; without it, `/explore` does negative auth probes only) |
+| `PRODUCT_PATH` | —                              | PDP path relative to `BASE_URL` (required for the live shopping flow) |
 
-Copy `.env.example` to `.env` and fill in credentials for live runs. `BB_EMAIL`/`BB_PASSWORD` are secrets — never echoed into reports, and traces (which capture typed values) are git-ignored.
+Copy `.env.example` to `.env` and configure the target URL, product path, and credentials needed by the selected live flow. `BB_EMAIL`/`BB_PASSWORD` are secrets — never echoed into reports, and traces (which capture typed values) are git-ignored.
 
 ## Coverage model
 

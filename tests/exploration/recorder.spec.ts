@@ -71,11 +71,11 @@ test.describe('hashing', () => {
 });
 
 test.describe('signal party classification', () => {
-  const base = 'https://www.g-star.com/en_nl';
+  const base = 'https://www.example.com/';
 
   test('same registrable domain (incl. subdomains) is first-party', () => {
-    expect(classifyParty('https://www.g-star.com/x', base)).toBe('first');
-    expect(classifyParty('https://al.g-star.com/1/indexes', base)).toBe(
+    expect(classifyParty('https://www.example.com/x', base)).toBe('first');
+    expect(classifyParty('https://api.example.com/1/indexes', base)).toBe(
       'first',
     );
   });

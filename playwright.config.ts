@@ -16,7 +16,7 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never' }]],
   timeout: 120_000,
   use: {
-    baseURL: process.env.BASE_URL ?? 'https://www.g-star.com/en_nl',
+    baseURL: process.env.BASE_URL,
     trace: 'on-first-retry',
     actionTimeout: 30_000,
     navigationTimeout: 60_000,

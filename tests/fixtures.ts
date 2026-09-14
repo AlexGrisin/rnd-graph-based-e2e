@@ -60,6 +60,12 @@ export const test = base.extend<MbtFixtures>({
       return;
     }
 
+    if (!baseURL) {
+      throw new Error(
+        'Missing BASE_URL. Set it in .env (see .env.example) before running live tests.',
+      );
+    }
+
     const browser = await chromium.launch();
     const context = await browser.newContext({ baseURL });
     const page = await context.newPage();

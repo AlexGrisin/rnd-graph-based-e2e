@@ -114,7 +114,7 @@ Safety is a **page-side guardrail**, not a code-enforced tool gate: the guardrai
 
 ## Environment
 
-`.env` (copy from `.env.example`): `BASE_URL` (default `https://www.g-star.com/en_nl`), `APP_EMAIL`, `APP_PASSWORD` (the latter two required for the `app` project). Loaded via `dotenv` in `playwright.config.ts`. `BB_EMAIL`/`BB_PASSWORD` are test-account credentials the `/explore` skill uses for real login / authenticated scenarios (optional — without them exploration does negative auth probes only). Treat them as secrets: never echo them into reports/debriefs or commit a trace (traces capture typed values and are git-ignored).
+`.env` (copy from `.env.example`) is the runtime source for `BASE_URL`, `PRODUCT_PATH`, and credentials. `BASE_URL` is required for live tests and trace parsing; `PRODUCT_PATH` is required for the live shopping flow; `APP_EMAIL`/`APP_PASSWORD` are required for live auth. Loaded via `dotenv` in `playwright.config.ts`. `BB_EMAIL`/`BB_PASSWORD` are test-account credentials the `/explore` skill uses for real login / authenticated scenarios (optional — without them exploration does negative auth probes only). Treat them as secrets: never echo them into reports/debriefs or commit a trace (traces capture typed values and are git-ignored).
 
 ## Note on docs
 

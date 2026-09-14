@@ -1,7 +1,7 @@
 # Application context — Beaverbrooks (BASE_URL)
 
-Authored notes that ground the exploration agent. Loaded by the live specs and
-passed to the decider as `appContext`. Edit this per target site.
+Authored notes that ground the exploration agent. The `/explore` command reads
+this profile before navigating. Edit it when the configured target site changes.
 
 UK jewellery & watch retailer (rings, watches, necklaces, bracelets, earrings,
 gifts). English UI, GBP, UK locale. Verified against robots.txt + sitemaps.

@@ -37,7 +37,7 @@ Keep entries brief, factual, and grep-friendly.
 - State assertions moved to page objects (`assertOnPage`) plus `state-verifier.ts` registry.
 - Unified fixtures: stub vs app selected by Playwright project.
 - Removed error-path filter from `runShortestPaths`.
-- Deleted `gstar-journeys`, `shortest-paths`, and `strategy-walk` specs.
+- Deleted the legacy site-journey, shortest-path, and strategy-walk specs.
 
 ### 2025-06-26 - Prettier
 
@@ -56,22 +56,20 @@ Keep entries brief, factual, and grep-friendly.
 - Selectors moved from `locators.ts` into page object constructors.
 - `assertOnPage` -> `shouldBeOnPage`; `assertErrorPage` -> `shouldShowError`.
 - Added `homePage`, `loginPage`, `myAccountPage` Playwright fixtures.
-- Removed `base.page.ts`, `pages/index.ts` (`PageRegistry`), and `gstar/locators.ts`.
+- Removed `base.page.ts`, `pages/index.ts` (`PageRegistry`), and the legacy site locator module.
 - Added `page-fixtures.ts` shared type for actions and state verifier.
 
-### 2025-06-26 - Rename example-app to gstar-auth
+### 2025-06-26 - Introduce site-specific auth naming
 
-- `example-app.machine.ts` -> `gstar-auth.machine.ts` (`gstarAuthMachine`, `GstarAuthEvent`, ...).
-- `example-app.actions.ts` -> `gstar-auth.actions.ts` (`createGstarAuthActions`).
+- Renamed the example auth machine and action adapter to site-specific names.
 - Updated fixtures, specs, walk strategy, and docs.
 
-### 2025-06-26 - Rename gstar to app
+### 2025-06-26 - Generalize site naming to app
 
-- `gstar-auth.machine.ts` -> `app-auth.machine.ts` (`appAuthMachine`, `AppAuthEvent`, ...).
-- `gstar-auth.actions.ts` -> `app-auth.actions.ts` (`createAppAuthActions`).
-- Playwright project `gstar` -> `app`; `test:gstar` -> `test:app`.
-- `tests/support/gstar/` -> `tests/support/app/` (`dismissAppOverlays`).
-- `gstar-credentials.ts` -> `app-credentials.ts`; `GSTAR_*` env -> `APP_*`.
+- Renamed the site-specific auth machine and action adapter to generic `app-*` names.
+- Renamed the Playwright project and test script to `app`.
+- Moved site-specific support helpers under `tests/support/app/`.
+- Renamed credentials configuration and environment variables to generic `APP_*` names.
 
 ### 2026-07-17 - Purchase journey MBT POC
 
@@ -109,3 +107,9 @@ Keep entries brief, factual, and grep-friendly.
 
 - Renamed `graph-driven.spec.ts` to `auth-graph-driven.spec.ts` and its suite title to `Auth graph-driven MBT`.
 - Updated Playwright matching and current contributor documentation to distinguish auth and shopping generated suites.
+
+### 2026-09-14 - Make target site configuration-driven
+
+- Removed hardcoded site fallbacks from Playwright and trace parsing; live flows now consume `BASE_URL` from `.env`.
+- Made `PRODUCT_PATH` required for the live shopping flow and aligned `.env.example` with the configured site profile.
+- Replaced legacy site references in source, tests, and documentation with neutral or configuration-driven wording.

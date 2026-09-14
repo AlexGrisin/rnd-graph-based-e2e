@@ -25,8 +25,8 @@ grep -q '^BASE_URL=' .env 2>/dev/null && \
 grep BASE_URL .env
 ```
 
-Also update the fallback default in `.env.example` and the two live specs
-(`tests/exploration-live/*.spec.ts`) for the next person — cosmetic, env wins.
+Also update the `BASE_URL` example in `.env.example` for the next person. Runtime
+behavior remains driven by `.env`; there is no hardcoded site fallback.
 
 ## 2. Recon the site (facts, not guesses)
 

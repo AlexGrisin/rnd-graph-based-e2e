@@ -4,8 +4,8 @@ import type { SignalParty } from './types.js';
  * First-party vs third-party signal classification (by registrable domain).
  *
  * A signal is first-party when its URL shares the site's registrable domain
- * (e.g. `www.g-star.com` and `al.g-star.com` are both first-party for a
- * `g-star.com` site); anything else (analytics, A/B, CDNs on other domains) is
+ * (e.g. `www.example.com` and `api.example.com` are both first-party for an
+ * `example.com` site); anything else (analytics, A/B, CDNs on other domains) is
  * third-party. This lets the report separate real site issues from external
  * vendor noise instead of discarding either.
  */

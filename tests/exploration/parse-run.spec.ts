@@ -17,15 +17,21 @@ import { parseTrace } from '../support/exploration/trace-parser.js';
  */
 const TRACE = process.env.EXPLORE_TRACE;
 
-test('parse MCP trace → exploration artifacts', async () => {
+test('parse MCP trace → exploration artifacts', async ({ baseURL }) => {
   test.skip(!TRACE, 'set EXPLORE_TRACE=<trace.zip> to run the parser');
+
+  if (!baseURL) {
+    throw new Error(
+      'Missing BASE_URL. Set it in .env (see .env.example) before parsing a trace.',
+    );
+  }
 
   const outDir =
     process.env.EXPLORE_OUT ?? join('artifacts', 'exploration', 'parsed');
   const target = process.env.EXPLORE_TARGET ?? 'pdp';
   const artifacts = await parseTrace(TRACE!, {
     target,
-    baseUrl: process.env.BASE_URL ?? 'https://www.beaverbrooks.co.uk/',
+    baseUrl: baseURL,
     runId: process.env.EXPLORE_RUN_ID ?? `parsed-${target}`,
   });
   const written = await writeArtifacts(outDir, artifacts);
