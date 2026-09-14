@@ -24,12 +24,11 @@ export default defineConfig({
   projects: [
     {
       name: 'stub',
-      testMatch:
-        /\/(graph-driven|purchase-graph-driven|coverage-loop)\.spec\.ts/,
+      testMatch: /\/(shopping-graph-driven)\.spec\.ts/,
     },
     {
       name: 'app',
-      testMatch: /\/(graph-driven|purchase-graph-driven)\.spec\.ts/,
+      testMatch: /\/(graph-driven|shopping-graph-driven)\.spec\.ts/,
     },
     {
       // Browser-free: exercises the exploration telemetry core (src/exploration)

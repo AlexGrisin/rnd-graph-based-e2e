@@ -11,7 +11,7 @@ Style: concise, factual, phase-friendly; implementation history belongs in `agen
 
 No CI workflow or repository quality gate is selected for the current POC. Add one only if the repository moves beyond the current manual-validation stage.
 
-## Medium - Future setup - Narrow traversal defaults if a production policy is needed - `src/mbt/graph/` and `src/mbt/runner/`
+## Medium - Future setup - Narrow traversal defaults if a production policy is needed - `src/mbt/graph/`
 
 The POC currently supports both shortest-path traversal and exploration-loop traversal. Document stricter defaults only if a later phase requires a single mandated execution policy.
 

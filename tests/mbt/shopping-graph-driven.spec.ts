@@ -1,12 +1,12 @@
-import { appPurchaseMachine } from '../../src/machines/app-purchase.machine.js';
+import { appShoppingMachine } from '../../src/machines/app-shopping.machine.js';
 import { describePath } from '../../src/mbt/graph/path-label.js';
-import { getAllShortestPaths } from '../../src/mbt/graph/path-generator.js';
+import { getAllCyclicPaths } from '../../src/mbt/graph/path-generator.js';
 import { testPath } from '../../src/mbt/graph/test-model-factory.js';
 import { test } from '../fixtures.js';
 
-const paths = getAllShortestPaths(appPurchaseMachine);
+const paths = getAllCyclicPaths(appShoppingMachine);
 
-test.describe('Purchase graph-driven MBT', () => {
+test.describe('Shopping graph-driven MBT', () => {
   test.beforeEach(async ({ page }, testInfo) => {
     if (testInfo.project.name === 'app') {
       await page.goto('/');

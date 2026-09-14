@@ -40,7 +40,6 @@ Data flow: **machine → path generator → spec → action map → page objects
 ```
 src/machines/      Pure XState machines — NO Playwright/browser imports allowed here
 src/mbt/graph/     Path generation + path execution engine
-src/mbt/runner/    MbtRunner — alternate programmatic execution API (not used by the spec)
 tests/mbt/         graph-driven.spec.ts — the only spec; generates all tests from the graph
 tests/support/     Adapters: actions/ (event→page), pages/ (POMs + verifier), app/ (overlays), config/
 tests/fixtures.ts  Playwright fixtures; selects stub vs live wiring by project name

@@ -93,3 +93,14 @@ Keep entries brief, factual, and grep-friendly.
 - Recorded supported traversal modes: shortest-path and exploration-loop.
 - Recorded live storefront execution policy: fail on the first observed `app` test failure.
 - Kept unresolved SDLC-system metadata as placeholders in `gain.json`.
+
+### 2026-09-14 - Remove unused MBT strategy layer
+
+- Removed the unreferenced walk-strategy machine and `MbtRunner` wrapper after graph-driven specs standardized on direct `testPath()` execution.
+- Removed the unused `mbtRunner` Playwright fixture and refreshed architecture, pattern, TODO, and CODEMAP references.
+
+### 2026-09-14 - Rename purchase model to shopping
+
+- Renamed `app-purchase.machine.ts` to `app-shopping.machine.ts`, including its exported types, helper, machine symbol, and machine ID.
+- Renamed the generated purchase spec to `shopping-graph-driven.spec.ts` and updated Playwright matching plus current documentation.
+- Kept `app-purchase.actions.ts` scoped to its existing PDP-to-checkout browser actions.

@@ -49,13 +49,12 @@ src/
   machines/           # Pure XState models (no Playwright imports)
   mbt/
     graph/              # Path generation, labeling, testPath executor
-    runner/             # MbtRunner (optional bulk execution API)
   exploration/        # Autonomous-exploration core (browser-independent, no Playwright imports)
 
 tests/
   mbt/
     graph-driven.spec.ts            # Auth graph — one test per shortest path
-    purchase-graph-driven.spec.ts   # Purchase graph — home→pdp→cart→checkout
+    shopping-graph-driven.spec.ts   # Shopping graph — discovery→product→favorites/cart→checkout
   exploration/                      # Browser-free exploration specs (recorder, guardrails, trace parser) + parse-run runner
   fixtures.ts                       # Playwright fixtures (stub vs live)
   support/

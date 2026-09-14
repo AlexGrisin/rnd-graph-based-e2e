@@ -12,12 +12,12 @@ Style: factual, confidence-qualified, concise; do not store credentials or secre
 
 ### A2 - Browser-free stub runs are sufficient for graph and wiring smoke
 - Confidence: High.
-- Evidence: Playwright `stub` project runs graph-driven, purchase, and coverage-loop specs with log-only actions.
+- Evidence: Playwright `stub` project runs the shopping graph spec with log-only actions.
 - Resolve into: `docs/ARCHITECTURE.md`, `docs/TODO.md` if broader non-browser validation is requested.
 
-### A3 - Purchase POC intentionally uses a fixed product-detail entry point
+### A3 - Shopping live actions use a configured product-detail path
 - Confidence: High.
-- Evidence: purchase journey begins at PDP through a runtime product path instead of catalog/search behavior.
+- Evidence: the model includes search and category discovery, while the live `OPEN_PDP` adapter navigates through the configured runtime product path.
 - Resolve into: `docs/CONTEXT.md`, `docs/PATTERNS/config-loader.md`.
 
 ## Decisions

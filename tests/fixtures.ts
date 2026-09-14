@@ -1,8 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 import { test as base, expect, chromium } from '@playwright/test';
 import type { ActionMap } from '../src/mbt/types.js';
-import { appAuthMachine } from '../src/machines/app-auth.machine.js';
-import { MbtRunner } from '../src/mbt/runner/mbt-runner.js';
 import { createAppAuthActions } from './support/actions/app-auth.actions.js';
 import { createAppPurchaseActions } from './support/actions/app-purchase.actions.js';
 import { createStubActions } from './support/actions/stub-actions.js';
@@ -20,7 +18,6 @@ import {
 } from './support/pages/state-verifier.js';
 
 type MbtFixtures = PageFixtures & {
-  mbtRunner: MbtRunner;
   mbtContext: ReturnType<typeof createLoggingContext>;
   actions: ActionMap;
   stateVerifier: ReturnType<typeof createStateVerifier>;
@@ -87,9 +84,6 @@ export const test = base.extend<MbtFixtures>({
   },
   checkoutPage: async ({ page }, use) => {
     await use(new CheckoutPage(page));
-  },
-  mbtRunner: async ({}, use) => {
-    await use(new MbtRunner(appAuthMachine));
   },
   mbtContext: async ({ page }, use) => {
     await use(createLoggingContext(page));

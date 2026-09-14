@@ -86,4 +86,4 @@ export function getExampleJourneyStateValue(
 ## Reference implementations
 
 - `src/machines/app-auth.machine.ts` - typed context plus `assign(...)` on `SUBMIT`
-- `src/machines/app-purchase.machine.ts` - stateless linear checkout journey with the same export shape
+- `src/machines/app-shopping.machine.ts` - shopping journey with discovery branches, home-return cycles, and checkout

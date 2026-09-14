@@ -7,7 +7,7 @@ Style: concise, factual, and complementary to `docs/CODEMAP.md`; use CODEMAP for
 
 - Single-package TypeScript/ESM Node project using npm and `package-lock.json`.
 - CODEMAP is the built-in structural index; no external graph or LSP backend is configured for this workspace.
-- Root TypeScript scope is 53 source/config files: 52 files under `src/` and `tests/`, plus `playwright.config.ts`.
+- Root TypeScript scope is 43 source/config files: 42 files under `src/` and `tests/`, plus `playwright.config.ts`.
 - Two independent subsystems coexist: the MBT engine (machines → generated Playwright tests) and the autonomous exploration engine (`src/exploration/`). They share no runtime code.
 - See `docs/CODEMAP.md` for path-by-path navigation and `docs/TECHSTACK.md` for dependency versions.
 
@@ -22,9 +22,8 @@ Style: concise, factual, and complementary to `docs/CODEMAP.md`; use CODEMAP for
 ## Layers
 
 ```text
-src/machines/         -> pure XState journey and walk-strategy machines
+src/machines/         -> pure XState journey machines
 src/mbt/graph/        -> graph traversal, path labels, coverage tracking, path execution
-src/mbt/runner/       -> high-level MBT runner API
 src/exploration/      -> browser-independent autonomous-exploration core (no Playwright imports)
 tests/support/        -> Playwright page objects, action maps, app helpers, runtime config loaders
 tests/support/exploration/ -> guardrail-script generator + post-hoc trace parser
@@ -35,8 +34,7 @@ tests/exploration/    -> browser-free exploration specs (core, guardrail, trace 
 ## Journey Models
 
 - `app-auth.machine.ts`: auth journey states `home`, `login`, `myAccount`, `error`; events `GO_LOGIN`, `SUBMIT`, `FAIL`, `LOGOUT`; `error` is final.
-- `app-purchase.machine.ts`: purchase journey states `home`, `pdp`, `cart`, `checkout`; events `OPEN_PDP`, `ADD_TO_CART`, `GO_CHECKOUT`; `checkout` is final.
-- `walk-strategy.machine.ts`: execution strategy state machine with `idle`, `walking`, `done`, and `failed`; tracks path index, visited states, and last error.
+- `app-shopping.machine.ts`: shopping journey states `home`, `search`, `category`, `pdp`, `favorites`, `cart`, `checkout`; models discovery, product selection, favorites, cart, home-return cycles, and guest checkout; `checkout` is final.
 - Journey machines must not import Playwright, page objects, or environment configuration.
 
 ## MBT Engine
@@ -45,14 +43,13 @@ tests/exploration/    -> browser-free exploration specs (core, guardrail, trace 
 - `test-model-factory.ts` executes a graph path by dispatching non-internal events through an action map, then optionally verifies the reached state.
 - `coverage-tracker.ts` tracks known states/edges from adjacency, visit counts, weighted gaps, and percentage reports.
 - `exploration-loop.ts` selects uncovered edge gaps, builds minimal paths to exercise them, applies persona/event compatibility, and stops on coverage completion or budget exhaustion.
-- `mbt-runner.ts` runs all shortest paths directly or through the walk-strategy machine.
 - The POC keeps both shortest-path traversal and exploration-loop traversal available as supported execution modes.
 
 ## Playwright Boundary
 
 - Page objects live under `tests/support/pages/` and own selectors plus state assertions.
 - Action maps live under `tests/support/actions/` and translate machine events into page-object calls or stub log entries.
-- `tests/fixtures.ts` merges auth and purchase live action maps for the `app` project and uses log-only stub actions for the `stub` project.
+- `tests/fixtures.ts` merges auth and shopping live action maps for the `app` project and uses log-only stub actions for the `stub` project.
 - Runtime config loaders under `tests/support/config/` centralize environment-backed inputs and fail fast for required values.
 
 ## Autonomous Exploration
@@ -73,7 +70,7 @@ tests/exploration/    -> browser-free exploration specs (core, guardrail, trace 
 ## Test Suites
 
 - `graph-driven.spec.ts`: one Playwright test per auth shortest path.
-- `purchase-graph-driven.spec.ts`: one Playwright test per purchase shortest path.
+- `shopping-graph-driven.spec.ts`: one Playwright test per generated shopping path.
 - `coverage-loop.spec.ts`: stub-only coverage-loop scenarios for default coverage, personas, weights, state priority, and budget exhaustion.
 - `tests/exploration/` (`exploration` project): browser-free specs exercising the exploration core, the guardrail generator, and the trace parser — `recorder.spec.ts`, `guardrails.spec.ts`, `trace-parser.spec.ts` — plus `parse-run.spec.ts` (a runner, skipped unless `EXPLORE_TRACE` is set). Live exploration is the `/explore` slash command (Playwright MCP), not a Playwright project.
 - Playwright config uses one worker, disables full parallelism, traces on first retry, and defines `stub`, `app`, and `exploration` projects.

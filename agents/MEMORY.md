@@ -27,6 +27,9 @@ When page objects call new Playwright APIs, update `createMockPage` or `createMo
 ### Refresh Derived Inventories After Artifact Changes [ACTIVE]
 Regenerate and validate CODEMAP counts after documentation or pattern artifacts change during initialization.
 
+### Remove Superseded Orchestration Layers [ACTIVE]
+When specs execute graph paths directly, remove unused wrapper runners and strategy machines so dependency type changes cannot break dead code.
+
 ## What Worked
 
 ### <Generalized What Worked> [ACTIVE|RETIRED]
@@ -46,6 +49,9 @@ Centralizing app overlay dismissal keeps page objects focused and prevents repea
 ### URL-Only Checkout Waiting Was Too Weak [ACTIVE]
 Prefer visible cart badge or guest form readiness over relying solely on checkout URL redirects.
 
+### Unused Strategy Layer Hid Type Drift [ACTIVE]
+The unreferenced walk-strategy and runner remained after specs moved to direct `testPath()` execution, adding compiler failures and maintenance surface without runtime value.
+
 ## Discoveries
 
 ### <Generalized Discovery> [ACTIVE|RETIRED]
@@ -55,4 +61,4 @@ Prefer visible cart badge or guest form readiness over relying solely on checkou
 Workspace initialization selected built-in CODEMAP only; do not assume external graph or LSP tools are available.
 
 ### Root-Only TypeScript Scope [ACTIVE]
-Root source/config inventory is 29 TypeScript files: 28 under `src/` and `tests/`, plus `playwright.config.ts`.
+Root source/config inventory is 43 TypeScript files: 42 under `src/` and `tests/`, plus `playwright.config.ts`.

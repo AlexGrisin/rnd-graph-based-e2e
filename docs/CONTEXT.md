@@ -14,7 +14,7 @@ Style: concise, factual, grep-friendly, no implementation changelog.
 
 - The POC covers two live storefront journeys:
   - Auth: visitor starts on the home page, opens login, reaches account on success, or reaches an error state on failure.
-  - Purchase: visitor starts on the home page, opens a product detail page, adds to cart, and reaches checkout shipping as a guest.
+  - Shopping: visitor starts on the home page, searches or browses a category, opens a product detail page, adds it to favorites or cart, and can reach checkout shipping as a guest.
 - The POC evaluates both deterministic shortest-path coverage and exploration-loop coverage over those journeys.
 - Payment completion, catalog discovery, search behavior, account lifecycle, and post-checkout fulfillment are outside the current MBT POC scope.
 - A browser-free smoke mode exists so graph wiring can be checked without depending on the live storefront.

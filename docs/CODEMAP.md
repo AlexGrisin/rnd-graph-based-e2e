@@ -1,6 +1,6 @@
 Code map for `rnd-graph-based-e2e`.
 
-## Root (81 tracked docs, source, and config files) - Playwright and XState MBT POC + autonomous exploration
+## Root (78 tracked docs, source, and config files) - Playwright and XState MBT POC + autonomous exploration
 
 - `.env.example`
 - `.gitignore`
@@ -15,15 +15,14 @@ Code map for `rnd-graph-based-e2e`.
 - `playwright.config.ts`
 - `tsconfig.json`
 
-### src/ (20 files) - MBT engine, state machines, and exploration core
+### src/ (18 files) - MBT engine, state machines, and exploration core
 
-#### src/machines/ (3 files) - XState journey models
+#### src/machines/ (2 files) - XState journey models
 
 - `app-auth.machine.ts`
-- `app-purchase.machine.ts`
-- `walk-strategy.machine.ts`
+- `app-shopping.machine.ts`
 
-#### src/mbt/ (7 files) - Graph traversal and runner logic
+#### src/mbt/ (6 files) - Graph traversal logic
 
 - `types.ts`
 
@@ -34,10 +33,6 @@ Code map for `rnd-graph-based-e2e`.
 - `path-generator.ts`
 - `path-label.ts`
 - `test-model-factory.ts`
-
-##### src/mbt/runner/ (1 file) - High-level runner API
-
-- `mbt-runner.ts`
 
 #### src/exploration/ (10 files) - Autonomous exploration core (browser-independent, no Playwright imports)
 
@@ -58,7 +53,7 @@ Code map for `rnd-graph-based-e2e`.
 
 - `coverage-loop.spec.ts`
 - `graph-driven.spec.ts`
-- `purchase-graph-driven.spec.ts`
+- `shopping-graph-driven.spec.ts`
 
 #### tests/support/ (14 files) - Page objects, adapters, and config
 

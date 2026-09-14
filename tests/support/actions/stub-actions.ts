@@ -14,8 +14,23 @@ export function createStubActions(): ActionMap {
     LOGOUT: async ({ log }) => {
       log('LOGOUT → sign out');
     },
+    BROWSE_CATEGORY: async ({ log }) => {
+      log('BROWSE_CATEGORY → browse product category');
+    },
+    SEARCH_QUERY: async ({ log }) => {
+      log('SEARCH_QUERY → search for query');
+    },
     OPEN_PDP: async ({ log }) => {
       log('OPEN_PDP → open product detail page');
+    },
+    GO_HOME: async ({ log }) => {
+      log('GO_HOME → go home');
+    },
+    GO_TO_PAGE: async ({ log }) => {
+      log('GO_TO_PAGE → go to page');
+    },
+    ADD_TO_FAVORITES: async ({ log }) => {
+      log('ADD_TO_FAVORITES → add to favorites');
     },
     ADD_TO_CART: async ({ log }) => {
       log('ADD_TO_CART → select size and add to bag');

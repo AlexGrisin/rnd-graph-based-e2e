@@ -10,12 +10,12 @@ Coverage: `tests/support/pages/*.page.ts`, `tests/support/pages/state-verifier.t
 ## Graph-Driven MBT Spec - one test per generated shortest path
 File: [test-spec.md](./test-spec.md)
 Use when creating a shortest-path Playwright suite backed by a machine and shared fixtures.
-Coverage: `tests/mbt/graph-driven.spec.ts`, `tests/mbt/purchase-graph-driven.spec.ts`
+Coverage: `tests/mbt/graph-driven.spec.ts`, `tests/mbt/shopping-graph-driven.spec.ts`
 
 ## XState Journey Machine - typed linear journey model
 File: [machine-model.md](./machine-model.md)
 Use when adding a new application journey under `src/machines/`.
-Coverage: `src/machines/app-auth.machine.ts`, `src/machines/app-purchase.machine.ts`
+Coverage: `src/machines/app-auth.machine.ts`, `src/machines/app-shopping.machine.ts`
 
 ## MBT Action Map - event to page-action adapter factory
 File: [action-map.md](./action-map.md)
@@ -29,13 +29,9 @@ Coverage: `tests/support/config/app-credentials.ts`, `tests/support/config/app-p
 
 ## Explicit Skips
 
-## `src/mbt/graph/` and `src/mbt/runner/` - skip
+## `src/mbt/graph/` - skip
 Reason: the traversal helpers share utility fragments, but the exported behaviors are algorithm-specific (`testPath`, shortest-path execution, coverage loop) rather than a stable contributor-facing template.
-Evidence: `src/mbt/graph/test-model-factory.ts`, `src/mbt/graph/exploration-loop.ts`, `src/mbt/runner/mbt-runner.ts`
-
-## `src/machines/walk-strategy.machine.ts` - skip
-Reason: only one orchestration machine exists, so there is no second implementation proving a reusable strategy-machine template yet.
-Evidence: `src/machines/walk-strategy.machine.ts`
+Evidence: `src/mbt/graph/test-model-factory.ts`, `src/mbt/graph/exploration-loop.ts`
 
 ## `tests/support/app/overlays.ts` - skip
 Reason: overlay dismissal is a single app-specific helper reused by many pages, but there is only one implementation and no alternative pattern to extract.
