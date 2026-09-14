@@ -49,36 +49,26 @@ src/
   machines/           # Pure XState models (no Playwright imports)
   mbt/
     graph/              # Path generation, labeling, testPath executor
-  exploration/        # Autonomous-exploration core (browser-independent, no Playwright imports)
 
 tests/
   mbt/
     auth-graph-driven.spec.ts       # Auth graph — one test per shortest path
     shopping-graph-driven.spec.ts   # Shopping graph — discovery→product→favorites/cart→checkout
-  exploration/                      # Browser-free exploration specs (recorder, guardrails, trace parser) + parse-run runner
   fixtures.ts                       # Playwright fixtures (stub vs live)
   support/
     actions/                        # Event → page method adapters
     pages/                          # Page objects + should*() assertions per state
     app/                            # Site-specific overlay helpers
     config/                         # Credentials + PRODUCT_PATH
-    exploration/                    # Guardrail-script generator + post-hoc trace parser
-
-config/
-  app-context.md      # Authored per-site profile that grounds the exploration agent
-  guardrails/         # Per-site guardrail data (+ generated init scripts)
-.mcp.json             # Registers the Playwright MCP server used by /explore
-.claude/commands/
-  explore.md          # /explore <target> agent-driven exploration command
 ```
 
-| Layer             | Location                         | Role                                                                 |
-| ----------------- | -------------------------------- | -------------------------------------------------------------------- |
-| Application model | `src/machines/*.machine.ts`      | States, transitions, events                                          |
-| Path engine       | `src/mbt/graph/`                 | `getShortestPaths`, `getPathsFromEvents`, `testPath`, `describePath` |
-| Action adapters   | `tests/support/actions/`         | Maps model events → Playwright calls                                 |
-| Page objects      | `tests/support/pages/`           | Locators, navigation, state assertions                               |
-| Generated tests   | `tests/mbt/auth-graph-driven.spec.ts` | One Playwright test per auth graph path                          |
+| Layer             | Location                              | Role                                                                 |
+| ----------------- | ------------------------------------- | -------------------------------------------------------------------- |
+| Application model | `src/machines/*.machine.ts`           | States, transitions, events                                          |
+| Path engine       | `src/mbt/graph/`                      | `getShortestPaths`, `getPathsFromEvents`, `testPath`, `describePath` |
+| Action adapters   | `tests/support/actions/`              | Maps model events → Playwright calls                                 |
+| Page objects      | `tests/support/pages/`                | Locators, navigation, state assertions                               |
+| Generated tests   | `tests/mbt/auth-graph-driven.spec.ts` | One Playwright test per auth graph path                              |
 
 ## How tests are generated
 
@@ -290,16 +280,14 @@ See [Specific journeys when needed](#specific-journeys-when-needed) for `--grep`
 
 ### Environment variables
 
-| Variable       | Default                        | Purpose                                     |
-| -------------- | ------------------------------ | ------------------------------------------- |
-| `BASE_URL`     | —                              | Application under test (required for live runs) |
-| `APP_EMAIL`    | —                              | Login email (required for `app` project)    |
-| `APP_PASSWORD` | —                              | Login password (required for `app` project) |
-| `BB_EMAIL`     | —                              | Test-account email `/explore` uses for real login / authenticated scenarios (optional) |
-| `BB_PASSWORD`  | —                              | Test-account password for the above (optional; without it, `/explore` does negative auth probes only) |
-| `PRODUCT_PATH` | —                              | PDP path relative to `BASE_URL` (required for the live shopping flow) |
+| Variable       | Default | Purpose                                                               |
+| -------------- | ------- | --------------------------------------------------------------------- |
+| `BASE_URL`     | —       | Application under test (required for live runs)                       |
+| `APP_EMAIL`    | —       | Login email (required for `app` project)                              |
+| `APP_PASSWORD` | —       | Login password (required for `app` project)                           |
+| `PRODUCT_PATH` | —       | PDP path relative to `BASE_URL` (required for the live shopping flow) |
 
-Copy `.env.example` to `.env` and configure the target URL, product path, and credentials needed by the selected live flow. `BB_EMAIL`/`BB_PASSWORD` are secrets — never echoed into reports, and traces (which capture typed values) are git-ignored.
+Copy `.env.example` to `.env` and configure the target URL, product path, and credentials needed by the selected live flow.
 
 ## Coverage model
 
@@ -526,56 +514,6 @@ sequenceDiagram
 | `npm run test:mbt` | Run MBT specs only          |
 | `npm run test:app` | Live app E2E project        |
 | `npm run test:ui`  | Playwright UI mode          |
-
-## Autonomous exploration (POC)
-
-A second, **independent** subsystem (it does not reuse the MBT engine). Given only a **semantic target** — an intent such as `pdp`, `cart`, or `guest checkout`, never a URL — an agent explores the live storefront (`BASE_URL`), records a state/transition graph plus telemetry, and emits a report. Entry page, budget, safety, and stop conditions are internal defaults; the input is the target plus an optional `:: <scope & risks>` note.
-
-The **in-session agent (Claude) drives Microsoft's Playwright MCP directly** — `browser_navigate` → `browser_snapshot` → reason → `browser_click`/`type`/`select`, with tracing on — then a **post-hoc parser** reads the recorded trace (the raw, uncompressed `trace-<ts>.trace` the MCP writes — no `unzip`; a bundled `trace.zip` is a fallback only) and emits the artifacts. There is **no AI SDK or API key** (the LLM is the session), and no bespoke browser host or file channel. The `/explore <target>` slash command (`.claude/commands/explore.md`) runs the whole flow.
-
-> **Design note.** This replaced an earlier engine (a Node `coordinator` loop, a `PlaywrightHost`, `Heuristic`/`AgentDecider`, a file channel, and a self-driving autonomous mode). See `docs/ai-exploratory-architecture.md` → "Key decisions" for the rationale and what changed.
-
-### Flow
-
-1. Agent starts tracing (`browser_start_tracing`), resolves the entry from `config/app-context.md`, and navigates.
-2. Loop (≤ 10 acting steps / 15 states, POC budget): snapshot → choose one on-target action → act. Cover happy paths **and** negative probes; for auth targets, do a real sign-in with the `BB_EMAIL`/`BB_PASSWORD` test account from `.env`.
-3. Agent stops tracing; the parser runner reads the newest raw `.trace` and turns it into `graph.json` / `issues.json` / `report.md`.
-
-### Safety (page-side guardrail)
-
-Because the agent calls `browser_click` directly, safety is a **page-side guardrail**, not an un-bypassable tool gate. An init-script (`config/guardrails/<site>.init.js`, loaded via the MCP server's `--init-script`) runs on every page and **neutralizes consequential controls** (matched against the shared `consequence-policy` patterns — e.g. order, payment, purchase, personal-data, destructive, send, publish; login/sign-up/register are intentionally explorable) and dismisses the cookie/consent overlay. The budget (10 acting steps / 15 states, POC) is prompt-enforced by the skill. Site-specific data (overlay selectors, extra consequential names) lives in `config/guardrails/<site>.json` — **context, not code**.
-
-### Telemetry & artifacts
-
-The parser derives signals from the trace's console stream — `consoleError`, plus `httpError`/`requestFailed` (network 4xx/failures mirror into console) and `pageError`. Each is classified **first-party** (site domain) vs **third-party** (external vendor); the report separates site issues from vendor noise. Issues are deduped by message with a total count and an affected-transitions tally.
-
-Each run writes to `artifacts/exploration/<run-id>/` (git-ignored): `manifest.json`, `graph.json`, `errors.json`, `issues.json`, `report.md`, and `evidence/`.
-
-### Key files
-
-| File                                          | Role                                                      |
-| --------------------------------------------- | --------------------------------------------------------- |
-| `.mcp.json`                                   | Registers the Playwright MCP server (tracing + guardrail) |
-| `.claude/commands/explore.md`                 | The `/explore <target>` agent-driven flow                 |
-| `tests/support/exploration/guardrails.ts`     | Generates the page-side guardrail init-script             |
-| `tests/support/exploration/trace-parser.ts`   | Post-hoc trace → artifacts; reads the raw `.trace` (the only trace reader) |
-| `tests/exploration/parse-run.spec.ts`         | Browser-free runner that invokes the parser               |
-| `src/exploration/recorder.ts` / `issues.ts`   | Step/graph/signal recording + issue dedup                 |
-| `src/exploration/report.ts`                   | `report.md` + full artifact set                           |
-| `src/exploration/consequence-policy.ts`       | Site-agnostic consequence patterns (feed the guardrail)   |
-| `config/app-context.md`, `config/guardrails/` | Per-site profile + guardrail data (context, not code)     |
-
-### Running
-
-```bash
-# Browser-free exploration suite (unit-tests the core + guardrail + parser)
-npm test -- --project=exploration
-
-# Agent-driven live run (you drive Playwright MCP; needs the MCP server loaded)
-/explore pdp        # Claude Code slash command
-```
-
-`src/exploration/` stays Playwright-free (like `src/machines/`), so the whole telemetry core is testable without a browser. The migration adds `@playwright/mcp` (consumed via `npx`); the parser reads the raw `.trace` directly and uses the system `unzip` only as a fallback for a bundled `.zip`. No runtime schema library.
 
 ## Design constraints
 

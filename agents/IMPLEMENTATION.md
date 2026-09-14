@@ -113,3 +113,9 @@ Keep entries brief, factual, and grep-friendly.
 - Removed hardcoded site fallbacks from Playwright and trace parsing; live flows now consume `BASE_URL` from `.env`.
 - Made `PRODUCT_PATH` required for the live shopping flow and aligned `.env.example` with the configured site profile.
 - Replaced legacy site references in source, tests, and documentation with neutral or configuration-driven wording.
+
+### 2026-09-14 - Remove autonomous exploration subsystem
+
+- Removed agent-driven Playwright MCP commands/configuration, site profiles/guardrails, exploration core, trace parser, and browser-free exploration suite.
+- Removed the exploration Playwright project and exploration-only environment and current-documentation references.
+- Retained deterministic MBT coverage-loop implementation/investigation and ignored legacy local trace/artifact paths for credential safety.

@@ -1,10 +1,9 @@
 Code map for `rnd-graph-based-e2e`.
 
-## Root (78 tracked docs, source, and config files) - Playwright and XState MBT POC + autonomous exploration
+## Root (55 tracked docs, source, and config files) - Playwright and XState MBT POC
 
 - `.env.example`
 - `.gitignore`
-- `.mcp.json` — registers the `@playwright/mcp` server (isolated Chromium, tracing, guardrail `--init-script`) used by `/explore`
 - `.prettierignore`
 - `.prettierrc.json`
 - `CLAUDE.md`
@@ -15,7 +14,7 @@ Code map for `rnd-graph-based-e2e`.
 - `playwright.config.ts`
 - `tsconfig.json`
 
-### src/ (18 files) - MBT engine, state machines, and exploration core
+### src/ (8 files) - MBT engine and state machines
 
 #### src/machines/ (2 files) - XState journey models
 
@@ -34,20 +33,7 @@ Code map for `rnd-graph-based-e2e`.
 - `path-label.ts`
 - `test-model-factory.ts`
 
-#### src/exploration/ (10 files) - Autonomous exploration core (browser-independent, no Playwright imports)
-
-- `types.ts` — pure domain types (Observation, VisibleAction, Signal, GraphNode/Edge, Issue, Manifest, ...)
-- `assert.ts` — lightweight artifact-boundary assertion helper (no schema lib)
-- `hash.ts` — normalized-state SHA-256 identity + issue fingerprints
-- `signal-origin.ts` — first-party vs third-party signal classification
-- `consequence-policy.ts` — site-agnostic consequence rules; exports `CONSEQUENCE_PATTERNS` (serializable) consumed by the guardrail generator + trace parser
-- `graph.ts` — `ObservedGraph`: hash-deduped nodes/edges + visited/expanded tracking
-- `issues.ts` — `IssueLog`: signal correlation + message-level dedup
-- `recorder.ts` — `SessionRecorder`: recording core (steps, dedup, correlation, manifest)
-- `report.ts` — `renderReport` (report.md) + `writeArtifacts` (full artifact set)
-- `index.ts` — public API barrel
-
-### tests/ (24 files) - Playwright specs and support layer
+### tests/ (18 files) - Playwright MBT specs and support layer
 
 #### tests/mbt/ (3 files) - Graph-driven specs
 
@@ -55,7 +41,7 @@ Code map for `rnd-graph-based-e2e`.
 - `auth-graph-driven.spec.ts`
 - `shopping-graph-driven.spec.ts`
 
-#### tests/support/ (14 files) - Page objects, adapters, and config
+#### tests/support/ (12 files) - Page objects, adapters, and config
 
 ##### tests/support/actions/ (3 files) - Event-to-action bindings
 
@@ -83,34 +69,11 @@ Code map for `rnd-graph-based-e2e`.
 - `pdp.page.ts`
 - `state-verifier.ts`
 
-##### tests/support/exploration/ (2 files) - MCP exploration support (guardrail + parser)
-
-- `guardrails.ts` — generates the page-side guardrail init-script (overlay dismissal + consequential-control neutralization) from per-site data + `CONSEQUENCE_PATTERNS`
-- `trace-parser.ts` — post-hoc trace → artifacts (`extractTrace` reads the raw `.trace` directly, `unzip` only for a legacy `.zip`, + pure `traceModelToArtifacts`); the only component that reads a real trace
-
-#### tests/exploration/ (4 files) - Browser-free exploration suite (`exploration` project)
-
-- `recorder.spec.ts` — recording core against synthesized observations
-- `guardrails.spec.ts` — guardrail generator + freshness of the committed init script
-- `trace-parser.spec.ts` — parser layers (hand-authored `TraceModel` + raw `trace.trace`)
-- `parse-run.spec.ts` — runner: `EXPLORE_TRACE` → parse → `writeArtifacts` (skipped unless the env var is set)
-
 #### tests/ (1 file) - Shared Playwright fixtures
 
 - `fixtures.ts`
 
-### config/ (3 files) - Authored per-site profile + guardrail data for exploration
-
-- `app-context.md` — page-type URL shapes, key flows, prerequisites, known third-party vendors; grounds the exploration agent
-- `guardrails/beaverbrooks.json` — per-site guardrail data (consent-overlay selectors, extra consequential names) — context, not code
-- `guardrails/beaverbrooks.init.js` — generated guardrail init-script, loaded via `.mcp.json` `--init-script` (regenerate with `UPDATE_GUARDRAILS=1`)
-
-### .claude/commands/ (2 files) - Claude Code slash commands
-
-- `explore.md` — `/explore <target>` agent-driven exploration; drives Playwright MCP directly, then parses the trace into artifacts
-- `onboard-site.md` — `/onboard-site <base-url>` recon + settle harness context for a new site
-
-### docs/ (16 files) - Current project documentation
+### docs/ (15 files) - Current project documentation
 
 - `ARCHITECTURE.md`
 - `ASSUMPTIONS.md`
@@ -119,7 +82,6 @@ Code map for `rnd-graph-based-e2e`.
 - `DEPENDENCIES.md`
 - `TECHSTACK.md`
 - `TODO.md`
-- `ai-exploratory-architecture.md` — AI exploratory subsystem: architecture + runtime flow + key decisions (as-built)
 - `exploration-loop-investigation.md`
 
 #### docs/PATTERNS/ (7 files) - Reusable patterns

@@ -30,6 +30,9 @@ Regenerate and validate CODEMAP counts after documentation or pattern artifacts 
 ### Remove Superseded Orchestration Layers [ACTIVE]
 When specs execute graph paths directly, remove unused wrapper runners and strategy machines so dependency type changes cannot break dead code.
 
+### Remove Isolated Subsystems Atomically [ACTIVE]
+When a subsystem has no active runtime consumers, remove its code, entry points, tests, configuration, and current documentation together so no dead contracts remain.
+
 ## What Worked
 
 ### <Generalized What Worked> [ACTIVE|RETIRED]
@@ -61,4 +64,4 @@ The unreferenced walk-strategy and runner remained after specs moved to direct `
 Workspace initialization selected built-in CODEMAP only; do not assume external graph or LSP tools are available.
 
 ### Root-Only TypeScript Scope [ACTIVE]
-Root source/config inventory is 43 TypeScript files: 42 under `src/` and `tests/`, plus `playwright.config.ts`.
+Root source/config inventory is 27 TypeScript files: 26 under `src/` and `tests/`, plus `playwright.config.ts`.

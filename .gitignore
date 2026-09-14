@@ -5,7 +5,7 @@ node_modules/
 /playwright/.cache/
 /dist/
 
-# Exploration run outputs (graph/report/evidence + transient agent channel)
+# Keep legacy local run artifacts ignored; they may contain credentials.
 /artifacts/
 .env
 .env.*

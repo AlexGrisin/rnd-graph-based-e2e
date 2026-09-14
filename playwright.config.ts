@@ -30,13 +30,6 @@ export default defineConfig({
       name: 'app',
       testMatch: /\/(auth-graph-driven|shopping-graph-driven)\.spec\.ts/,
     },
-    {
-      // Browser-free: exercises the exploration telemetry core (src/exploration)
-      // + the guardrail generator and post-hoc trace parser. The agent-driven
-      // live run is /explore (Playwright MCP), not a Playwright project.
-      name: 'exploration',
-      testMatch: /\/exploration\/.*\.spec\.ts/,
-    },
   ],
   tsconfig: './tsconfig.json',
 });
