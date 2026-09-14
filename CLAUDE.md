@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Proof of concept for **model-based testing (MBT)**: application behavior is an XState v5 state machine, and Playwright tests are **generated from the graph at runtime** — there are no per-journey test cases. A single spec (`tests/mbt/graph-driven.spec.ts`) reads the machine, asks `@xstate/graph` for one shortest path per reachable state, and registers one Playwright test per path. Adding a state/transition to the machine makes new tests appear automatically.
+Proof of concept for **model-based testing (MBT)**: application behavior is an XState v5 state machine, and Playwright tests are **generated from the graph at runtime** — there are no per-journey test cases. The auth spec (`tests/mbt/auth-graph-driven.spec.ts`) reads the machine, asks `@xstate/graph` for one shortest path per reachable state, and registers one Playwright test per path. Adding a state/transition to the machine makes new tests appear automatically.
 
 ## Commands
 
@@ -40,20 +40,20 @@ Data flow: **machine → path generator → spec → action map → page objects
 ```
 src/machines/      Pure XState machines — NO Playwright/browser imports allowed here
 src/mbt/graph/     Path generation + path execution engine
-tests/mbt/         graph-driven.spec.ts — the only spec; generates all tests from the graph
+tests/mbt/         Auth and shopping graph-driven specs
 tests/support/     Adapters: actions/ (event→page), pages/ (POMs + verifier), app/ (overlays), config/
 tests/fixtures.ts  Playwright fixtures; selects stub vs live wiring by project name
 ```
 
 ### How a test runs
 
-1. `graph-driven.spec.ts` calls `getAllShortestPaths(appAuthMachine)` at module load and loops over paths.
+1. `auth-graph-driven.spec.ts` calls `getAllShortestPaths(appAuthMachine)` at module load and loops over paths.
 2. For each path it calls `testPath()` (`src/mbt/graph/test-model-factory.ts`), which walks each step, looks up `actions[event.type]`, runs the handler, then calls `verifyState(expectedStateName)`.
 3. Action handlers call page-object methods; the state verifier calls each page's `should*` assertion.
 
-### Two Playwright projects, one spec
+### Shared fixture wiring
 
-Both projects run the same `graph-driven.spec.ts`; `tests/fixtures.ts` swaps the wiring by `testInfo.project.name`:
+The generated specs share `tests/fixtures.ts`, which swaps the wiring by `testInfo.project.name`:
 
 | Fixture         | `stub`                       | `app`                                |
 | --------------- | ---------------------------- | ------------------------------------ |
@@ -81,7 +81,7 @@ To add a state — e.g. `checkout` after `myAccount`:
 4. `tests/support/actions/app-auth.actions.ts` — add a handler per new event (key matches event `type`).
 5. `tests/support/pages/state-verifier.ts` — map the new state name to its page assertion.
 
-Then `npm test -- --project=stub` confirms new paths generate. No edit to `graph-driven.spec.ts` is needed.
+Then run the matching browser-free project to confirm new paths generate. No edit to `auth-graph-driven.spec.ts` is needed.
 
 ## Conventions
 

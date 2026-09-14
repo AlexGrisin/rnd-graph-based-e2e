@@ -15,7 +15,7 @@ The test suite reads the machine, generates one Playwright test per shortest pat
 flowchart LR
     M["XState machine"]
     G["getShortestPaths()"]
-    S["graph-driven.spec.ts"]
+    S["auth-graph-driven.spec.ts"]
     A["Action map"]
     P["Page objects"]
     M --> G --> S
@@ -53,7 +53,7 @@ src/
 
 tests/
   mbt/
-    graph-driven.spec.ts            # Auth graph — one test per shortest path
+    auth-graph-driven.spec.ts       # Auth graph — one test per shortest path
     shopping-graph-driven.spec.ts   # Shopping graph — discovery→product→favorites/cart→checkout
   exploration/                      # Browser-free exploration specs (recorder, guardrails, trace parser) + parse-run runner
   fixtures.ts                       # Playwright fixtures (stub vs live)
@@ -78,11 +78,11 @@ config/
 | Path engine       | `src/mbt/graph/`                 | `getShortestPaths`, `getPathsFromEvents`, `testPath`, `describePath` |
 | Action adapters   | `tests/support/actions/`         | Maps model events → Playwright calls                                 |
 | Page objects      | `tests/support/pages/`           | Locators, navigation, state assertions                               |
-| Generated tests   | `tests/mbt/graph-driven.spec.ts` | One Playwright test per graph path                                   |
+| Generated tests   | `tests/mbt/auth-graph-driven.spec.ts` | One Playwright test per auth graph path                          |
 
 ## How tests are generated
 
-At module load time, `graph-driven.spec.ts` calls `getAllShortestPaths(appAuthMachine)` from `@xstate/graph`. For each path it registers a Playwright test named after the target state and event sequence:
+At module load time, `auth-graph-driven.spec.ts` calls `getAllShortestPaths(appAuthMachine)` from `@xstate/graph`. For each path it registers a Playwright test named after the target state and event sequence:
 
 ```
 → myAccount: GO_LOGIN → SUBMIT
@@ -147,7 +147,7 @@ Example: add a `checkout` state after `myAccount`.
 | 4    | `tests/support/actions/app-auth.actions.ts` | Add `GO_CHECKOUT`, `PAY` handlers                                                    |
 | 5    | `tests/support/pages/state-verifier.ts`     | Add `checkout: () => pages.checkoutPage.shouldBeOnPage()`                            |
 
-Run `npm test -- --project=stub` to confirm new paths are generated. No changes to `graph-driven.spec.ts`.
+Run the matching browser-free project to confirm new paths are generated. No changes to `auth-graph-driven.spec.ts` are needed.
 
 ## Specific journeys when needed
 
@@ -262,7 +262,7 @@ This file is optional. Add it only when `--grep` or a one-off `getPathsFromEvent
 
 ### 4. Model the journey in the machine
 
-If a journey is business-critical and should **always** appear in the default generated suite, express it in the machine (states, transitions, or branches) so `getShortestPaths` or `getSimplePaths` picks it up. Then no extra spec or registry is needed — `graph-driven.spec.ts` generates the test automatically.
+If a journey is business-critical and should **always** appear in the default generated suite, express it in the machine (states, transitions, or branches) so `getShortestPaths` or `getSimplePaths` picks it up. Then no extra spec or registry is needed — the corresponding graph-driven spec generates the test automatically.
 
 ### What you still do not write
 
@@ -500,7 +500,7 @@ npm test -- --project=stub --grep "Coverage Loop"
 
 ```mermaid
 sequenceDiagram
-    participant Spec as graph-driven.spec.ts
+    participant Spec as auth-graph-driven.spec.ts
     participant Graph as getShortestPaths
     participant Runner as testPath
     participant Actions as Action map

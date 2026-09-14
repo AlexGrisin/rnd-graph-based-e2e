@@ -39,7 +39,7 @@ import { test } from '../fixtures.js';
 
 const paths = getAllShortestPaths(appAuthMachine);
 
-test.describe('Graph-driven MBT', () => {
+test.describe('Auth graph-driven MBT', () => {
   test.beforeEach(async ({ page }, testInfo) => {
     // Project-specific bootstrap only — keep minimal
     if (testInfo.project.name === 'app') {
@@ -91,4 +91,4 @@ Run live E2E: `npm test -- --project=app`
 
 ## Reference implementation
 
-- `tests/mbt/graph-driven.spec.ts` — canonical graph-driven spec for `appAuthMachine`
+- `tests/mbt/auth-graph-driven.spec.ts` — canonical graph-driven spec for `appAuthMachine`

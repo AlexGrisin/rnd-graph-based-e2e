@@ -104,3 +104,8 @@ Keep entries brief, factual, and grep-friendly.
 - Renamed `app-purchase.machine.ts` to `app-shopping.machine.ts`, including its exported types, helper, machine symbol, and machine ID.
 - Renamed the generated purchase spec to `shopping-graph-driven.spec.ts` and updated Playwright matching plus current documentation.
 - Kept `app-purchase.actions.ts` scoped to its existing PDP-to-checkout browser actions.
+
+### 2026-09-14 - Rename auth graph-driven spec
+
+- Renamed `graph-driven.spec.ts` to `auth-graph-driven.spec.ts` and its suite title to `Auth graph-driven MBT`.
+- Updated Playwright matching and current contributor documentation to distinguish auth and shopping generated suites.

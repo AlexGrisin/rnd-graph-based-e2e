@@ -52,7 +52,7 @@ Code map for `rnd-graph-based-e2e`.
 #### tests/mbt/ (3 files) - Graph-driven specs
 
 - `coverage-loop.spec.ts`
-- `graph-driven.spec.ts`
+- `auth-graph-driven.spec.ts`
 - `shopping-graph-driven.spec.ts`
 
 #### tests/support/ (14 files) - Page objects, adapters, and config

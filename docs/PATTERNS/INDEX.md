@@ -10,7 +10,7 @@ Coverage: `tests/support/pages/*.page.ts`, `tests/support/pages/state-verifier.t
 ## Graph-Driven MBT Spec - one test per generated shortest path
 File: [test-spec.md](./test-spec.md)
 Use when creating a shortest-path Playwright suite backed by a machine and shared fixtures.
-Coverage: `tests/mbt/graph-driven.spec.ts`, `tests/mbt/shopping-graph-driven.spec.ts`
+Coverage: `tests/mbt/auth-graph-driven.spec.ts`, `tests/mbt/shopping-graph-driven.spec.ts`
 
 ## XState Journey Machine - typed linear journey model
 File: [machine-model.md](./machine-model.md)

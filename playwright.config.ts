@@ -28,7 +28,7 @@ export default defineConfig({
     },
     {
       name: 'app',
-      testMatch: /\/(graph-driven|shopping-graph-driven)\.spec\.ts/,
+      testMatch: /\/(auth-graph-driven|shopping-graph-driven)\.spec\.ts/,
     },
     {
       // Browser-free: exercises the exploration telemetry core (src/exploration)

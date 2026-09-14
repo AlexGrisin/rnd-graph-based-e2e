@@ -6,7 +6,7 @@ import { test } from '../fixtures.js';
 
 const paths = getAllShortestPaths(appAuthMachine);
 
-test.describe('Graph-driven MBT', () => {
+test.describe('Auth graph-driven MBT', () => {
   test.beforeEach(async ({ page }, testInfo) => {
     if (testInfo.project.name === 'app') {
       await page.goto('/');

@@ -69,7 +69,7 @@ tests/exploration/    -> browser-free exploration specs (core, guardrail, trace 
 
 ## Test Suites
 
-- `graph-driven.spec.ts`: one Playwright test per auth shortest path.
+- `auth-graph-driven.spec.ts`: one Playwright test per auth shortest path.
 - `shopping-graph-driven.spec.ts`: one Playwright test per generated shopping path.
 - `coverage-loop.spec.ts`: stub-only coverage-loop scenarios for default coverage, personas, weights, state priority, and budget exhaustion.
 - `tests/exploration/` (`exploration` project): browser-free specs exercising the exploration core, the guardrail generator, and the trace parser — `recorder.spec.ts`, `guardrails.spec.ts`, `trace-parser.spec.ts` — plus `parse-run.spec.ts` (a runner, skipped unless `EXPLORE_TRACE` is set). Live exploration is the `/explore` slash command (Playwright MCP), not a Playwright project.
