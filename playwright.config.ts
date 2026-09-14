@@ -24,7 +24,7 @@ export default defineConfig({
   projects: [
     {
       name: 'stub',
-      testMatch: /\/(shopping-graph-driven)\.spec\.ts/,
+      testMatch: /\/(auth-graph-driven|shopping-graph-driven)\.spec\.ts/,
     },
     {
       name: 'app',
