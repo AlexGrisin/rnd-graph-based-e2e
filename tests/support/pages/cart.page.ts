@@ -1,5 +1,4 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { dismissAppOverlays } from '../app/overlays.js';
 
 export class CartPage {
   private readonly proceedToCheckout: Locator;
@@ -23,11 +22,8 @@ export class CartPage {
 
   /** Opens the login/guest checkout gate (no payment). */
   async proceedToCheckoutGate(): Promise<void> {
-    await dismissAppOverlays(this.page);
     await this.proceedToCheckout.click();
-
     await this.page.waitForURL(/\/checkout\/delivery/, { timeout: 30_000 });
-    await dismissAppOverlays(this.page);
     await expect(this.guestEmail).toBeVisible({ timeout: 30_000 });
   }
 }

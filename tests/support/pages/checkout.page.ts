@@ -1,5 +1,4 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { dismissAppOverlays } from '../app/overlays.js';
 
 /** Guest checkout email for the POC — not a real account credential. */
 const GUEST_CHECKOUT_EMAIL = 'mbt-poc@example.com';
@@ -25,14 +24,11 @@ export class CheckoutPage {
    * delivery/collection step on the same /checkout/delivery page. No payment step.
    */
   async continueAsGuestIfNeeded(): Promise<void> {
-    await dismissAppOverlays(this.page);
-
     if (await this.guestEmail.isVisible().catch(() => false)) {
       await this.guestEmail.fill(GUEST_CHECKOUT_EMAIL);
       await this.guestContinueButton.click();
     }
 
     await this.page.waitForURL(/\/checkout\/delivery/, { timeout: 30_000 });
-    await dismissAppOverlays(this.page);
   }
 }

@@ -2,14 +2,16 @@ import { appAuthMachine } from '../../src/machines/app-auth.machine.js';
 import { describePath } from '../../src/mbt/graph/path-label.js';
 import { getAllShortestPaths } from '../../src/mbt/graph/path-generator.js';
 import { testPath } from '../../src/mbt/graph/test-model-factory.js';
+import { dismissAppOverlays } from '../support/app/overlays.js';
 import { test } from '../fixtures.js';
 
 const paths = getAllShortestPaths(appAuthMachine);
 
-test.describe('Auth graph-driven MBT', () => {
+test.describe('Auth graph-driven', () => {
   test.beforeEach(async ({ page }, testInfo) => {
     if (testInfo.project.name === 'app') {
       await page.goto('/');
+      await dismissAppOverlays(page);
     }
   });
 

@@ -1,5 +1,4 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { dismissAppOverlays } from '../app/overlays.js';
 
 /** Beaverbrooks home is the bare origin — may render with or without a trailing slash. */
 export const isHomeUrl = (url: URL): boolean =>
@@ -32,27 +31,22 @@ export class HomePage {
   }
 
   async openMyAccount(): Promise<void> {
-    await dismissAppOverlays(this.page);
-    await this.myAccountLink.click();
+    await this.myAccountLink.hover();
     await this.myAccountLink.click();
     await this.page.waitForURL(/\/my-account/, { timeout: 30_000 });
   }
 
   async goto(): Promise<void> {
     await this.page.goto('/');
-    await dismissAppOverlays(this.page);
     await this.page.waitForURL(isHomeUrl);
   }
 
   async openLogin(): Promise<void> {
     if (!isHomeUrl(new URL(this.page.url()))) {
       await this.goto();
-    } else {
-      await dismissAppOverlays(this.page);
     }
 
     await this.loginLink.click();
     await this.page.waitForURL(/\/login/);
-    await dismissAppOverlays(this.page);
   }
 }

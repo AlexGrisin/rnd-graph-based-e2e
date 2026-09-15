@@ -1,5 +1,4 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { dismissAppOverlays } from '../app/overlays.js';
 import { isHomeUrl } from './home.page.js';
 
 export class LoginPage {
@@ -28,7 +27,6 @@ export class LoginPage {
 
   /** Beaverbrooks redirects to home (signed in) after login, not straight to /my-account. */
   async submit(username: string, password: string): Promise<void> {
-    await dismissAppOverlays(this.page);
     await this.emailField.fill(username);
     await this.passwordField.fill(password);
     await this.loginButton.click();
@@ -36,7 +34,6 @@ export class LoginPage {
   }
 
   async failLogin(): Promise<void> {
-    await dismissAppOverlays(this.page);
     await this.emailField.fill('mbt-poc-invalid@example.com');
     await this.passwordField.fill('definitely-wrong-password');
     await this.loginButton.click();

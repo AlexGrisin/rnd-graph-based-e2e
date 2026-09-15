@@ -50,7 +50,7 @@ export function createLoggingContext(
   return {
     page,
     log: (message: string) => {
-      console.log(`[mbt] ${message}`);
+      console.log(`[xstate] ${message}`);
     },
   };
 }

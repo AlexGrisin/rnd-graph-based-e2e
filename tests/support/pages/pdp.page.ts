@@ -1,5 +1,4 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { dismissAppOverlays } from '../app/overlays.js';
 import { getAppProduct } from '../config/app-product.js';
 
 export class PdpPage {
@@ -27,20 +26,15 @@ export class PdpPage {
   async openProduct(): Promise<void> {
     const { productPath } = getAppProduct();
     await this.page.goto(productPath);
-    await dismissAppOverlays(this.page);
     await expect(this.addToCartButton).toBeVisible({ timeout: 30_000 });
   }
 
   async addToFavorites(): Promise<void> {
-    await dismissAppOverlays(this.page);
     await this.addToFavoritesButton.click();
   }
 
   async addToCartAndGoToBag(): Promise<void> {
-    await dismissAppOverlays(this.page);
     await this.selectSizeIfPresent();
-
-    await dismissAppOverlays(this.page);
     await this.addToCartButton.click();
 
     // Header bag badge updates once the line item is in the session cart.
@@ -48,7 +42,6 @@ export class PdpPage {
       timeout: 20_000,
     });
     await this.bagLink.first().click();
-    await dismissAppOverlays(this.page);
     await this.page.waitForURL(/\/checkout\/cart/);
     await expect(this.page.getByText(/basket is currently empty/i)).toHaveCount(
       0,

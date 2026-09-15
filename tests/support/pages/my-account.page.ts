@@ -1,5 +1,4 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { dismissAppOverlays } from '../app/overlays.js';
 import { isHomeUrl } from './home.page.js';
 
 export class MyAccountPage {
@@ -14,9 +13,7 @@ export class MyAccountPage {
   }
 
   async logout(): Promise<void> {
-    await dismissAppOverlays(this.page);
     await this.logoutLink.click();
     await this.page.waitForURL(isHomeUrl);
-    await dismissAppOverlays(this.page);
   }
 }
