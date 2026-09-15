@@ -7,6 +7,12 @@ export const isHomeUrl = (url: URL): boolean =>
 export class HomePage {
   private readonly loginLink: Locator;
   private readonly myAccountLink: Locator;
+  private readonly homeLink: Locator;
+  private readonly categoryMenuButton: Locator;
+  private readonly categoryLeafLink: Locator;
+  private readonly searchInput: Locator;
+  private readonly searchSubmit: Locator;
+  private readonly favoritesLink: Locator;
 
   constructor(private readonly page: Page) {
     const header = page.locator('header');
@@ -16,6 +22,20 @@ export class HomePage {
     // is confirmed to authenticate.
     this.myAccountLink = header
       .getByRole('link', { name: /my account/i })
+      .first();
+    this.homeLink = header.locator('a[href="/"]').first();
+    // The top-level "Jewellery" nav link goes to a category hub page with no
+    // products; a leaf link from its flyout menu reaches a real listing.
+    this.categoryMenuButton = header.getByRole('button', {
+      name: 'Open Jewellery menu',
+    });
+    this.categoryLeafLink = header
+      .getByRole('link', { name: 'Necklaces', exact: true })
+      .first();
+    this.searchInput = page.locator('#search-app-input');
+    this.searchSubmit = page.getByTestId('search-app-submit');
+    this.favoritesLink = header
+      .getByRole('link', { name: /favourites/i })
       .first();
   }
 
@@ -34,6 +54,30 @@ export class HomePage {
     await this.myAccountLink.hover();
     await this.myAccountLink.click();
     await this.page.waitForURL(/\/my-account/, { timeout: 30_000 });
+  }
+
+  async browseCategory(): Promise<void> {
+    await this.categoryMenuButton.hover();
+    await this.categoryLeafLink.click();
+    await this.page.waitForURL(/\/jewellery\//, { timeout: 30_000 });
+  }
+
+  async goFavorites(): Promise<void> {
+    await this.favoritesLink.hover();
+    await this.favoritesLink.click();
+    await this.page.waitForURL(/\/favourites/, { timeout: 30_000 });
+  }
+
+  async search(query: string): Promise<void> {
+    await this.searchInput.fill(query);
+    await this.searchSubmit.click();
+    await this.page.waitForURL(/\/jewellery\//, { timeout: 30_000 });
+  }
+
+  /** Returns home from any page sharing the full header (pdp, category, search, favorites). */
+  async goHome(): Promise<void> {
+    await this.homeLink.click();
+    await this.page.waitForURL(isHomeUrl, { timeout: 30_000 });
   }
 
   async goto(): Promise<void> {

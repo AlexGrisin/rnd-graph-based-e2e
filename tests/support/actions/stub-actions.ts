@@ -29,14 +29,17 @@ export function createStubActions(): ActionMap {
     GO_HOME: async ({ log }) => {
       log('GO_HOME → go home');
     },
-    GO_TO_PAGE: async ({ log }) => {
-      log('GO_TO_PAGE → go to page');
+    GO_FAVORITES: async ({ log }) => {
+      log('GO_FAVORITES → open favorites list');
     },
     ADD_TO_FAVORITES: async ({ log }) => {
       log('ADD_TO_FAVORITES → add to favorites');
     },
     ADD_TO_CART: async ({ log }) => {
       log('ADD_TO_CART → select size and add to bag');
+    },
+    GO_CART: async ({ log }) => {
+      log('GO_CART → view bag');
     },
     GO_CHECKOUT: async ({ log }) => {
       log('GO_CHECKOUT → proceed to checkout (no payment)');

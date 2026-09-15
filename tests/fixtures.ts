@@ -2,13 +2,15 @@ import type { Locator, Page } from '@playwright/test';
 import { test as base, expect, chromium } from '@playwright/test';
 import type { ActionMap } from '../src/mbt/types.js';
 import { createAppAuthActions } from './support/actions/app-auth.actions.js';
-import { createAppPurchaseActions } from './support/actions/app-purchase.actions.js';
+import { createAppShoppingActions } from './support/actions/app-shopping.actions.js';
 import { createStubActions } from './support/actions/stub-actions.js';
 import { createLoggingContext } from './support/actions/stub-actions.js';
 import { HomePage } from './support/pages/home.page.js';
 import { LoginPage } from './support/pages/login.page.js';
 import { MyAccountPage } from './support/pages/my-account.page.js';
 import { PdpPage } from './support/pages/pdp.page.js';
+import { ListingPage } from './support/pages/listing.page.js';
+import { FavoritesListPage } from './support/pages/favorites-list.page.js';
 import { CartPage } from './support/pages/cart.page.js';
 import { CheckoutPage } from './support/pages/checkout.page.js';
 import type { PageFixtures } from './support/pages/page-fixtures.js';
@@ -85,6 +87,12 @@ export const test = base.extend<MbtFixtures>({
   pdpPage: async ({ page }, use) => {
     await use(new PdpPage(page));
   },
+  listingPage: async ({ page }, use) => {
+    await use(new ListingPage(page));
+  },
+  favoritesListPage: async ({ page }, use) => {
+    await use(new FavoritesListPage(page));
+  },
   cartPage: async ({ page }, use) => {
     await use(new CartPage(page));
   },
@@ -95,7 +103,16 @@ export const test = base.extend<MbtFixtures>({
     await use(createLoggingContext(page));
   },
   actions: async (
-    { homePage, loginPage, myAccountPage, pdpPage, cartPage, checkoutPage },
+    {
+      homePage,
+      loginPage,
+      myAccountPage,
+      pdpPage,
+      listingPage,
+      favoritesListPage,
+      cartPage,
+      checkoutPage,
+    },
     use,
     testInfo,
   ) => {
@@ -108,16 +125,27 @@ export const test = base.extend<MbtFixtures>({
       loginPage,
       myAccountPage,
       pdpPage,
+      listingPage,
+      favoritesListPage,
       cartPage,
       checkoutPage,
     };
     await use({
       ...createAppAuthActions(pages),
-      ...createAppPurchaseActions(pages),
+      ...createAppShoppingActions(pages),
     });
   },
   stateVerifier: async (
-    { homePage, loginPage, myAccountPage, pdpPage, cartPage, checkoutPage },
+    {
+      homePage,
+      loginPage,
+      myAccountPage,
+      pdpPage,
+      listingPage,
+      favoritesListPage,
+      cartPage,
+      checkoutPage,
+    },
     use,
     testInfo,
   ) => {
@@ -131,6 +159,8 @@ export const test = base.extend<MbtFixtures>({
         loginPage,
         myAccountPage,
         pdpPage,
+        listingPage,
+        favoritesListPage,
         cartPage,
         checkoutPage,
       }),

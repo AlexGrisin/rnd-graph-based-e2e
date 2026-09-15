@@ -7,7 +7,7 @@ import { test } from '../fixtures.js';
 
 const paths = getAllCyclicPaths(appShoppingMachine);
 
-test.describe('Shopping graph-driven MBT', () => {
+test.describe('Shopping graph-driven', () => {
   test.beforeEach(async ({ page }, testInfo) => {
     if (testInfo.project.name === 'app') {
       await page.goto('/');

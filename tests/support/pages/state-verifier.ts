@@ -9,6 +9,11 @@ export function createStateVerifier(pages: PageFixtures): StateVerifier {
     myAccount: () => pages.myAccountPage.shouldBeOnPage(),
     error: () => pages.loginPage.shouldShowError(),
     pdp: () => pages.pdpPage.shouldBeOnPage(),
+    category: () => pages.listingPage.shouldBeOnPage(),
+    search: () => pages.listingPage.shouldBeOnPage(),
+    favoritesAdded: () => pages.pdpPage.shouldBeFavorited(),
+    favoritesList: () => pages.favoritesListPage.shouldBeOnPage(),
+    bagAdded: () => pages.pdpPage.shouldHaveItemInBag(),
     cart: () => pages.cartPage.shouldBeOnPage(),
     checkout: () => pages.checkoutPage.shouldBeOnPage(),
   };
