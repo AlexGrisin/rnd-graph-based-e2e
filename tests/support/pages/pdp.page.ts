@@ -6,6 +6,7 @@ export class PdpPage {
   private readonly sizeDropdown: Locator;
   private readonly addToFavoritesButton: Locator;
   private readonly miniCartCheckoutButton: Locator;
+  private readonly headerCartLink: Locator;
 
   constructor(private readonly page: Page) {
     this.productName = page.getByTestId('product-name');
@@ -14,8 +15,12 @@ export class PdpPage {
       .getByTestId('swatch-list-wrapper')
       .getByTestId('ring-size-dropdown');
     this.addToFavoritesButton = page.getByTestId('add-favourites-button');
-    // "Add to bag" auto-opens a mini-cart drawer; its own CTA navigates to the bag.
+    // "Add to bag" auto-opens this mini-cart drawer; its own CTA navigates to the bag.
     this.miniCartCheckoutButton = page.getByTestId('mini-cart-checkout-button');
+    // The header cart icon (present on every page) opens the same drawer when it isn't already open.
+    this.headerCartLink = page
+      .locator('header a[href="/checkout/cart"]')
+      .first();
   }
 
   async shouldBeOnPage(): Promise<void> {
@@ -44,7 +49,21 @@ export class PdpPage {
     await expect(this.miniCartCheckoutButton).toBeVisible();
   }
 
+  /**
+   * The mini-cart drawer is global (same on every page), but only auto-opens
+   * right after "Add to bag". Open it via the header icon when it isn't
+   * already showing, so this works whether GO_CART fires from the PDP
+   * (bagAdded, drawer already open) or elsewhere (e.g. home).
+   */
   async goToCart(): Promise<void> {
+    if (!(await this.miniCartCheckoutButton.isVisible().catch(() => false))) {
+      await this.headerCartLink.click();
+      await this.miniCartCheckoutButton.waitFor({
+        state: 'visible',
+        timeout: 10_000,
+      });
+    }
+
     await this.miniCartCheckoutButton.click({ timeout: 20_000 });
     await this.page.waitForURL(/\/checkout\/cart/);
     await expect(this.page.getByText(/basket is currently empty/i)).toHaveCount(

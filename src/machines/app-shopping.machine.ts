@@ -1,6 +1,9 @@
-import { setup } from 'xstate';
+import { assign, setup } from 'xstate';
 
-export type AppShoppingContext = Record<string, never>;
+export type AppShoppingContext = {
+  hasFavorite: boolean;
+  hasItemInCart: boolean;
+};
 
 export type AppShoppingEvent =
   | { type: 'SEARCH_QUERY' }
@@ -18,17 +21,25 @@ export const appShoppingMachine = setup({
     context: {} as AppShoppingContext,
     events: {} as AppShoppingEvent,
   },
+  guards: {
+    hasFavoritedItem: ({ context }) => context.hasFavorite,
+    hasItemInCart: ({ context }) => context.hasItemInCart,
+  },
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QEMAOqAKBXATgYwAtlYwA6AgewFswBiAIQCUB5AdQGUBRAfQGEBBACqcA4s0YBNANoAGALqJQqCrACWAF1UUAdopAAPRAEYAbEdImA7EYAclgEwmArPYCcNo64A0IAJ6IAZksA0icZcJkAgJtw11cAFgBfRJ80TFxCYjJKGloufkZeAAluAEUAVU5JWQUkEGU1TR09QwRTcytbB2c3D28-RHjLeNJ4uNcotwD7GXinZNT0bHwiElISZBXaMW4i5gBZThq9Bo0tXTrW+3iZUJlLDxM4yydXSxN7H38EePsQ8dcJhsURMzk8AQWIDSy0yaw2W2YGE4ADluBgACIYY51U5NC6gVpjSyhP5DJ5vZxRL6DaakGTA+xOIFAmTOeYpKFLDKrMh4ZDqMBQCg4XzbZi7A5HeQnFRnZqXRDXW5hB6mZ6vd6fAYIab2UgAuLxD4zUyQ6HcrKkPkCoUi2iIlFozHYpSyvEtQZvEkBMnPSkBak6gLmelRe5DX52GxmrkrS2oCCoMUSw4u+pu84ehBhcw2V43aw2Nyuew2QMzPXXcYvSKM+yWGPpONrBNJ-jo9HcQTigSMQRp3GZhUIYIhUlBSwJB5BIzlpw2Ubz4N-JwBFxJDnm5tkVu0dud7vcABi-AAauIAJLCdgDjPygmIUekceWSdDYHWcv3fVLoYBQFvEYUSNjCPKkAAZsgABuwoaHAyZ7Km0o4ne+IGIgMROKEli1sG8Q2IC8SBh4dwRC4NhGjcRhGCBFprHyODqMmxScLwADSzDlP2yGuo0Q4Pm0rLmPYjjrvE1E3Ncc4LnMwJGCua7XMkHLaBQEBwHoW6wmAMp8fe6EIAAtCYgbGXSEQWZZ9y0du5DUDpKF6WhhJat8uqkNMRiRsGPrRpusbaesYCbIQulys5gRFnSjgyK8Hjgh8TiBvEtJLm485uOJrIbosTaBdagrCt8vHhVmQQLtEpb1nFVgmPERHalE5hLj6dVriY0yAjZgWtmF7rDnVrikMEKXuAEkT-q4s7avYXmkHYYT0iJ40dXM3VgZBME4HB8COaVw4JCE9Wrl5jgTDhrmIK4tyhsGzgpWEYT2OtloMeofX8QZrjznSeYlt9timA40k-kWo4lkYDzDC99EEGAeAANYUFg717f1AnyUEFjfSJXkUSWZYzU4xI4WDbL-rY33KYkQA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QEMAOqDKALA9uglgHZQB0uAtmAMQBCASgPIDqGAogPoDCAggCqsBxBnQCaAbQAMAXUShUOWPgAu+HIVkgAHogDsADgDMJPQE49AFgBMZnRIBsEgKyOANCACeiAxZKOAvn5uaJi4BMRkOJRUbNx0nAAS7ACKAKqsopIySCDyiipqGtoI+kamFtZ6tg7Obp4IAIx6lr4BQejYeKhEpBTUQuwAYtwAasIAkvwYmRq5yqrq2UUlxmZWNvZOrh6IloYtgSDBHWGksGDIAE4AxlhU-fEMALKs09mz+QugRXp2zToG5gMdn+VU2tUQ9QMllah3aoS64TOlxuVAYAAVWAA5dhogAiaNecgUcwKi0QekcehIBlWFVBNW2CD09X2bRCnW6JCuyCUYCgOAu7juDHYD2ehJyxI+hXJvxI-0BwIM9K2dQMAJhR3hnO5vP5gtRGOxeIJ0hmUvmMqZlOptPW1VViDsQN8jgMjh09SsFM95k1cI54VQEFQwtFTxeZreFtJXwh5gkvnBCAB5ld7t9uw9Xr9By1gdIwdD3FxuPYvBFPDovAl70tZIaCaTjPMnvllgklm8EhMji7zIM-vZJxIRaoJbLFcGI3Gk1rMc+WnjicdCEsXeMEgzXqzmaHxwRpAAZsgAG4C5RwbgQCCQMNiyNZIl5etxhCOep2akfxy-Vfr0ot2zb1gOhPMAxHE9zwuS9YAAGXwWAlHvCN5xfWMlyZOUFSBEENgZOou0HcDh0PEgACNkCga9bwgFDxSjZ8SUXIoPy-d16l-SxV3MOxHGpIDMx9HN921cJKOom8736Ksa0YyV0JYxA2O-Ti-2TH9N23EDfVEgsuUuZCZPiVhOAAaQYFI5KfBTmKtZYyjWSp8NXTS9EEndhNzA5CBwW94GyfMTnNRSrQAWjsZMIr0kdehCuyGzsOw03XPj1MZLt+PqfRQK8sC2QPTkkWuLB4ulBt6gkSqSAcExcOVFzkxMZpKn8EjCvCXU+QFOomPKt9Kuq2r6pVZMAX45U2oKsTCxDMrX0wqwxvMfinG03cRPamaSCgi9eVgGjIHmjCindRNPR7Sbk3XNMDA8nSdxisjdpg-aEKQ46lIaKrE2GpVRoy8wWUpdVQbB9V6iezkJMOiBPqtZUjG4-RsspX5nWTVtmnXTtu17ftIShzrDPhxK7BMYx6kscwTDsRo3U7HQNM-AT1q8onSBuMArgAaxwABXJRSYGn6asu-7GsZTS1ty4CAgCIA */
   id: 'appShopping',
   initial: 'home',
-  context: {},
+  context: { hasFavorite: false, hasItemInCart: false },
   states: {
     home: {
       on: {
         BROWSE_CATEGORY: 'category',
         SEARCH_QUERY: 'search',
         GO_FAVORITES: 'favoritesList',
+        GO_CART: {
+          target: 'cart',
+          guard: 'hasItemInCart',
+        },
       },
     },
     search: {
@@ -46,23 +57,32 @@ export const appShoppingMachine = setup({
     pdp: {
       on: {
         GO_HOME: 'home',
-        ADD_TO_CART: 'bagAdded',
-        ADD_TO_FAVORITES: 'favoritesAdded',
+        ADD_TO_CART: {
+          target: 'bagAdded',
+          actions: assign({ hasItemInCart: true }),
+        },
+        ADD_TO_FAVORITES: {
+          target: 'favoritesAdded',
+          actions: assign({ hasFavorite: true }),
+        },
       },
     },
     favoritesAdded: {
       on: {
-        GO_HOME: 'home',
+        GO_FAVORITES: 'favoritesList',
       },
     },
     favoritesList: {
       on: {
         GO_HOME: 'home',
+        OPEN_PDP: {
+          target: 'pdp',
+          guard: 'hasFavoritedItem',
+        },
       },
     },
     bagAdded: {
       on: {
-        GO_HOME: 'home',
         GO_CART: 'cart',
       },
     },

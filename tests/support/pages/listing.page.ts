@@ -10,7 +10,7 @@ export class ListingPage {
 
   constructor(private readonly page: Page) {
     // Product PDPs are always at <sku>/<slug>/p.
-    this.productTiles = page.locator('a[href$="/p"]');
+    this.productTiles = page.getByTestId('product-card-link');
   }
 
   async shouldBeOnPage(): Promise<void> {

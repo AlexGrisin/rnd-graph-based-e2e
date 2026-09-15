@@ -9,15 +9,15 @@ dotenv.config({
 
 export default defineConfig({
   testDir: './tests',
-  fullyParallel: false,
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: 1,
+  workers: 2,
   reporter: [['list'], ['html', { open: 'never' }]],
   timeout: 120_000,
   use: {
     baseURL: process.env.BASE_URL,
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     actionTimeout: 30_000,
     navigationTimeout: 60_000,
   },

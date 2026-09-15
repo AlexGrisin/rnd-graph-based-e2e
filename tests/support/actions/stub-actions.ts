@@ -52,8 +52,6 @@ export function createLoggingContext(
 ): MbtContext {
   return {
     page,
-    log: (message: string) => {
-      console.log(`[xstate] ${message}`);
-    },
+    log: (message: string) => {},
   };
 }

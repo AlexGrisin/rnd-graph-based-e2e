@@ -5,7 +5,7 @@ import {
   adjacencyMapToArray,
 } from 'xstate/graph';
 import type { AnyActorLogic, EventObject } from 'xstate';
-import { getSnapshotStateValue } from './path-label.js';
+import { getSnapshotKey, getSnapshotStateValue } from './path-label.js';
 
 export { getShortestPaths, getSimplePaths, getAdjacencyMap };
 
@@ -31,13 +31,13 @@ export function getAllTransitionPaths<TLogic extends AnyActorLogic>(
 ) {
   const shortestPaths = getShortestPaths(logic);
   const prefixByState = new Map(
-    shortestPaths.map((path) => [getSnapshotStateValue(path.state), path]),
+    shortestPaths.map((path) => [getSnapshotKey(path.state), path]),
   );
 
   const edges = adjacencyMapToArray(getAdjacencyMap(logic, {}));
 
   return edges.map(({ state, event, nextState }) => {
-    const sourceKey = getSnapshotStateValue(state);
+    const sourceKey = getSnapshotKey(state);
     const prefix = prefixByState.get(sourceKey);
 
     if (!prefix) {
@@ -87,7 +87,7 @@ export function getAllCyclicPaths<TLogic extends AnyActorLogic>(
   for (const { state, event, nextState } of adjacencyMapToArray(
     getAdjacencyMap(logic, {}),
   )) {
-    const key = getSnapshotStateValue(state);
+    const key = getSnapshotKey(state);
     const edges = edgesByState.get(key) ?? [];
     edges.push({ event, nextState });
     edgesByState.set(key, edges);
@@ -105,7 +105,11 @@ export function getAllCyclicPaths<TLogic extends AnyActorLogic>(
     steps: Array<{ state: unknown; event: EventObject }>,
     visitCounts: Map<string, number>,
   ) {
-    paths.push({ state: currentState, weight: steps.length, steps: [...steps] });
+    paths.push({
+      state: currentState,
+      weight: steps.length,
+      steps: [...steps],
+    });
 
     if (paths.length > maxPaths) {
       throw new Error(
@@ -114,7 +118,7 @@ export function getAllCyclicPaths<TLogic extends AnyActorLogic>(
     }
 
     for (const { event, nextState } of edgesByState.get(stateKey) ?? []) {
-      const nextKey = getSnapshotStateValue(nextState);
+      const nextKey = getSnapshotKey(nextState);
       const count = visitCounts.get(nextKey) ?? 0;
 
       if (count >= maxRevisits + 1) {
@@ -122,12 +126,17 @@ export function getAllCyclicPaths<TLogic extends AnyActorLogic>(
       }
 
       visitCounts.set(nextKey, count + 1);
-      dfs(nextKey, nextState, [...steps, { state: nextState, event }], visitCounts);
+      dfs(
+        nextKey,
+        nextState,
+        [...steps, { state: nextState, event }],
+        visitCounts,
+      );
       visitCounts.set(nextKey, count);
     }
   }
 
-  const initialKey = getSnapshotStateValue(initialPath.state);
+  const initialKey = getSnapshotKey(initialPath.state);
   dfs(initialKey, initialPath.state, [], new Map([[initialKey, 1]]));
 
   return paths;
