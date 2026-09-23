@@ -28,6 +28,7 @@ export function getLlmJudgeConfig(): LlmGatewayJudgeConfig | undefined {
     token,
     model: JUDGE_MODEL,
     modelVersion: process.env.LLM_JUDGE_MODEL_VERSION ?? JUDGE_MODEL_VERSION,
+    attachRawResponse: process.env.LLM_JUDGE_ATTACH_RAW_RESPONSE === 'true',
     timeoutMs: 15_000,
   };
 }

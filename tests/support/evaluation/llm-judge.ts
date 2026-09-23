@@ -8,6 +8,7 @@ export type JudgeResult = {
   verdict: 'pass' | 'fail' | 'inconclusive';
   confidence: number;
   findings: JudgeFinding[];
+  rawResponse?: unknown;
 };
 
 export type JudgeEvidence = {
@@ -28,6 +29,7 @@ export type LlmGatewayJudgeConfig = {
   token: string;
   model: 'gpt-4o-mini';
   modelVersion: string;
+  attachRawResponse: boolean;
   timeoutMs: number;
 };
 
@@ -144,7 +146,12 @@ export function createLlmGatewayJudge(
           return INCONCLUSIVE;
         }
 
-        return parseJudgeResult(await response.json());
+        const payload = await response.json();
+        const result = parseJudgeResult(payload);
+
+        return config.attachRawResponse
+          ? { ...result, rawResponse: payload }
+          : result;
       } catch {
         return INCONCLUSIVE;
       } finally {

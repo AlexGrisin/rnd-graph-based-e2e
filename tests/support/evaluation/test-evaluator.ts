@@ -72,14 +72,18 @@ export function createPathEvaluator({
     });
 
     const result = await safelyJudge(judge, evidence);
-    await safelyAttach(testInfo, 'llm-judge-result', result);
+    const { rawResponse, ...verdict } = result;
+    await safelyAttach(testInfo, 'llm-judge-result', verdict);
+    if (rawResponse !== undefined) {
+      await safelyAttach(testInfo, 'llm-judge-raw-response', rawResponse);
+    }
     log(
       'verdict=' +
-        result.verdict +
+        verdict.verdict +
         ' confidence=' +
-        result.confidence +
+        verdict.confidence +
         ' findings=' +
-        result.findings.join(','),
+        verdict.findings.join(','),
     );
   }
 
@@ -115,10 +119,15 @@ function log(message: string) {
   console.log('[llm-judge] ' + message);
 }
 
-async function safelyAttach(testInfo: TestInfo, name: string, value: object) {
+async function safelyAttach(testInfo: TestInfo, name: string, value: unknown) {
   try {
+    const body = JSON.stringify(value);
+    if (!body) {
+      return;
+    }
+
     await testInfo.attach(name, {
-      body: JSON.stringify(value),
+      body,
       contentType: 'application/json',
     });
   } catch {

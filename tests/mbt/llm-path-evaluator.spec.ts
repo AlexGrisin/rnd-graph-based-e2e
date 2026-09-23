@@ -20,6 +20,7 @@ test.describe('LLM path evaluator', () => {
         token: 'test-token',
         model: 'gpt-4o-mini',
         modelVersion: 'unversioned-alias',
+        attachRawResponse: true,
         timeoutMs: 100,
       },
       async (url, init) => {
@@ -61,10 +62,13 @@ test.describe('LLM path evaluator', () => {
 
     expect(requestUrl).toBe('https://api.openai.com/v1/responses');
     expect(requestBody).toContain('GO_LOGIN');
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       verdict: 'pass',
       confidence: 0.8,
       findings: ['route_supported'],
+      rawResponse: {
+        output: expect.any(Array),
+      },
     });
   });
 
@@ -75,6 +79,7 @@ test.describe('LLM path evaluator', () => {
         token: 'test-token',
         model: 'gpt-4o-mini',
         modelVersion: 'unversioned-alias',
+        attachRawResponse: false,
         timeoutMs: 100,
       },
       async () => new Response('', { status: 500 }),
@@ -99,6 +104,7 @@ test.describe('LLM path evaluator', () => {
           verdict: 'inconclusive',
           confidence: 0,
           findings: ['missing_evidence'],
+          rawResponse: { output: 'debug response' },
         };
       },
     };
@@ -138,6 +144,9 @@ test.describe('LLM path evaluator', () => {
       attachments.filter((item) => item.contentType === 'image/png'),
     ).toHaveLength(5);
     expect(attachments.map((item) => item.name)).toContain('llm-judge-result');
+    expect(attachments.map((item) => item.name)).toContain(
+      'llm-judge-raw-response',
+    );
   });
 
   test('preserves a deterministic failure after attaching partial evidence', async () => {
