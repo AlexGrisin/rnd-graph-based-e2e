@@ -8,6 +8,9 @@ export function createStubActions(): ActionMap {
     SUBMIT: async ({ log }) => {
       log('SUBMIT → submit login form');
     },
+    SUBMIT_WITHOUT_CREDENTIALS: async ({ log }) => {
+      log('SUBMIT_WITHOUT_CREDENTIALS → submit empty login form');
+    },
     FAIL: async ({ log }) => {
       log('FAIL → simulate login failure');
     },
@@ -52,6 +55,8 @@ export function createLoggingContext(
 ): MbtContext {
   return {
     page,
-    log: (message: string) => {},
+    log: (message: string) => {
+      console.log(message);
+    },
   };
 }

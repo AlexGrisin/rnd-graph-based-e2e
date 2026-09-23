@@ -7,6 +7,7 @@ export type AppAuthContext = {
 export type AppAuthEvent =
   | { type: 'GO_LOGIN' }
   | { type: 'SUBMIT' }
+  | { type: 'SUBMIT_WITHOUT_CREDENTIALS' }
   | { type: 'FAIL' }
   | { type: 'GO_MY_ACCOUNT' }
   | { type: 'LOGOUT' };
@@ -17,7 +18,7 @@ export const appAuthMachine = setup({
     events: {} as AppAuthEvent,
   },
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QEMAOqCCBXALgCwDo8B7AWzAGIBxAeQH0AZGqgSQDkBtABgF1FRUxWAEscw4gDt+IAB6IAtAEYAzFwIAWAGzaArJoAcWzQCYAnOuUAaEAE9Ei42sP79yxQcWe9AX2-W0mLiEADbEUMISFADKAKoAQgCyLAAq3HxIIIIiYpLScgjyOvoEpvrGxvqKhtpmFurWdgjlAOwapsrKJu2eij5+IAHY+ASh4ZEAYhgsDGnSWaLiUhn5ys2tXJrqOt06Hc1cOvW2iKumBJrNqjpcFj19-uhDhKQ2GADGb8RYEjgUTLQxVK8OZCBa5ZaIMw6AjKHTNPSKUxcPYHI6NDpqLjNdpcG5uLyaXz9CTECBwaSDIIg7KLPIKRTNYpGTR6apdCwNE7KGHqFxuDwE3wPQLDEjkalgpagfI6RQaBzGdTmZGrA7aTkIKrFbSmRTqdRVO6E-qU4ajCISnJS2QnTQELi69qaJEovSaDXqcoENb6WW6yqCk2PIIEF7vT7fHCW2kQhBKgiVLY7V3q44IZTqdZcTzw26B4VPAhgABOxeIxej4OliHjie2bl2qrdHsqBGuOcO+N6xt8QA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QEMAOqCCBXALgCwDo8B7AWzAGIBxAeQH0AZGqgSQDkBtABgF1FRUxWAEscw4gDt+IAB6IAjABZ5BAGwB2eQA51AVgA0IAJ6IATAGYV5gJznTp+bvPrTL+eYC+Hw2ky5CADbEUMISFADKAKoAQgCyLAAq3HxIIIIiYpLScgjmqtYE6qq6qqYGxmZcpgRlXj7o2PgEQSFhAGIYLAzJ0umi4lKpOXkFRSVlhiYIptZaNVyWXNbqyg5LinUgvo2EJOQ71PSxAJp0GADC5zSRbEm8vUL9WUOIpVyF2nqTZqaKBMvFXSKHRcVRcIHqTbbfwEUhGDAAYwRxCwEhwFCYtEidxSAkemUGoBy+T+C3kpi04PkenUWnk3wQdIIui83hAEmIEDg0mh+AeGQG2UQAFpVAzRVCGjC9mB+U9CbJEIpTAydMytOZNVrtZrJX4mi1QnKCULppSatZVDpylMLCotLZ7I5nK4HJ42bzdmQwDtjYKXghFNZ3rNFM4bT9dARFGMgSCwRC9TtYfCkSi0X7nkTEFpTO9dLTHLpdNSC3SGcGCFwNTra0mYWAAE6N4iNzMKnJBkNaMNfCrTZbRpzrYG-BzWVkeIA */
   id: 'appAuth',
   initial: 'home',
   context: {
@@ -35,9 +36,11 @@ export const appAuthMachine = setup({
           target: 'homeAuth',
           actions: assign({ username: 'demo-user' }),
         },
+        SUBMIT_WITHOUT_CREDENTIALS: 'credentialsRequired',
         FAIL: 'error',
       },
     },
+    credentialsRequired: {},
     // Beaverbrooks redirects to home (signed in) after login; "My account" nav opens myAccount.
     homeAuth: {
       on: {
@@ -58,6 +61,7 @@ export const appAuthMachine = setup({
 export type AppAuthStateValue =
   | 'home'
   | 'login'
+  | 'credentialsRequired'
   | 'homeAuth'
   | 'myAccount'
   | 'error';

@@ -6,6 +6,7 @@ export class LoginPage {
   private readonly passwordField: Locator;
   private readonly loginButton: Locator;
   private readonly errorMessage: Locator;
+  private readonly requiredFieldMessages: Locator;
 
   constructor(private readonly page: Page) {
     this.emailField = page.locator('#signInEmail');
@@ -14,6 +15,9 @@ export class LoginPage {
     this.errorMessage = page.getByText(
       /Your username and\/or password was incorrect/i,
     );
+    this.requiredFieldMessages = page.getByText('This is a required field', {
+      exact: true,
+    });
   }
 
   async shouldBeOnPage(): Promise<void> {
@@ -23,6 +27,11 @@ export class LoginPage {
   async shouldShowError(): Promise<void> {
     await expect(this.page).toHaveURL(/\/login/);
     await expect(this.errorMessage).toBeVisible();
+  }
+
+  async shouldRequireCredentials(): Promise<void> {
+    await expect(this.page).toHaveURL(/\/login/);
+    await expect(this.requiredFieldMessages).toHaveCount(2);
   }
 
   /** Beaverbrooks redirects to home (signed in) after login, not straight to /my-account. */
@@ -38,5 +47,9 @@ export class LoginPage {
     await this.passwordField.fill('definitely-wrong-password');
     await this.loginButton.click();
     await expect(this.errorMessage).toBeVisible({ timeout: 30_000 });
+  }
+
+  async submitWithoutCredentials(): Promise<void> {
+    await this.loginButton.click();
   }
 }

@@ -29,7 +29,7 @@ tests/mbt/            -> generated-path Playwright specs
 
 ## Journey Models
 
-- `app-auth.machine.ts`: auth journey states `home`, `login`, `myAccount`, `error`; events `GO_LOGIN`, `SUBMIT`, `FAIL`, `LOGOUT`; `error` is final.
+- `app-auth.machine.ts`: auth journey states `home`, `login`, `credentialsRequired`, `homeAuth`, `myAccount`, `error`; includes successful login, empty-credential validation, invalid login, account navigation, and logout; `error` is final.
 - `app-shopping.machine.ts`: shopping journey states `home`, `search`, `category`, `pdp`, `favorites`, `cart`, `checkout`; models discovery, product selection, favorites, cart, home-return cycles, and guest checkout; `checkout` is final.
 - Journey machines must not import Playwright, page objects, or environment configuration.
 

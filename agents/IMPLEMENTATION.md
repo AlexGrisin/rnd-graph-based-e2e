@@ -119,3 +119,8 @@ Keep entries brief, factual, and grep-friendly.
 - Removed agent-driven Playwright MCP commands/configuration, site profiles/guardrails, exploration core, trace parser, and browser-free exploration suite.
 - Removed the exploration Playwright project and exploration-only environment and current-documentation references.
 - Retained deterministic MBT coverage-loop implementation/investigation and ignored legacy local trace/artifact paths for credential safety.
+
+### 2026-09-23 - Model empty-credential authentication validation
+
+- Added `SUBMIT_WITHOUT_CREDENTIALS` from `login` to `credentialsRequired` in the auth machine.
+- Wired the generated path through the live and stub action maps and a page-level assertion for both required-field messages.

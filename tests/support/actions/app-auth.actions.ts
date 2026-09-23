@@ -13,6 +13,10 @@ export function createAppAuthActions(pages: PageFixtures): ActionMap {
       const credentials = getAppCredentials();
       await pages.loginPage.submit(credentials.email, credentials.password);
     },
+    SUBMIT_WITHOUT_CREDENTIALS: async (ctx: MbtContext) => {
+      ctx.log('SUBMIT_WITHOUT_CREDENTIALS');
+      await pages.loginPage.submitWithoutCredentials();
+    },
     FAIL: async (ctx: MbtContext) => {
       ctx.log('FAIL');
       await pages.loginPage.failLogin();
