@@ -18,11 +18,19 @@ import {
   createStateVerifier,
   noopStateVerifier,
 } from './support/pages/state-verifier.js';
+import { getLlmJudgeConfig } from './support/config/llm-judge.js';
+import {
+  createNoopPathEvaluator,
+  createPathEvaluator,
+  type PathEvaluator,
+} from './support/evaluation/test-evaluator.js';
+import { createLlmGatewayJudge } from './support/evaluation/llm-judge.js';
 
 type MbtFixtures = PageFixtures & {
   mbtContext: ReturnType<typeof createLoggingContext>;
   actions: ActionMap;
   stateVerifier: ReturnType<typeof createStateVerifier>;
+  pathEvaluator: PathEvaluator;
 };
 
 function createMockLocator(): Locator {
@@ -101,6 +109,26 @@ export const test = base.extend<MbtFixtures>({
   },
   mbtContext: async ({ page }, use) => {
     await use(createLoggingContext(page));
+  },
+  pathEvaluator: async ({ page }, use, testInfo) => {
+    if (testInfo.project.name === 'stub') {
+      await use(createNoopPathEvaluator());
+      return;
+    }
+
+    const config = getLlmJudgeConfig();
+    if (!config) {
+      await use(createNoopPathEvaluator());
+      return;
+    }
+
+    await use(
+      createPathEvaluator({
+        page,
+        testInfo,
+        judge: createLlmGatewayJudge(config),
+      }),
+    );
   },
   actions: async (
     {

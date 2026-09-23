@@ -1,5 +1,8 @@
 import { appAuthMachine } from '../../src/machines/app-auth.machine.js';
-import { describePath } from '../../src/mbt/graph/path-label.js';
+import {
+  describePath,
+  getSnapshotStateValue,
+} from '../../src/mbt/graph/path-label.js';
 import { getAllShortestPaths } from '../../src/mbt/graph/path-generator.js';
 import { testPath } from '../../src/mbt/graph/test-model-factory.js';
 import { dismissAppOverlays } from '../support/app/overlays.js';
@@ -16,11 +19,20 @@ test.describe('Auth graph-driven', () => {
   });
 
   for (const path of paths) {
-    test(describePath(path), async ({ mbtContext, actions, stateVerifier }) => {
-      await testPath(path, mbtContext, {
-        actions,
-        verifyState: stateVerifier,
-      });
-    });
+    test(
+      describePath(path),
+      async ({ mbtContext, actions, stateVerifier, pathEvaluator }) => {
+        await pathEvaluator.run(
+          getSnapshotStateValue(path.state),
+          async (onStepCompleted) => {
+            await testPath(path, mbtContext, {
+              actions,
+              verifyState: stateVerifier,
+              onStepCompleted,
+            });
+          },
+        );
+      },
+    );
   }
 });

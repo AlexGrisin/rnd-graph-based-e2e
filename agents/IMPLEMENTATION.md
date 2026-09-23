@@ -124,3 +124,8 @@ Keep entries brief, factual, and grep-friendly.
 
 - Added `SUBMIT_WITHOUT_CREDENTIALS` from `login` to `credentialsRequired` in the auth machine.
 - Wired the generated path through the live and stub action maps and a page-level assertion for both required-field messages.
+
+### 2026-09-23 - Add advisory LLM path evaluation MVP
+
+- Added an optional post-verification MBT callback and an app-only evaluator that attaches routes, masked screenshots, and advisory verdicts to Playwright results.
+- Added a configurable LLM Gateway Responses API adapter for gpt-4o-mini; it is disabled by default and preserves deterministic Playwright status on provider failures.

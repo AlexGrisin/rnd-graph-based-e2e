@@ -1,12 +1,18 @@
 import { createActor } from 'xstate';
 import type { AnyActorLogic, EventObject } from 'xstate';
 import type { StatePath } from 'xstate/graph';
-import type { ActionMap, MbtContext, StateVerifier } from '../types.js';
+import type {
+  ActionMap,
+  MbtContext,
+  MbtVerifiedStep,
+  StateVerifier,
+} from '../types.js';
 
 export type TestModelOptions<TEvent extends EventObject> = {
   actions: ActionMap;
   verifyState?: StateVerifier;
   onStateVisited?: (stateValue: string) => void;
+  onStepCompleted?: (step: MbtVerifiedStep) => void | Promise<void>;
 };
 
 function getSnapshotStateValue(snapshot: unknown): string {
@@ -27,7 +33,8 @@ export async function testPath<TEvent extends EventObject>(
   ctx: MbtContext,
   options: TestModelOptions<TEvent>,
 ): Promise<void> {
-  const { actions, verifyState, onStateVisited } = options;
+  const { actions, verifyState, onStateVisited, onStepCompleted } = options;
+  let verifiedStepCount = 0;
 
   for (const step of path.steps) {
     const eventType = getEventType(step.event);
@@ -50,6 +57,13 @@ export async function testPath<TEvent extends EventObject>(
     if (verifyState) {
       await verifyState(expectedState, ctx);
     }
+
+    await onStepCompleted?.({
+      index: verifiedStepCount,
+      eventType,
+      expectedState,
+    });
+    verifiedStepCount += 1;
   }
 
   const finalState = getSnapshotStateValue(path.state);

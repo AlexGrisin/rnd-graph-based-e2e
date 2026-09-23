@@ -12,19 +12,21 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: 2,
+  workers: 1,
   reporter: [['list'], ['html', { open: 'never' }]],
   timeout: 120_000,
   use: {
     baseURL: process.env.BASE_URL,
-    trace: 'retain-on-failure',
+    trace: 'retain-on-failure', 
     actionTimeout: 30_000,
     navigationTimeout: 60_000,
+    headless: true
   },
   projects: [
     {
       name: 'stub',
-      testMatch: /\/(auth-graph-driven|shopping-graph-driven)\.spec\.ts/,
+      testMatch:
+        /\/(auth-graph-driven|shopping-graph-driven|llm-path-evaluator)\.spec\.ts/,
     },
     {
       name: 'app',
