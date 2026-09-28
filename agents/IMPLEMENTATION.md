@@ -138,3 +138,4 @@ Keep entries brief, factual, and grep-friendly.
 - Replaced redundant console findings with score, confidence, criterion coverage, deterministic decision reason, and problematic criterion IDs.
 - Added explicit route-node and final-state criteria, screenshot label mapping, and final-screenshot retention within the evidence cap.
 - Added expected XState context to verified route steps and judge evidence so screenshots can be checked against both node and context.
+- Added concise expected-versus-observed criterion explanations and screenshot indexes, logged only for non-passing criteria.

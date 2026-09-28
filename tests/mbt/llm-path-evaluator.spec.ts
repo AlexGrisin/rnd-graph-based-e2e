@@ -12,6 +12,7 @@ import {
 } from '../support/evaluation/judge-client.js';
 import { pathEvidenceRubric } from '../support/evaluation/rubrics/path-evidence.rubric.js';
 import {
+  formatJudgeIssues,
   createPathEvaluator,
   formatJudgeSummary,
 } from '../support/evaluation/test-evaluator.js';
@@ -81,6 +82,8 @@ test.describe('LLM path evaluator', () => {
     expect(requestUrl).toBe('https://api.openai.com/v1/responses');
     expect(requestBody).toContain('GO_LOGIN');
     expect(requestBody).toContain('route-node-correspondence');
+    expect(requestBody).toContain('evidenceImageIndexes');
+    expect(requestBody).toContain('explanation');
     expect(parsedEvidence).toMatchObject({
       finalExpectedState: 'login',
       finalExpectedContext: { authenticated: false },
@@ -349,6 +352,9 @@ test.describe('LLM path evaluator', () => {
             score: 0.3,
             confidence: 0.91,
             reasonCode: 'visible_conflict',
+            evidenceImageIndexes: [1, 4],
+            explanation:
+              'Expected state and context conflict with the visible UI.',
           },
           {
             criterionId: 'final-state-appropriate',
@@ -356,6 +362,8 @@ test.describe('LLM path evaluator', () => {
             score: 0.9,
             confidence: 0.91,
             reasonCode: 'visible_support',
+            evidenceImageIndexes: [4],
+            explanation: 'The final state is visibly supported.',
           },
         ],
       }),
@@ -364,6 +372,32 @@ test.describe('LLM path evaluator', () => {
         'reason=required_criterion_failed ' +
         'issues=route-node-correspondence:not_met',
     );
+
+    expect(
+      formatJudgeIssues({
+        verdict: 'fail',
+        decisionReason: 'required_criterion_failed',
+        score: 0.44,
+        confidence: 0.91,
+        findings: ['route_not_supported'],
+        criteria: [
+          {
+            criterionId: 'route-node-correspondence',
+            status: 'not_met',
+            score: 0.3,
+            confidence: 0.91,
+            reasonCode: 'visible_conflict',
+            evidenceImageIndexes: [1, 4],
+            explanation:
+              'Expected state and context conflict with the visible UI.',
+          },
+        ],
+      }),
+    ).toEqual([
+      'issue criterion=route-node-correspondence status=not_met ' +
+        'score=0.3 confidence=0.91 reason=visible_conflict images=1,4 ' +
+        'detail="Expected state and context conflict with the visible UI."',
+    ]);
   });
 });
 
@@ -374,5 +408,7 @@ function createAssessments(score: number, confidence: number) {
     score,
     confidence,
     reasonCode: 'visible_support',
+    evidenceImageIndexes: [],
+    explanation: 'The criterion is supported by the supplied evidence.',
   }));
 }

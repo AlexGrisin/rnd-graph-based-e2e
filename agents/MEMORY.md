@@ -33,6 +33,12 @@ Terminate and verify each file hunk before starting the next file update so one 
 ### Assert Nested JSON Structurally [ACTIVE]
 Decode embedded JSON payloads before asserting fields so transport escaping cannot create false test failures.
 
+### Re-read Formatted Regions Before Exact Patches [ACTIVE]
+After formatting changes a file, inspect the exact target region before applying context-sensitive follow-up patches.
+
+### Align Structured Schemas With Runtime Parsers [ACTIVE]
+Do not enforce stricter hidden parser constraints than the provider schema; optional diagnostic fields must not invalidate an otherwise usable result.
+
 ### Remove Superseded Orchestration Layers [ACTIVE]
 When specs execute graph paths directly, remove unused wrapper runners and strategy machines so dependency type changes cannot break dead code.
 

@@ -122,7 +122,7 @@ export function createLlmGatewayJudge(
         const payload = await response.json();
         const outputText = getOutputText(payload);
         const assessments = outputText
-          ? parseAssessments(outputText, rubric)
+          ? parseAssessments(outputText, rubric, evidence.screenshots.length)
           : undefined;
         const result = assessments
           ? evaluateAssessments(rubric, assessments)

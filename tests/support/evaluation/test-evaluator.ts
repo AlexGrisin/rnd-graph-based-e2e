@@ -88,6 +88,9 @@ export function createPathEvaluator({
       await safelyAttach(testInfo, 'llm-judge-raw-response', rawResponse);
     }
     log(formatJudgeSummary(verdict));
+    for (const issue of formatJudgeIssues(verdict)) {
+      log(issue);
+    }
   }
 
   return {
@@ -145,6 +148,29 @@ export function formatJudgeSummary(result: JudgeResult): string {
   ]
     .filter(Boolean)
     .join(' ');
+}
+
+export function formatJudgeIssues(result: JudgeResult): string[] {
+  if (result.verdict === 'pass') {
+    return [];
+  }
+
+  return result.criteria
+    .filter((criterion) => criterion.status !== 'met')
+    .map((criterion) =>
+      [
+        'issue',
+        'criterion=' + criterion.criterionId,
+        'status=' + criterion.status,
+        'score=' + criterion.score,
+        'confidence=' + criterion.confidence,
+        'reason=' + criterion.reasonCode,
+        criterion.evidenceImageIndexes.length > 0
+          ? 'images=' + criterion.evidenceImageIndexes.join(',')
+          : 'images=none',
+        'detail=' + JSON.stringify(criterion.explanation),
+      ].join(' '),
+    );
 }
 
 async function safelyAttachImage(
