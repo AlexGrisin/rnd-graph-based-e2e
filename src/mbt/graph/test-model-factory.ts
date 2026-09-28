@@ -53,6 +53,7 @@ export async function testPath<TEvent extends EventObject>(
     await handler(ctx);
 
     const expectedState = getSnapshotStateValue(step.state);
+    ctx.log(`[xstate] ACTION=${eventType} TARGET=${expectedState}`);
     onStateVisited?.(expectedState);
 
     if (verifyState) {

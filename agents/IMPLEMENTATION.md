@@ -139,3 +139,4 @@ Keep entries brief, factual, and grep-friendly.
 - Added explicit route-node and final-state criteria, screenshot label mapping, and final-screenshot retention within the evidence cap.
 - Added expected XState context to verified route steps and judge evidence so screenshots can be checked against both node and context.
 - Added concise expected-versus-observed criterion explanations and screenshot indexes, logged only for non-passing criteria.
+- Added centralized XState transition logging through `MbtContext.log` with the executed event/action and expected target state.

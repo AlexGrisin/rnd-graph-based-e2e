@@ -278,11 +278,12 @@ test.describe('LLM path evaluator', () => {
         ),
     );
     const steps: MbtVerifiedStep[] = [];
+    const logs: string[] = [];
 
     expect(path).toBeDefined();
     await testPath(
       path!,
-      { page: {} as Page, log: () => undefined },
+      { page: {} as Page, log: (message) => logs.push(message) },
       {
         actions: { GO_LOGIN: async () => undefined },
         verifyState: async (state) => {
@@ -302,6 +303,7 @@ test.describe('LLM path evaluator', () => {
         expectedContext: { username: '' },
       },
     ]);
+    expect(logs).toContain('[xstate] ACTION=GO_LOGIN TARGET=login');
   });
 
   test('reports XState context after shopping actions', async () => {
