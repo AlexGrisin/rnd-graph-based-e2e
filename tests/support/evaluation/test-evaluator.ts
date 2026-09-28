@@ -1,6 +1,6 @@
 import type { Page, TestInfo } from '@playwright/test';
 import type { MbtVerifiedStep } from '../../../src/mbt/types.js';
-import type { JudgeEvidence, JudgeResult, LlmJudge } from './llm-judge.js';
+import type { JudgeEvidence, JudgeResult, LlmJudge } from './judge-client.js';
 
 const MAX_SCREENSHOTS = 5;
 
@@ -10,6 +10,7 @@ export interface PathEvaluator {
     execute: (
       onStepCompleted: (step: MbtVerifiedStep) => Promise<void>,
     ) => Promise<T>,
+    terminalContext?: Record<string, unknown>,
   ): Promise<T>;
 }
 
@@ -35,28 +36,29 @@ export function createPathEvaluator({
   const steps: MbtVerifiedStep[] = [];
   const screenshots: JudgeEvidence['screenshots'] = [];
 
-  async function captureScreenshot(eventType: string, expectedState: string) {
-    if (screenshots.length >= MAX_SCREENSHOTS) {
-      return;
-    }
-
+  async function captureScreenshot(
+    eventType: string,
+    expectedState: string,
+    sequenceNumber: number,
+  ) {
     try {
       const image = await page.locator('main').screenshot({
         animations: 'disabled',
         mask: [page.locator('input, textarea, [contenteditable="true"]')],
       });
       const label =
-        String(screenshots.length + 1).padStart(2, '0') +
+        String(sequenceNumber).padStart(2, '0') +
         '-' +
         eventType.toLowerCase() +
         '-' +
         expectedState;
+      const screenshot = { label, image };
 
-      screenshots.push({ label, image });
-      await testInfo.attach(label, {
-        body: image,
-        contentType: 'image/png',
-      });
+      if (screenshots.length < MAX_SCREENSHOTS) {
+        screenshots.push(screenshot);
+      } else {
+        screenshots[MAX_SCREENSHOTS - 1] = screenshot;
+      }
     } catch {
       // Evidence collection is advisory and must not hide the test result.
     }
@@ -65,10 +67,18 @@ export function createPathEvaluator({
   async function finalize(status: JudgeEvidence['status']) {
     const evidence: JudgeEvidence = { status, steps, screenshots };
 
+    for (const screenshot of screenshots) {
+      await safelyAttachImage(testInfo, screenshot.label, screenshot.image);
+    }
+
     await safelyAttach(testInfo, 'llm-judge-route', {
       status,
       steps,
       screenshotCount: screenshots.length,
+      screenshots: screenshots.map((screenshot, imageIndex) => ({
+        imageIndex,
+        label: screenshot.label,
+      })),
     });
 
     const result = await safelyJudge(judge, evidence);
@@ -77,22 +87,19 @@ export function createPathEvaluator({
     if (rawResponse !== undefined) {
       await safelyAttach(testInfo, 'llm-judge-raw-response', rawResponse);
     }
-    log(
-      'verdict=' +
-        verdict.verdict +
-        ' confidence=' +
-        verdict.confidence +
-        ' findings=' +
-        verdict.findings.join(','),
-    );
+    log(formatJudgeSummary(verdict));
   }
 
   return {
-    async run(terminalState, execute) {
+    async run(terminalState, execute, terminalContext) {
       try {
         const result = await execute(async (step) => {
           steps.push(step);
-          await captureScreenshot(step.eventType, step.expectedState);
+          await captureScreenshot(
+            step.eventType,
+            step.expectedState,
+            step.index + 1,
+          );
         });
 
         if (steps.length === 0) {
@@ -100,14 +107,15 @@ export function createPathEvaluator({
             index: 0,
             eventType: 'INITIAL',
             expectedState: terminalState,
+            expectedContext: terminalContext,
           });
-          await captureScreenshot('INITIAL', terminalState);
+          await captureScreenshot('INITIAL', terminalState, 1);
         }
 
         await finalize('passed');
         return result;
       } catch (error) {
-        await captureScreenshot('FAILURE', 'failure');
+        await captureScreenshot('FAILURE', 'failure', steps.length + 1);
         await finalize('failed');
         throw error;
       }
@@ -117,6 +125,41 @@ export function createPathEvaluator({
 
 function log(message: string) {
   console.log('[llm-judge] ' + message);
+}
+
+export function formatJudgeSummary(result: JudgeResult): string {
+  const metCount = result.criteria.filter(
+    (criterion) => criterion.status === 'met',
+  ).length;
+  const issues = result.criteria
+    .filter((criterion) => criterion.status !== 'met')
+    .map((criterion) => criterion.criterionId + ':' + criterion.status);
+
+  return [
+    'verdict=' + result.verdict,
+    'score=' + result.score,
+    'confidence=' + result.confidence,
+    'criteria=' + metCount + '/' + result.criteria.length,
+    'reason=' + result.decisionReason,
+    issues.length > 0 ? 'issues=' + issues.join(',') : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+async function safelyAttachImage(
+  testInfo: TestInfo,
+  name: string,
+  image: Buffer,
+) {
+  try {
+    await testInfo.attach(name, {
+      body: image,
+      contentType: 'image/png',
+    });
+  } catch {
+    // Attachments supplement, rather than determine, test outcomes.
+  }
 }
 
 async function safelyAttach(testInfo: TestInfo, name: string, value: unknown) {
@@ -144,8 +187,11 @@ async function safelyJudge(
   } catch {
     return {
       verdict: 'inconclusive',
+      decisionReason: 'provider_unavailable',
+      score: 0,
       confidence: 0,
       findings: ['missing_evidence'],
+      criteria: [],
     };
   }
 }

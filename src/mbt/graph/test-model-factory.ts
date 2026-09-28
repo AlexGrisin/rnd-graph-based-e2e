@@ -7,6 +7,7 @@ import type {
   MbtVerifiedStep,
   StateVerifier,
 } from '../types.js';
+import { getSnapshotContext } from './path-label.js';
 
 export type TestModelOptions<TEvent extends EventObject> = {
   actions: ActionMap;
@@ -62,6 +63,7 @@ export async function testPath<TEvent extends EventObject>(
       index: verifiedStepCount,
       eventType,
       expectedState,
+      expectedContext: getSnapshotContext(step.state),
     });
     verifiedStepCount += 1;
   }

@@ -129,3 +129,12 @@ Keep entries brief, factual, and grep-friendly.
 
 - Added an optional post-verification MBT callback and an app-only evaluator that attaches routes, masked screenshots, and advisory verdicts to Playwright results.
 - Added a configurable LLM Gateway Responses API adapter for gpt-4o-mini; it is disabled by default and preserves deterministic Playwright status on provider failures.
+
+### 2026-09-28 - Extract rubric-driven judge policy
+
+- Separated the generic LLM judge client from a self-contained path-evidence rubric.
+- Moved instructions, weighted criteria, and verdict thresholds into the rubric file.
+- Kept final scoring and threshold application deterministic in the client.
+- Replaced redundant console findings with score, confidence, criterion coverage, deterministic decision reason, and problematic criterion IDs.
+- Added explicit route-node and final-state criteria, screenshot label mapping, and final-screenshot retention within the evidence cap.
+- Added expected XState context to verified route steps and judge evidence so screenshots can be checked against both node and context.

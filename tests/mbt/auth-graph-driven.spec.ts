@@ -1,6 +1,7 @@
 import { appAuthMachine } from '../../src/machines/app-auth.machine.js';
 import {
   describePath,
+  getSnapshotContext,
   getSnapshotStateValue,
 } from '../../src/mbt/graph/path-label.js';
 import { getAllShortestPaths } from '../../src/mbt/graph/path-generator.js';
@@ -31,6 +32,7 @@ test.describe('Auth graph-driven', () => {
               onStepCompleted,
             });
           },
+          getSnapshotContext(path.state),
         );
       },
     );

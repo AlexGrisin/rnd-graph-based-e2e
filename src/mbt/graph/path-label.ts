@@ -6,7 +6,7 @@ export function getSnapshotStateValue(snapshot: unknown): string {
   return typeof value === 'string' ? value : JSON.stringify(value);
 }
 
-function getSnapshotContext(
+export function getSnapshotContext(
   snapshot: unknown,
 ): Record<string, unknown> | undefined {
   return (snapshot as { context?: Record<string, unknown> }).context;

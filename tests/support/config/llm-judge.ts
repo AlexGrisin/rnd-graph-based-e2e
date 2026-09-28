@@ -1,4 +1,4 @@
-import type { LlmGatewayJudgeConfig } from '../evaluation/llm-judge.js';
+import type { LlmGatewayJudgeConfig } from '../evaluation/judge-client.js';
 
 const DEFAULT_GATEWAY_URL = 'https://api.openai.com/v1';
 const JUDGE_MODEL = 'gpt-4o-mini';

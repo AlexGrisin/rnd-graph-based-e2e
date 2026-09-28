@@ -4,6 +4,7 @@ export type MbtVerifiedStep = {
   index: number;
   eventType: string;
   expectedState: string;
+  expectedContext?: Record<string, unknown>;
 };
 
 export type MbtContext = {

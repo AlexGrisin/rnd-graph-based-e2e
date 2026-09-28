@@ -1,6 +1,7 @@
 import { appShoppingMachine } from '../../src/machines/app-shopping.machine.js';
 import {
   describePath,
+  getSnapshotContext,
   getSnapshotStateValue,
 } from '../../src/mbt/graph/path-label.js';
 import { getAllCyclicPaths } from '../../src/mbt/graph/path-generator.js';
@@ -31,6 +32,7 @@ test.describe('Shopping graph-driven', () => {
               onStepCompleted,
             });
           },
+          getSnapshotContext(path.state),
         );
       },
     );

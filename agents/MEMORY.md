@@ -27,6 +27,12 @@ When page objects call new Playwright APIs, update `createMockPage` or `createMo
 ### Refresh Derived Inventories After Artifact Changes [ACTIVE]
 Regenerate and validate CODEMAP counts after documentation or pattern artifacts change during initialization.
 
+### Keep Multi-File Patch Hunks Independent [ACTIVE]
+Terminate and verify each file hunk before starting the next file update so one malformed boundary cannot reject the complete patch.
+
+### Assert Nested JSON Structurally [ACTIVE]
+Decode embedded JSON payloads before asserting fields so transport escaping cannot create false test failures.
+
 ### Remove Superseded Orchestration Layers [ACTIVE]
 When specs execute graph paths directly, remove unused wrapper runners and strategy machines so dependency type changes cannot break dead code.
 

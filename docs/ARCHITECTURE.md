@@ -35,7 +35,7 @@ tests/mbt/            -> generated-path Playwright specs
 
 ## MBT Engine
 
-- The optional app-only LLM evaluator records verified steps, attaches masked main-content screenshots, and produces an advisory gateway verdict without changing deterministic test status.
+- The optional app-only LLM evaluator records verified steps with their expected XState context, attaches labeled masked screenshots, preserves the final screenshot within its evidence cap, and produces an advisory gateway verdict without changing deterministic test status. A generic judge client applies criteria, weights, and thresholds from self-contained rubric files, including state/context correspondence and final-state appropriateness.
 - `path-generator.ts` re-exports XState graph helpers and adds helpers for all shortest paths, transition counts, and reachable state values.
 - `test-model-factory.ts` executes a graph path by dispatching non-internal events through an action map, then optionally verifies the reached state.
 - `coverage-tracker.ts` tracks known states/edges from adjacency, visit counts, weighted gaps, and percentage reports.
