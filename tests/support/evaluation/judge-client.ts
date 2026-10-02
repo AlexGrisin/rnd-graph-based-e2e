@@ -25,6 +25,9 @@ export type JudgeEvidence = {
   screenshots: Array<{
     label: string;
     image: Buffer;
+    stepIndex?: number;
+    action?: string;
+    target?: string;
   }>;
 };
 
@@ -95,6 +98,9 @@ export function createLlmGatewayJudge(
                           (screenshot, imageIndex) => ({
                             imageIndex,
                             label: screenshot.label,
+                            stepIndex: screenshot.stepIndex,
+                            action: screenshot.action,
+                            target: screenshot.target,
                           }),
                         ),
                       }),

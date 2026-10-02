@@ -17,7 +17,8 @@ export interface PathEvaluator {
 type PathEvaluatorOptions = {
   page: Page;
   testInfo: TestInfo;
-  judge: LlmJudge;
+  routeJudge?: LlmJudge;
+  stepJudge?: LlmJudge;
 };
 
 export function createNoopPathEvaluator(): PathEvaluator {
@@ -31,7 +32,8 @@ export function createNoopPathEvaluator(): PathEvaluator {
 export function createPathEvaluator({
   page,
   testInfo,
-  judge,
+  routeJudge,
+  stepJudge,
 }: PathEvaluatorOptions): PathEvaluator {
   const steps: MbtVerifiedStep[] = [];
   const screenshots: JudgeEvidence['screenshots'] = [];
@@ -40,7 +42,8 @@ export function createPathEvaluator({
     eventType: string,
     expectedState: string,
     sequenceNumber: number,
-  ) {
+    stepIndex?: number,
+  ): Promise<JudgeEvidence['screenshots'][number] | undefined> {
     try {
       const image = await page.locator('main').screenshot({
         animations: 'disabled',
@@ -52,15 +55,24 @@ export function createPathEvaluator({
         eventType.toLowerCase() +
         '-' +
         expectedState;
-      const screenshot = { label, image };
+      const screenshot = {
+        label,
+        image,
+        stepIndex,
+        action: eventType,
+        target: expectedState,
+      };
 
       if (screenshots.length < MAX_SCREENSHOTS) {
         screenshots.push(screenshot);
       } else {
         screenshots[MAX_SCREENSHOTS - 1] = screenshot;
       }
+
+      return screenshot;
     } catch {
       // Evidence collection is advisory and must not hide the test result.
+      return undefined;
     }
   }
 
@@ -78,10 +90,17 @@ export function createPathEvaluator({
       screenshots: screenshots.map((screenshot, imageIndex) => ({
         imageIndex,
         label: screenshot.label,
+        stepIndex: screenshot.stepIndex,
+        action: screenshot.action,
+        target: screenshot.target,
       })),
     });
 
-    const result = await safelyJudge(judge, evidence);
+    if (!routeJudge) {
+      return;
+    }
+
+    const result = await safelyJudge(routeJudge, evidence);
     const { rawResponse, ...verdict } = result;
     await safelyAttach(testInfo, 'llm-judge-result', verdict);
     if (rawResponse !== undefined) {
@@ -93,16 +112,64 @@ export function createPathEvaluator({
     }
   }
 
+  async function evaluateStep(
+    step: MbtVerifiedStep,
+    screenshot: JudgeEvidence['screenshots'][number] | undefined,
+  ) {
+    if (!stepJudge) {
+      return;
+    }
+
+    const evidence: JudgeEvidence = {
+      status: 'passed',
+      steps: [step],
+      screenshots: screenshot ? [screenshot] : [],
+    };
+    const stepName =
+      'llm-judge-step-' + String(step.index + 1).padStart(2, '0');
+    await safelyAttach(testInfo, stepName, {
+      step,
+      screenshotCount: evidence.screenshots.length,
+      screenshots: evidence.screenshots.map((item, imageIndex) => ({
+        imageIndex,
+        label: item.label,
+        action: item.action,
+        target: item.target,
+      })),
+    });
+
+    const result = await safelyJudge(stepJudge, evidence);
+    const { rawResponse, ...verdict } = result;
+    await safelyAttach(testInfo, stepName + '-result', verdict);
+    if (rawResponse !== undefined) {
+      await safelyAttach(testInfo, stepName + '-raw-response', rawResponse);
+    }
+
+    const stepDescription =
+      'step=' +
+      String(step.index + 1).padStart(2, '0') +
+      ' action=' +
+      step.eventType +
+      ' target=' +
+      step.expectedState;
+    log(stepDescription + ' ' + formatJudgeSummary(verdict));
+    for (const reasoning of formatJudgeReasoning(verdict)) {
+      log(stepDescription + ' ' + reasoning);
+    }
+  }
+
   return {
     async run(terminalState, execute, terminalContext) {
       try {
         const result = await execute(async (step) => {
           steps.push(step);
-          await captureScreenshot(
+          const screenshot = await captureScreenshot(
             step.eventType,
             step.expectedState,
             step.index + 1,
+            step.index,
           );
+          await evaluateStep(step, screenshot);
         });
 
         if (steps.length === 0) {
@@ -112,7 +179,7 @@ export function createPathEvaluator({
             expectedState: terminalState,
             expectedContext: terminalContext,
           });
-          await captureScreenshot('INITIAL', terminalState, 1);
+          await captureScreenshot('INITIAL', terminalState, 1, 0);
         }
 
         await finalize('passed');
@@ -171,6 +238,21 @@ export function formatJudgeIssues(result: JudgeResult): string[] {
         'detail=' + JSON.stringify(criterion.explanation),
       ].join(' '),
     );
+}
+
+export function formatJudgeReasoning(result: JudgeResult): string[] {
+  if (result.criteria.length === 0) {
+    return ['reasoning=unavailable'];
+  }
+
+  return result.criteria.map((criterion) =>
+    [
+      'reasoning',
+      'criterion=' + criterion.criterionId,
+      'status=' + criterion.status,
+      'detail=' + JSON.stringify(criterion.explanation),
+    ].join(' '),
+  );
 }
 
 async function safelyAttachImage(

@@ -4,7 +4,13 @@ const DEFAULT_GATEWAY_URL = 'https://api.openai.com/v1';
 const JUDGE_MODEL = 'gpt-4o-mini';
 const JUDGE_MODEL_VERSION = 'unversioned-alias';
 
-export function getLlmJudgeConfig(): LlmGatewayJudgeConfig | undefined {
+export type LlmJudgeScope = 'route' | 'step' | 'both';
+
+export type ConfiguredLlmJudge = LlmGatewayJudgeConfig & {
+  scope: LlmJudgeScope;
+};
+
+export function getLlmJudgeConfig(): ConfiguredLlmJudge | undefined {
   if (process.env.LLM_JUDGE_ENABLED !== 'true') {
     return undefined;
   }
@@ -23,6 +29,8 @@ export function getLlmJudgeConfig(): LlmGatewayJudgeConfig | undefined {
     );
   }
 
+  const scope = getLlmJudgeScope(process.env.LLM_JUDGE_SCOPE);
+
   return {
     gatewayUrl: process.env.LLM_GATEWAY_URL ?? DEFAULT_GATEWAY_URL,
     token,
@@ -30,5 +38,17 @@ export function getLlmJudgeConfig(): LlmGatewayJudgeConfig | undefined {
     modelVersion: process.env.LLM_JUDGE_MODEL_VERSION ?? JUDGE_MODEL_VERSION,
     attachRawResponse: process.env.LLM_JUDGE_ATTACH_RAW_RESPONSE === 'true',
     timeoutMs: 15_000,
+    scope,
   };
+}
+
+function getLlmJudgeScope(value: string | undefined): LlmJudgeScope {
+  if (value === undefined || value === 'route') {
+    return 'route';
+  }
+  if (value === 'step' || value === 'both') {
+    return value;
+  }
+
+  throw new Error('LLM_JUDGE_SCOPE must be "route", "step", or "both".');
 }

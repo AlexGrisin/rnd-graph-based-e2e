@@ -140,3 +140,10 @@ Keep entries brief, factual, and grep-friendly.
 - Added expected XState context to verified route steps and judge evidence so screenshots can be checked against both node and context.
 - Added concise expected-versus-observed criterion explanations and screenshot indexes, logged only for non-passing criteria.
 - Added centralized XState transition logging through `MbtContext.log` with the executed event/action and expected target state.
+
+### 2026-10-02 - Add advisory inline step evaluation
+
+- Added `LLM_JUDGE_SCOPE` with `route` as the default plus `step` and `both` modes.
+- Added a dedicated step-evidence rubric; each inline call receives one already-verified transition, its expected XState context, and its masked screenshot.
+- Preserved the route screenshot cap and deterministic Playwright status; inline verdicts are attached and logged as advisory evidence only.
+- Logged each step criterion's concise LLM explanation alongside its inline verdict.

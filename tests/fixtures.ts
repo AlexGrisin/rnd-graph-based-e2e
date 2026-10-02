@@ -26,6 +26,7 @@ import {
 } from './support/evaluation/test-evaluator.js';
 import { createLlmGatewayJudge } from './support/evaluation/judge-client.js';
 import { pathEvidenceRubric } from './support/evaluation/rubrics/path-evidence.rubric.js';
+import { stepEvidenceRubric } from './support/evaluation/rubrics/step-evidence.rubric.js';
 
 type MbtFixtures = PageFixtures & {
   mbtContext: ReturnType<typeof createLoggingContext>;
@@ -127,7 +128,14 @@ export const test = base.extend<MbtFixtures>({
       createPathEvaluator({
         page,
         testInfo,
-        judge: createLlmGatewayJudge(config, pathEvidenceRubric),
+        routeJudge:
+          config.scope === 'route' || config.scope === 'both'
+            ? createLlmGatewayJudge(config, pathEvidenceRubric)
+            : undefined,
+        stepJudge:
+          config.scope === 'step' || config.scope === 'both'
+            ? createLlmGatewayJudge(config, stepEvidenceRubric)
+            : undefined,
       }),
     );
   },

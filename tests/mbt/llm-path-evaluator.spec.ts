@@ -11,9 +11,11 @@ import {
   type LlmJudge,
 } from '../support/evaluation/judge-client.js';
 import { pathEvidenceRubric } from '../support/evaluation/rubrics/path-evidence.rubric.js';
+import { stepEvidenceRubric } from '../support/evaluation/rubrics/step-evidence.rubric.js';
 import {
   formatJudgeIssues,
   createPathEvaluator,
+  formatJudgeReasoning,
   formatJudgeSummary,
 } from '../support/evaluation/test-evaluator.js';
 
@@ -68,6 +70,9 @@ test.describe('LLM path evaluator', () => {
         {
           label: '01-go_login-login',
           image: Buffer.from('image'),
+          stepIndex: 0,
+          action: 'GO_LOGIN',
+          target: 'login',
         },
       ],
     });
@@ -92,7 +97,15 @@ test.describe('LLM path evaluator', () => {
           expectedContext: { authenticated: false },
         }),
       ],
-      screenshots: [{ imageIndex: 0, label: '01-go_login-login' }],
+      screenshots: [
+        {
+          imageIndex: 0,
+          label: '01-go_login-login',
+          action: 'GO_LOGIN',
+          stepIndex: 0,
+          target: 'login',
+        },
+      ],
     });
     expect(result).toMatchObject({
       verdict: 'pass',
@@ -205,7 +218,7 @@ test.describe('LLM path evaluator', () => {
           });
         },
       } as unknown as TestInfo,
-      judge,
+      routeJudge: judge,
     });
 
     await evaluator.run('done', async (onStepCompleted) => {
@@ -253,7 +266,7 @@ test.describe('LLM path evaluator', () => {
       testInfo: {
         attach: async () => undefined,
       } as unknown as TestInfo,
-      judge,
+      routeJudge: judge,
     });
     const deterministicFailure = new Error('deterministic failure');
 
@@ -265,6 +278,99 @@ test.describe('LLM path evaluator', () => {
 
     expect(capturedEvidence?.status).toBe('failed');
     expect(capturedEvidence?.steps).toEqual([]);
+  });
+
+  test('judges every verified step inline before the next action', async () => {
+    const stepEvidence: JudgeEvidence[] = [];
+    const executionOrder: string[] = [];
+    const attachments: string[] = [];
+    const evaluator = createPathEvaluator({
+      page: {
+        locator: () => ({
+          screenshot: async () => Buffer.from('masked-image'),
+        }),
+      } as unknown as Page,
+      testInfo: {
+        attach: async (name: string) => {
+          attachments.push(name);
+        },
+      } as unknown as TestInfo,
+      stepJudge: {
+        async evaluate(evidence) {
+          stepEvidence.push(evidence);
+          executionOrder.push('judge:' + evidence.steps[0]?.eventType);
+          return {
+            verdict: 'pass',
+            decisionReason: 'pass_threshold_met',
+            score: 1,
+            confidence: 1,
+            findings: ['route_supported'],
+            criteria: createStepAssessments(1, 1),
+          };
+        },
+      },
+    });
+
+    await evaluator.run('done', async (onStepCompleted) => {
+      await onStepCompleted({
+        index: 0,
+        eventType: 'GO_LOGIN',
+        expectedState: 'login',
+        expectedContext: { username: '' },
+      });
+      executionOrder.push('after:GO_LOGIN');
+      await onStepCompleted({
+        index: 1,
+        eventType: 'SUBMIT_WITHOUT_CREDENTIALS',
+        expectedState: 'credentialsRequired',
+      });
+      executionOrder.push('after:SUBMIT_WITHOUT_CREDENTIALS');
+    });
+
+    expect(executionOrder).toEqual([
+      'judge:GO_LOGIN',
+      'after:GO_LOGIN',
+      'judge:SUBMIT_WITHOUT_CREDENTIALS',
+      'after:SUBMIT_WITHOUT_CREDENTIALS',
+    ]);
+    expect(stepEvidence).toHaveLength(2);
+    expect(stepEvidence[0]).toMatchObject({
+      status: 'passed',
+      steps: [
+        {
+          eventType: 'GO_LOGIN',
+          expectedState: 'login',
+          expectedContext: { username: '' },
+        },
+      ],
+      screenshots: [
+        {
+          label: '01-go_login-login',
+          stepIndex: 0,
+          action: 'GO_LOGIN',
+          target: 'login',
+        },
+      ],
+    });
+    expect(stepEvidence[1]).toMatchObject({
+      steps: [{ eventType: 'SUBMIT_WITHOUT_CREDENTIALS' }],
+      screenshots: [
+        {
+          label: '02-submit_without_credentials-credentialsRequired',
+          stepIndex: 1,
+          action: 'SUBMIT_WITHOUT_CREDENTIALS',
+          target: 'credentialsRequired',
+        },
+      ],
+    });
+    expect(attachments).toEqual(
+      expect.arrayContaining([
+        'llm-judge-step-01',
+        'llm-judge-step-01-result',
+        'llm-judge-step-02',
+        'llm-judge-step-02-result',
+      ]),
+    );
   });
 
   test('reports a verified graph step after its deterministic check', async () => {
@@ -400,6 +506,30 @@ test.describe('LLM path evaluator', () => {
         'score=0.3 confidence=0.91 reason=visible_conflict images=1,4 ' +
         'detail="Expected state and context conflict with the visible UI."',
     ]);
+
+    expect(
+      formatJudgeReasoning({
+        verdict: 'pass',
+        decisionReason: 'pass_threshold_met',
+        score: 0.9,
+        confidence: 0.9,
+        findings: ['route_supported'],
+        criteria: [
+          {
+            criterionId: 'target-state-visible',
+            status: 'met',
+            score: 0.9,
+            confidence: 0.9,
+            reasonCode: 'visible_support',
+            evidenceImageIndexes: [0],
+            explanation: 'The expected target state is visibly supported.',
+          },
+        ],
+      }),
+    ).toEqual([
+      'reasoning criterion=target-state-visible status=met ' +
+        'detail="The expected target state is visibly supported."',
+    ]);
   });
 });
 
@@ -410,6 +540,18 @@ function createAssessments(score: number, confidence: number) {
     score,
     confidence,
     reasonCode: 'visible_support',
+    evidenceImageIndexes: [],
+    explanation: 'The criterion is supported by the supplied evidence.',
+  }));
+}
+
+function createStepAssessments(score: number, confidence: number) {
+  return stepEvidenceRubric.criteria.map((criterion) => ({
+    criterionId: criterion.id,
+    status: 'met' as const,
+    score,
+    confidence,
+    reasonCode: 'visible_support' as const,
     evidenceImageIndexes: [],
     explanation: 'The criterion is supported by the supplied evidence.',
   }));
