@@ -13,14 +13,18 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+    ['./tests/support/reporting/llm-observation-reporter.ts'],
+  ],
   timeout: 120_000,
   use: {
     baseURL: process.env.BASE_URL,
-    trace: 'retain-on-failure', 
+    trace: 'retain-on-failure',
     actionTimeout: 30_000,
     navigationTimeout: 60_000,
-    headless: true
+    headless: true,
   },
   projects: [
     {

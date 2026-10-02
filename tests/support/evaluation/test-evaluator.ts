@@ -1,6 +1,25 @@
 import type { Page, TestInfo } from '@playwright/test';
 import type { MbtVerifiedStep } from '../../../src/mbt/types.js';
-import type { JudgeEvidence, JudgeResult, LlmJudge } from './judge-client.js';
+import type {
+  JudgeEvidence,
+  JudgeResult,
+  LlmJudge,
+  ObservationJudge,
+  ObservationJudgeEvidence,
+} from './judge-client.js';
+import {
+  formatExploratoryObservationReport,
+  formatJudgeIssues,
+  formatJudgeReasoning,
+  formatJudgeSummary,
+  formatObservationSummary,
+} from './report-formatters.js';
+import {
+  safelyAttachImage,
+  safelyAttachJson,
+  safelyAttachText,
+} from './test-attachments.js';
+import { collectStepEvaluationIssues } from './step-evaluation-issues.js';
 
 const MAX_SCREENSHOTS = 5;
 
@@ -19,6 +38,7 @@ type PathEvaluatorOptions = {
   testInfo: TestInfo;
   routeJudge?: LlmJudge;
   stepJudge?: LlmJudge;
+  observationJudge?: ObservationJudge;
 };
 
 export function createNoopPathEvaluator(): PathEvaluator {
@@ -34,9 +54,11 @@ export function createPathEvaluator({
   testInfo,
   routeJudge,
   stepJudge,
+  observationJudge,
 }: PathEvaluatorOptions): PathEvaluator {
   const steps: MbtVerifiedStep[] = [];
   const screenshots: JudgeEvidence['screenshots'] = [];
+  const stepResults: ObservationJudgeEvidence['stepResults'] = [];
 
   async function captureScreenshot(
     eventType: string,
@@ -83,7 +105,7 @@ export function createPathEvaluator({
       await safelyAttachImage(testInfo, screenshot.label, screenshot.image);
     }
 
-    await safelyAttach(testInfo, 'llm-judge-route', {
+    await safelyAttachJson(testInfo, 'llm-judge-route', {
       status,
       steps,
       screenshotCount: screenshots.length,
@@ -96,20 +118,22 @@ export function createPathEvaluator({
       })),
     });
 
-    if (!routeJudge) {
-      return;
+    let routeResult: JudgeResult | undefined;
+    if (routeJudge) {
+      const result = await safelyJudge(routeJudge, evidence);
+      const { rawResponse, ...verdict } = result;
+      routeResult = verdict;
+      await safelyAttachJson(testInfo, 'llm-judge-result', verdict);
+      if (rawResponse !== undefined) {
+        await safelyAttachJson(testInfo, 'llm-judge-raw-response', rawResponse);
+      }
+      log(formatJudgeSummary(verdict));
+      for (const issue of formatJudgeIssues(verdict)) {
+        log(issue);
+      }
     }
 
-    const result = await safelyJudge(routeJudge, evidence);
-    const { rawResponse, ...verdict } = result;
-    await safelyAttach(testInfo, 'llm-judge-result', verdict);
-    if (rawResponse !== undefined) {
-      await safelyAttach(testInfo, 'llm-judge-raw-response', rawResponse);
-    }
-    log(formatJudgeSummary(verdict));
-    for (const issue of formatJudgeIssues(verdict)) {
-      log(issue);
-    }
+    await evaluateObservations(evidence, routeResult);
   }
 
   async function evaluateStep(
@@ -127,7 +151,7 @@ export function createPathEvaluator({
     };
     const stepName =
       'llm-judge-step-' + String(step.index + 1).padStart(2, '0');
-    await safelyAttach(testInfo, stepName, {
+    await safelyAttachJson(testInfo, stepName, {
       step,
       screenshotCount: evidence.screenshots.length,
       screenshots: evidence.screenshots.map((item, imageIndex) => ({
@@ -140,9 +164,10 @@ export function createPathEvaluator({
 
     const result = await safelyJudge(stepJudge, evidence);
     const { rawResponse, ...verdict } = result;
-    await safelyAttach(testInfo, stepName + '-result', verdict);
+    stepResults.push({ step, result: verdict, screenshot });
+    await safelyAttachJson(testInfo, stepName + '-result', verdict);
     if (rawResponse !== undefined) {
-      await safelyAttach(testInfo, stepName + '-raw-response', rawResponse);
+      await safelyAttachJson(testInfo, stepName + '-raw-response', rawResponse);
     }
 
     const stepDescription =
@@ -155,6 +180,50 @@ export function createPathEvaluator({
     log(stepDescription + ' ' + formatJudgeSummary(verdict));
     for (const reasoning of formatJudgeReasoning(verdict)) {
       log(stepDescription + ' ' + reasoning);
+    }
+  }
+
+  async function evaluateObservations(
+    route: JudgeEvidence,
+    routeResult: JudgeResult | undefined,
+  ) {
+    if (!observationJudge) {
+      return;
+    }
+
+    const { report, rawResponse } = await safelyObserve(observationJudge, {
+      route,
+      routeResult,
+      stepResults,
+    });
+    if (report) {
+      const reportWithStepIssues = {
+        ...report,
+        stepEvaluationIssues: collectStepEvaluationIssues(
+          stepResults,
+          route.screenshots,
+        ),
+      };
+      await safelyAttachText(
+        testInfo,
+        'llm-judge-observations',
+        formatExploratoryObservationReport(reportWithStepIssues),
+      );
+      await safelyAttachJson(
+        testInfo,
+        'llm-judge-observation-result',
+        reportWithStepIssues,
+      );
+      log(formatObservationSummary(reportWithStepIssues));
+    } else {
+      log('observations=unavailable');
+    }
+    if (rawResponse !== undefined) {
+      await safelyAttachJson(
+        testInfo,
+        'llm-judge-observation-raw-response',
+        rawResponse,
+      );
     }
   }
 
@@ -197,95 +266,6 @@ function log(message: string) {
   console.log('[llm-judge] ' + message);
 }
 
-export function formatJudgeSummary(result: JudgeResult): string {
-  const metCount = result.criteria.filter(
-    (criterion) => criterion.status === 'met',
-  ).length;
-  const issues = result.criteria
-    .filter((criterion) => criterion.status !== 'met')
-    .map((criterion) => criterion.criterionId + ':' + criterion.status);
-
-  return [
-    'verdict=' + result.verdict,
-    'score=' + result.score,
-    'confidence=' + result.confidence,
-    'criteria=' + metCount + '/' + result.criteria.length,
-    'reason=' + result.decisionReason,
-    issues.length > 0 ? 'issues=' + issues.join(',') : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-}
-
-export function formatJudgeIssues(result: JudgeResult): string[] {
-  if (result.verdict === 'pass') {
-    return [];
-  }
-
-  return result.criteria
-    .filter((criterion) => criterion.status !== 'met')
-    .map((criterion) =>
-      [
-        'issue',
-        'criterion=' + criterion.criterionId,
-        'status=' + criterion.status,
-        'score=' + criterion.score,
-        'confidence=' + criterion.confidence,
-        'reason=' + criterion.reasonCode,
-        criterion.evidenceImageIndexes.length > 0
-          ? 'images=' + criterion.evidenceImageIndexes.join(',')
-          : 'images=none',
-        'detail=' + JSON.stringify(criterion.explanation),
-      ].join(' '),
-    );
-}
-
-export function formatJudgeReasoning(result: JudgeResult): string[] {
-  if (result.criteria.length === 0) {
-    return ['reasoning=unavailable'];
-  }
-
-  return result.criteria.map((criterion) =>
-    [
-      'reasoning',
-      'criterion=' + criterion.criterionId,
-      'status=' + criterion.status,
-      'detail=' + JSON.stringify(criterion.explanation),
-    ].join(' '),
-  );
-}
-
-async function safelyAttachImage(
-  testInfo: TestInfo,
-  name: string,
-  image: Buffer,
-) {
-  try {
-    await testInfo.attach(name, {
-      body: image,
-      contentType: 'image/png',
-    });
-  } catch {
-    // Attachments supplement, rather than determine, test outcomes.
-  }
-}
-
-async function safelyAttach(testInfo: TestInfo, name: string, value: unknown) {
-  try {
-    const body = JSON.stringify(value);
-    if (!body) {
-      return;
-    }
-
-    await testInfo.attach(name, {
-      body,
-      contentType: 'application/json',
-    });
-  } catch {
-    // Attachments supplement, rather than determine, test outcomes.
-  }
-}
-
 async function safelyJudge(
   judge: LlmJudge,
   evidence: JudgeEvidence,
@@ -301,5 +281,16 @@ async function safelyJudge(
       findings: ['missing_evidence'],
       criteria: [],
     };
+  }
+}
+
+async function safelyObserve(
+  judge: ObservationJudge,
+  evidence: Parameters<ObservationJudge['evaluate']>[0],
+) {
+  try {
+    return await judge.evaluate(evidence);
+  } catch {
+    return {};
   }
 }

@@ -8,6 +8,7 @@ import {
 } from './rubric-engine.js';
 import type { MbtVerifiedStep } from '../../../src/mbt/types.js';
 import type { JudgeResult, JudgeRubric } from './rubric-engine.js';
+import type { ExploratoryObservationReport } from './rubrics/exploratory-observation.rubric.js';
 
 export type {
   CriterionAssessment,
@@ -18,6 +19,11 @@ export type {
   JudgeResult,
   JudgeRubric,
 } from './rubric-engine.js';
+export type {
+  ExploratoryConcern,
+  ExploratoryObservation,
+  ExploratoryObservationReport,
+} from './rubrics/exploratory-observation.rubric.js';
 
 export type JudgeEvidence = {
   status: 'passed' | 'failed';
@@ -44,7 +50,26 @@ export interface LlmJudge {
   evaluate(evidence: JudgeEvidence): Promise<JudgeResult>;
 }
 
-type FetchImplementation = (
+export type ObservationJudgeEvidence = {
+  route: JudgeEvidence;
+  routeResult?: JudgeResult;
+  stepResults: Array<{
+    step: MbtVerifiedStep;
+    result: JudgeResult;
+    screenshot?: JudgeEvidence['screenshots'][number];
+  }>;
+};
+
+export type ObservationJudgeResult = {
+  report?: ExploratoryObservationReport;
+  rawResponse?: unknown;
+};
+
+export interface ObservationJudge {
+  evaluate(evidence: ObservationJudgeEvidence): Promise<ObservationJudgeResult>;
+}
+
+export type FetchImplementation = (
   input: string,
   init: RequestInit,
 ) => Promise<Response>;
@@ -146,11 +171,11 @@ export function createLlmGatewayJudge(
   };
 }
 
-function getResponsesUrl(gatewayUrl: string): string {
+export function getResponsesUrl(gatewayUrl: string): string {
   return gatewayUrl.replace(/\/+$/, '') + '/responses';
 }
 
-function getOutputText(payload: unknown): string | undefined {
+export function getOutputText(payload: unknown): string | undefined {
   if (!isRecord(payload)) {
     return undefined;
   }

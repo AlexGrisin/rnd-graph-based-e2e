@@ -8,16 +8,22 @@ import { test, expect } from '../fixtures.js';
 import {
   createLlmGatewayJudge,
   type JudgeEvidence,
+  type JudgeResult,
   type LlmJudge,
+  type ObservationJudge,
+  type ObservationJudgeEvidence,
 } from '../support/evaluation/judge-client.js';
+import { createLlmGatewayObservationJudge } from '../support/evaluation/observation-judge-client.js';
+import type { ExploratoryObservationReport } from '../support/evaluation/rubrics/exploratory-observation.rubric.js';
 import { pathEvidenceRubric } from '../support/evaluation/rubrics/path-evidence.rubric.js';
 import { stepEvidenceRubric } from '../support/evaluation/rubrics/step-evidence.rubric.js';
 import {
   formatJudgeIssues,
-  createPathEvaluator,
   formatJudgeReasoning,
   formatJudgeSummary,
-} from '../support/evaluation/test-evaluator.js';
+} from '../support/evaluation/report-formatters.js';
+import { createPathEvaluator } from '../support/evaluation/test-evaluator.js';
+import { formatSuiteObservationReport } from '../support/reporting/llm-observation-reporter.js';
 
 test.describe('LLM path evaluator', () => {
   test('uses the structured gateway result without a live request', async () => {
@@ -148,6 +154,73 @@ test.describe('LLM path evaluator', () => {
       findings: ['missing_evidence'],
       criteria: [],
     });
+  });
+
+  test('uses a structured exploratory observation report without a live request', async () => {
+    let requestBody = '';
+    const judge = createLlmGatewayObservationJudge(
+      {
+        gatewayUrl: 'https://api.openai.com/v1',
+        token: 'test-token',
+        model: 'gpt-4o-mini',
+        modelVersion: 'unversioned-alias',
+        attachRawResponse: false,
+        timeoutMs: 100,
+      },
+      async (_url, init) => {
+        requestBody = String(init.body);
+        return new Response(
+          JSON.stringify({ output_text: JSON.stringify(observationReport()) }),
+          { status: 200 },
+        );
+      },
+    );
+
+    const result = await judge.evaluate({
+      route: {
+        status: 'passed',
+        steps: [
+          {
+            index: 0,
+            eventType: 'GO_LOGIN',
+            expectedState: 'login',
+          },
+        ],
+        screenshots: [
+          {
+            label: '01-go_login-login',
+            image: Buffer.from('image'),
+            stepIndex: 0,
+            action: 'GO_LOGIN',
+            target: 'login',
+          },
+        ],
+      },
+      routeResult: passingJudgeResult(),
+      stepResults: [
+        {
+          step: {
+            index: 0,
+            eventType: 'GO_LOGIN',
+            expectedState: 'login',
+          },
+          result: passingJudgeResult(),
+          screenshot: {
+            label: '01-go_login-login',
+            image: Buffer.from('image'),
+            stepIndex: 0,
+            action: 'GO_LOGIN',
+            target: 'login',
+          },
+        },
+      ],
+    });
+
+    expect(requestBody).toContain('stepJudgments');
+    expect(requestBody).toContain('routeVerdict');
+    expect(requestBody).toContain('wentWell');
+    expect(requestBody).toContain('routeScreenshotIndex');
+    expect(result.report).toEqual(observationReport());
   });
 
   test('applies the rubric threshold band deterministically', async () => {
@@ -373,6 +446,116 @@ test.describe('LLM path evaluator', () => {
     );
   });
 
+  test('attaches a synthesized observation report without changing the test outcome', async () => {
+    let observationEvidence: ObservationJudgeEvidence | undefined;
+    const attachments: Array<{
+      name: string;
+      contentType: string;
+      body?: string;
+    }> = [];
+    const passingJudge: LlmJudge = {
+      async evaluate() {
+        return passingJudgeResult();
+      },
+    };
+    const observationJudge: ObservationJudge = {
+      async evaluate(evidence) {
+        observationEvidence = evidence;
+        return { report: observationReport() };
+      },
+    };
+    const stepJudge: LlmJudge = {
+      async evaluate() {
+        return failedStepJudgeResult();
+      },
+    };
+    const evaluator = createPathEvaluator({
+      page: {
+        locator: () => ({
+          screenshot: async () => Buffer.from('masked-image'),
+        }),
+      } as unknown as Page,
+      testInfo: {
+        attach: async (
+          name: string,
+          options: Parameters<TestInfo['attach']>[1],
+        ) => {
+          attachments.push({
+            name,
+            contentType: options?.contentType ?? 'unknown',
+            body: typeof options?.body === 'string' ? options.body : undefined,
+          });
+        },
+      } as unknown as TestInfo,
+      routeJudge: passingJudge,
+      stepJudge,
+      observationJudge,
+    });
+
+    await expect(
+      evaluator.run('done', async (onStepCompleted) => {
+        await onStepCompleted({
+          index: 0,
+          eventType: 'GO_LOGIN',
+          expectedState: 'login',
+        });
+      }),
+    ).resolves.toBeUndefined();
+
+    expect(observationEvidence).toMatchObject({
+      route: { status: 'passed', steps: [{ eventType: 'GO_LOGIN' }] },
+      routeResult: { verdict: 'pass' },
+      stepResults: [
+        {
+          step: { eventType: 'GO_LOGIN' },
+          result: { verdict: 'fail' },
+        },
+      ],
+    });
+    const reportAttachment = attachments.find(
+      (attachment) => attachment.name === 'llm-judge-observations',
+    );
+    expect(reportAttachment).toMatchObject({
+      contentType: 'text/markdown',
+      body: expect.stringContaining(
+        '## Potential issues detected by step evaluation',
+      ),
+    });
+    expect(reportAttachment?.body).toContain(
+      'Step 1 (GO_LOGIN → login): target-state-visible was not met.',
+    );
+    const resultAttachment = attachments.find(
+      (attachment) => attachment.name === 'llm-judge-observation-result',
+    );
+    expect(resultAttachment?.body).toContain('stepEvaluationIssues');
+    expect(resultAttachment?.body).toContain('target-state-visible');
+  });
+
+  test('formats all test observations into a suite report', () => {
+    const report = formatSuiteObservationReport([
+      {
+        title: 'app › Auth graph-driven › login',
+        status: 'passed',
+        report: observationReport(),
+      },
+    ]);
+
+    expect(report).toContain('## Suite summary');
+    expect(report).toContain('Tests with observations: 1');
+    expect(report).toContain('## What went well');
+    expect(report).toContain('## Potential issues detected by step evaluation');
+    expect(report).toContain('## Concerns and potential issues');
+    expect(report).toContain('severity: low');
+    expect(report).toContain('app › Auth graph-driven › login');
+  });
+
+  test('exposes an observation result to the suite reporter', async ({}, testInfo) => {
+    await testInfo.attach('llm-judge-observation-result', {
+      body: JSON.stringify(observationReport()),
+      contentType: 'application/json',
+    });
+  });
+
   test('reports a verified graph step after its deterministic check', async () => {
     const path = getAllShortestPaths(appAuthMachine).find(
       (candidate) =>
@@ -536,10 +719,10 @@ test.describe('LLM path evaluator', () => {
 function createAssessments(score: number, confidence: number) {
   return pathEvidenceRubric.criteria.map((criterion) => ({
     criterionId: criterion.id,
-    status: 'met',
+    status: 'met' as const,
     score,
     confidence,
-    reasonCode: 'visible_support',
+    reasonCode: 'visible_support' as const,
     evidenceImageIndexes: [],
     explanation: 'The criterion is supported by the supplied evidence.',
   }));
@@ -555,4 +738,68 @@ function createStepAssessments(score: number, confidence: number) {
     evidenceImageIndexes: [],
     explanation: 'The criterion is supported by the supplied evidence.',
   }));
+}
+
+function passingJudgeResult(): JudgeResult {
+  return {
+    verdict: 'pass',
+    decisionReason: 'pass_threshold_met',
+    score: 1,
+    confidence: 1,
+    findings: ['route_supported'],
+    criteria: createAssessments(1, 1),
+  };
+}
+
+function failedStepJudgeResult(): JudgeResult {
+  const criteria = createStepAssessments(1, 1);
+  criteria[0] = {
+    ...criteria[0]!,
+    status: 'not_met',
+    score: 0,
+    confidence: 0.8,
+    reasonCode: 'visible_conflict',
+    evidenceImageIndexes: [0],
+    explanation: 'The expected target state is not visible.',
+  };
+  return {
+    verdict: 'fail',
+    decisionReason: 'required_criterion_failed',
+    score: 0.5,
+    confidence: 0.8,
+    findings: ['route_not_supported'],
+    criteria,
+  };
+}
+
+function observationReport(): ExploratoryObservationReport {
+  return {
+    summary:
+      'The observed route is supported overall, with one follow-up concern.',
+    wentWell: [
+      {
+        statement: 'The expected target state is visibly supported.',
+        confidence: 0.9,
+        evidence: {
+          stepNumbers: [1],
+          screenshotIndexes: [0],
+          criteria: ['target-state-visible'],
+        },
+      },
+    ],
+    concerns: [
+      {
+        statement: 'A visible confirmation of the context change is limited.',
+        confidence: 0.7,
+        severity: 'low',
+        evidence: {
+          stepNumbers: [1],
+          screenshotIndexes: [0],
+          criteria: ['context-effect-consistent'],
+        },
+      },
+    ],
+    errorsSeen: [],
+    coverageGaps: [],
+  };
 }

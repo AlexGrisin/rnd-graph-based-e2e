@@ -147,3 +147,5 @@ Keep entries brief, factual, and grep-friendly.
 - Added a dedicated step-evidence rubric; each inline call receives one already-verified transition, its expected XState context, and its masked screenshot.
 - Preserved the route screenshot cap and deterministic Playwright status; inline verdicts are attached and logged as advisory evidence only.
 - Logged each step criterion's concise LLM explanation alongside its inline verdict.
+- Added a final LLM-assisted exploratory-observation report that consolidates route and completed-step verdicts into evidence-backed successes, concerns, errors, and coverage gaps.
+- Added a Playwright reporter that rolls all per-test observation reports into `artifacts/llm-observations/llm-judge-suite-observations.md` after a suite run.
