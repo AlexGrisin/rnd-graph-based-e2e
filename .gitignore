@@ -4,6 +4,9 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /dist/
+
+# Keep legacy local run artifacts ignored; they may contain credentials.
+/artifacts/
 .env
 .env.*
 !.env.example
@@ -11,3 +14,8 @@ node_modules/
 .DS_Store
 
 .playwright-mcp/
+
+# Rosetta
+agents/TEMP/
+refsrc/
+!refsrc/INDEX.md

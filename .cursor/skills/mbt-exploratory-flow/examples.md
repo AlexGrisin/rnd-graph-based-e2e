@@ -1,11 +1,11 @@
-# Example: purchase journey (this repo)
+# Example: shopping journey (this repo)
 
 Captured from the home → PDP → cart → checkout (no payment) POC.
 
 ## Gate A (intent) — locked decisions
 
-- Separate auth and purchase machines
-- MVP reach PDP via **direct `PRODUCT_PATH`** (not search/catalog)
+- Separate auth and shopping machines
+- Shopping reaches the PDP through category browsing or the approved search term
 - Final state: `checkout` (shipping / secure checkout; no payment)
 
 ## Probe findings
@@ -31,17 +31,16 @@ Assertions:
 
 ## Glue files added
 
-- `src/machines/app-purchase.machine.ts`
+- `src/machines/app-shopping.machine.ts`
 - `tests/support/pages/pdp.page.ts`, `cart.page.ts`, `checkout.page.ts`
-- `tests/support/actions/app-purchase.actions.ts` + stub events
-- `tests/mbt/purchase-graph-driven.spec.ts`
-- `tests/support/config/app-product.ts`
+- `tests/support/actions/app-shopping.actions.ts` + stub events
+- `tests/mbt/shopping-graph-driven.spec.ts`
 
 ## Validation commands
 
 ```bash
 npm test -- --project=stub
-npm test -- --project=app --grep "Purchase graph-driven.*→ checkout"
+npm test -- --project=app --grep "Shopping graph-driven.*→ checkout"
 ```
 
 ## Stabilization lessons (encode in future runs)

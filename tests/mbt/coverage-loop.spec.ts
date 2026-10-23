@@ -42,7 +42,7 @@ test.describe('Coverage Loop MBT', () => {
   }) => {
     // happy_path persona: only takes the success branch
     // error_path persona: only takes the failure branch
-    // Together they cover all 4 edges: GO_LOGIN, SUBMIT, LOGOUT, FAIL
+    // Together they cover all 5 edges, including empty-credential validation.
     const personas: PersonaConfig[] = [
       {
         name: 'happy_path',
@@ -50,7 +50,7 @@ test.describe('Coverage Loop MBT', () => {
       },
       {
         name: 'error_path',
-        allowedEvents: ['GO_LOGIN', 'FAIL'],
+        allowedEvents: ['GO_LOGIN', 'SUBMIT_WITHOUT_CREDENTIALS', 'FAIL'],
       },
     ];
 
@@ -147,7 +147,7 @@ test.describe('Coverage Loop MBT', () => {
       },
     });
 
-    // One path was executed; some edges covered, but not all 4
+    // One path was executed; some edges were covered, but not all of them.
     expect(report.visitedEdges).toBeGreaterThan(0);
     expect(report.visitedEdges).toBeLessThan(report.totalEdges);
   });

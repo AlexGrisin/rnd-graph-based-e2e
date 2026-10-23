@@ -1,16 +1,100 @@
-Agent memory for rnd-graph-based-e2e.
+# AGENT MEMORY
 
-## Conventions
+Generalized reusable lessons from agent sessions.
+Root causes converted into preventive rules, not incident-specific notes.
+Entries are h3 headers with [ACTIVE|RETIRED] status.
+Content: brief, grep-friendly, MECE across sections.
+Style: one-liner per entry, optional sub-bullets for context.
+Keep template entries so that AI knows how to fill them in later on.
 
-- Keep XState machines in `src/machines/` without Playwright imports.
-- Page objects belong in `tests/support/pages/`.
-- Event→browser glue belongs in `tests/support/actions/`.
+## Preventive Rules
 
-## Preventive rules
+### <Generalized Preventive Rule> [ACTIVE|RETIRED]
 
-- Do not put Playwright locators inside `src/` — breaks model/engine separation.
-- Use `assign()` for XState context mutations, not direct mutation.
-- Default coverage runs all `getShortestPaths` results, including the `error` terminal path (the error-path filter was removed).
-- Extend stub `createMockPage` / `createMockLocator` whenever new page objects call extra Playwright APIs (e.g. `getByTestId`).
-- Dismiss Exponea subscription overlays in addition to OneTrust/push before PDP clicks.
-- Prefer waiting for cart badge / guest form visibility over relying solely on checkout URL redirects.
+[Root cause, Reasons, Problems]
+
+### Keep Journey Machines Browser-Free [ACTIVE]
+
+Do not put Playwright locators, page objects, or environment reads inside `src/machines/`; this preserves model/adapter separation.
+
+### Use XState Assign For Context Changes [ACTIVE]
+
+Use `assign()` for machine context updates instead of direct mutation.
+
+### Keep Generated Coverage Inclusive [ACTIVE]
+
+Default shortest-path coverage includes terminal error paths unless a reviewed requirement narrows the suite.
+
+### Extend Stub Fixtures With Page API Growth [ACTIVE]
+
+When page objects call new Playwright APIs, update `createMockPage` or `createMockLocator` so stub runs remain useful.
+
+### Refresh Derived Inventories After Artifact Changes [ACTIVE]
+
+Regenerate and validate CODEMAP counts after documentation or pattern artifacts change during initialization.
+
+### Keep Multi-File Patch Hunks Independent [ACTIVE]
+
+Terminate and verify each file hunk before starting the next file update so one malformed boundary cannot reject the complete patch.
+
+### Assert Nested JSON Structurally [ACTIVE]
+
+Decode embedded JSON payloads before asserting fields so transport escaping cannot create false test failures.
+
+### Re-read Formatted Regions Before Exact Patches [ACTIVE]
+
+After formatting changes a file, inspect the exact target region before applying context-sensitive follow-up patches.
+
+### Align Structured Schemas With Runtime Parsers [ACTIVE]
+
+Do not enforce stricter hidden parser constraints than the provider schema; optional diagnostic fields must not invalidate an otherwise usable result.
+
+### Remove Superseded Orchestration Layers [ACTIVE]
+
+When specs execute graph paths directly, remove unused wrapper runners and strategy machines so dependency type changes cannot break dead code.
+
+### Remove Isolated Subsystems Atomically [ACTIVE]
+
+When a subsystem has no active runtime consumers, remove its code, entry points, tests, configuration, and current documentation together so no dead contracts remain.
+
+## What Worked
+
+### <Generalized What Worked> [ACTIVE|RETIRED]
+
+[Root cause, Reasons, Problems]
+
+### Pattern Docs For Contributor-Facing Repetition [ACTIVE]
+
+Page object, graph spec, journey machine, action-map, and config-loader patterns capture repeated contributor contracts without duplicating architecture docs.
+
+### Overlay Dismissal Centralization [ACTIVE]
+
+Centralizing app overlay dismissal keeps page objects focused and prevents repeated live storefront workarounds.
+
+## What Failed
+
+### <Generalized What Failed> [ACTIVE|RETIRED]
+
+[Hypothesis, Root cause, Reasons, Problems]
+
+### URL-Only Checkout Waiting Was Too Weak [ACTIVE]
+
+Prefer visible cart badge or guest form readiness over relying solely on checkout URL redirects.
+
+### Unused Strategy Layer Hid Type Drift [ACTIVE]
+
+The unreferenced walk-strategy and runner remained after specs moved to direct `testPath()` execution, adding compiler failures and maintenance surface without runtime value.
+
+## Discoveries
+
+### <Generalized Discovery> [ACTIVE|RETIRED]
+
+[Usage, Reasons, Problems]
+
+### Built-In CODEMAP Only [ACTIVE]
+
+Workspace initialization selected built-in CODEMAP only; do not assume external graph or LSP tools are available.
+
+### Root-Only TypeScript Scope [ACTIVE]
+
+Current root source/config inventory is 47 TypeScript files: 46 under `src/` and `tests/`, plus `playwright.config.ts`.

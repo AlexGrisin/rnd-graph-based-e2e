@@ -9,27 +9,33 @@ dotenv.config({
 
 export default defineConfig({
   testDir: './tests',
-  fullyParallel: false,
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+    ['./tests/support/reporting/llm-observation-reporter.ts'],
+  ],
   timeout: 120_000,
   use: {
-    baseURL: process.env.BASE_URL ?? 'https://www.g-star.com/en_nl',
-    trace: 'on-first-retry',
+    baseURL: process.env.BASE_URL,
+    trace: 'retain-on-failure',
     actionTimeout: 30_000,
     navigationTimeout: 60_000,
+    headless: false,
   },
   projects: [
     {
       name: 'stub',
       testMatch:
-        /\/(graph-driven|purchase-graph-driven|coverage-loop)\.spec\.ts/,
+        /\/(auth-graph-driven|shopping-graph-driven|store-lookup-graph-driven|llm-path-evaluator)\.spec\.ts/,
     },
     {
       name: 'app',
-      testMatch: /\/(graph-driven|purchase-graph-driven)\.spec\.ts/,
+      testMatch:
+        /\/(auth-graph-driven|shopping-graph-driven|store-lookup-graph-driven)\.spec\.ts/,
     },
   ],
   tsconfig: './tsconfig.json',

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Proof of concept for **model-based testing (MBT)**: application behavior is an XState v5 state machine, and Playwright tests are **generated from the graph at runtime** — there are no per-journey test cases. A single spec (`tests/mbt/graph-driven.spec.ts`) reads the machine, asks `@xstate/graph` for one shortest path per reachable state, and registers one Playwright test per path. Adding a state/transition to the machine makes new tests appear automatically.
+Proof of concept for **model-based testing (MBT)**: application behavior is an XState v5 state machine, and Playwright tests are **generated from the graph at runtime** — there are no per-journey test cases. The auth spec (`tests/mbt/auth-graph-driven.spec.ts`) reads the machine, asks `@xstate/graph` for one shortest path per reachable state, and registers one Playwright test per path. Adding a state/transition to the machine makes new tests appear automatically.
 
 ## Commands
 
@@ -12,7 +12,7 @@ Proof of concept for **model-based testing (MBT)**: application behavior is an X
 npm install
 npx playwright install chromium     # required before the `app` project can run
 
-npm test                            # both projects (stub + app)
+npm test                            # both MBT projects (stub + app)
 npm test -- --project=stub          # fast graph/wiring smoke — mock page, no browser, log-only actions
 npm test -- --project=app           # live E2E against BASE_URL (Chromium) — needs APP_EMAIL/APP_PASSWORD
 npm run test:mbt                    # specs under tests/mbt only
@@ -37,21 +37,20 @@ Data flow: **machine → path generator → spec → action map → page objects
 ```
 src/machines/      Pure XState machines — NO Playwright/browser imports allowed here
 src/mbt/graph/     Path generation + path execution engine
-src/mbt/runner/    MbtRunner — alternate programmatic execution API (not used by the spec)
-tests/mbt/         graph-driven.spec.ts — the only spec; generates all tests from the graph
+tests/mbt/         Auth and shopping graph-driven specs
 tests/support/     Adapters: actions/ (event→page), pages/ (POMs + verifier), app/ (overlays), config/
 tests/fixtures.ts  Playwright fixtures; selects stub vs live wiring by project name
 ```
 
 ### How a test runs
 
-1. `graph-driven.spec.ts` calls `getAllShortestPaths(appAuthMachine)` at module load and loops over paths.
+1. `auth-graph-driven.spec.ts` calls `getAllShortestPaths(appAuthMachine)` at module load and loops over paths.
 2. For each path it calls `testPath()` (`src/mbt/graph/test-model-factory.ts`), which walks each step, looks up `actions[event.type]`, runs the handler, then calls `verifyState(expectedStateName)`.
 3. Action handlers call page-object methods; the state verifier calls each page's `should*` assertion.
 
-### Two Playwright projects, one spec
+### Shared fixture wiring
 
-Both projects run the same `graph-driven.spec.ts`; `tests/fixtures.ts` swaps the wiring by `testInfo.project.name`:
+The generated specs share `tests/fixtures.ts`, which swaps the wiring by `testInfo.project.name`:
 
 | Fixture         | `stub`                       | `app`                                |
 | --------------- | ---------------------------- | ------------------------------------ |
@@ -79,7 +78,7 @@ To add a state — e.g. `checkout` after `myAccount`:
 4. `tests/support/actions/app-auth.actions.ts` — add a handler per new event (key matches event `type`).
 5. `tests/support/pages/state-verifier.ts` — map the new state name to its page assertion.
 
-Then `npm test -- --project=stub` confirms new paths generate. No edit to `graph-driven.spec.ts` is needed.
+Then run the matching browser-free project to confirm new paths generate. No edit to `auth-graph-driven.spec.ts` is needed.
 
 ## Conventions
 
@@ -89,13 +88,13 @@ Then `npm test -- --project=stub` confirms new paths generate. No edit to `graph
 
 ## Design constraints
 
-- `workers: 1`, `fullyParallel: false` — MBT paths are stateful and run sequentially.
+- `workers: 1`, `fullyParallel: true`, and `trace: 'retain-on-failure'` are the current Playwright settings.
 - `src/machines/` stays pure (no Playwright imports) so the model is testable/serializable independent of the browser.
-- Coverage model is `getShortestPaths` — one minimal path per reachable state. For non-shortest or named journeys, use `getPathsFromEvents` (resolves an explicit event list into a path, validated by the graph) — see README "Specific journeys when needed". For exhaustive coverage, extend `src/mbt/graph/path-generator.ts` (e.g. `getSimplePaths`).
+- Path selection is journey-specific: auth uses shortest paths, shopping uses cyclic paths, and store lookup uses transition paths. For named journeys, use `getPathsFromEvents` (resolves an explicit event list into a path, validated by the graph); additional generators belong in `src/mbt/graph/path-generator.ts`.
 
 ## Environment
 
-`.env` (copy from `.env.example`): `BASE_URL` (default `https://www.g-star.com/en_nl`), `APP_EMAIL`, `APP_PASSWORD` (the latter two required for the `app` project). Loaded via `dotenv` in `playwright.config.ts`.
+`.env` (copy from `.env.example`) is the runtime source for `BASE_URL`, credentials, and optional advisory-evaluation configuration. `BASE_URL` is required for live tests; `APP_EMAIL`/`APP_PASSWORD` are required for live auth. The LLM judge remains disabled unless explicitly enabled and configured. Values are loaded through `dotenv` in `playwright.config.ts`.
 
 ## Note on docs
 

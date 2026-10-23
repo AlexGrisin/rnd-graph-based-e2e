@@ -1,56 +1,130 @@
-Code map for rnd-graph-based-e2e (3 levels).
+Code map for `rnd-graph-based-e2e`.
 
-## src/
+## Core project inventory (76 tracked docs, source, and config files) - Playwright and XState MBT POC
 
-Application model and MBT engine — no Playwright imports.
+This inventory excludes editor-specific contributor skills under `.claude/` and `.cursor/` and the installed Rosetta framework under `.agents/`.
 
-### src/machines/
+- `.env.example`
+- `.gitignore`
+- `.prettierignore`
+- `.prettierrc.json`
+- `CLAUDE.md`
+- `README.md`
+- `gain.json`
+- `package-lock.json`
+- `package.json`
+- `playwright.config.ts`
+- `tsconfig.json`
 
-- `app-auth.machine.ts` — app auth state model
-- `app-purchase.machine.ts` — purchase happy-path model
-- `walk-strategy.machine.ts` — path orchestration model
+### src/ (9 files) - MBT engine and state machines
 
-### src/mbt/
+#### src/machines/ (3 files) - XState journey models
 
-- `types.ts` — ActionMap, MbtContext, StateVerifier contracts
-- `graph/path-generator.ts` — getShortestPaths / getAdjacencyMap wrappers
-- `graph/test-model-factory.ts` — testPath execution engine
-- `graph/path-label.ts` — describePath (human-readable test titles)
-- `runner/mbt-runner.ts` — high-level MBT runner (alternate programmatic API)
+- `app-auth.machine.ts`
+- `app-shopping.machine.ts`
+- `app-store-lookup.machine.ts`
 
-## tests/
+#### src/mbt/ (6 files) - Graph traversal logic
 
-Playwright infrastructure and graph-driven specs.
+- `types.ts`
 
-### tests/support/pages/
+##### src/mbt/graph/ (5 files) - Path generation and execution helpers
 
-- `home.page.ts`, `login.page.ts`, `my-account.page.ts` — auth page objects
-- `pdp.page.ts`, `cart.page.ts`, `checkout.page.ts` — purchase page objects
-- `page-fixtures.ts` — shared `PageFixtures` type
-- `state-verifier.ts` — state name → `should*` assertion registry
+- `coverage-tracker.ts`
+- `exploration-loop.ts`
+- `path-generator.ts`
+- `path-label.ts`
+- `test-model-factory.ts`
 
-### tests/support/actions/
+### tests/ (37 files) - Playwright MBT specs and support layer
 
-- `stub-actions.ts` — log-only actions + `createLoggingContext`
-- `app-auth.actions.ts` — auth event→POM wiring
-- `app-purchase.actions.ts` — purchase event→POM wiring
+#### tests/mbt/ (5 files) - Graph-driven and evaluator specs
 
-### tests/support/ (other)
+- `coverage-loop.spec.ts`
+- `auth-graph-driven.spec.ts`
+- `shopping-graph-driven.spec.ts`
+- `store-lookup-graph-driven.spec.ts`
+- `llm-path-evaluator.spec.ts`
 
-- `app/overlays.ts` — `dismissAppOverlays` (OneTrust / push / Exponea)
-- `config/app-credentials.ts` — `APP_EMAIL` / `APP_PASSWORD` loader
-- `config/app-product.ts` — `PRODUCT_PATH` loader
+#### tests/support/ (31 files) - Page objects, adapters, configuration, evaluation, and reporting
 
-### tests/mbt/
+##### tests/support/actions/ (4 files) - Event-to-action bindings
 
-- `graph-driven.spec.ts` — auth shortest paths
-- `purchase-graph-driven.spec.ts` — purchase shortest paths
-- `coverage-loop.spec.ts` — coverage-loop experiments (stub)
+- `app-auth.actions.ts`
+- `app-shopping.actions.ts`
+- `app-store-lookup.actions.ts`
+- `stub-actions.ts`
 
-### tests/
+##### tests/support/app/ (1 file) - App-specific helpers
 
-- `fixtures.ts` — Playwright custom fixtures (stub vs app wiring)
+- `overlays.ts`
 
-## Root configs
+##### tests/support/config/ (2 files) - Runtime test config loaders
 
-- `package.json`, `tsconfig.json`, `playwright.config.ts`, `README.md`, `.prettierrc.json`
+- `app-credentials.ts`
+- `llm-judge.ts`
+
+##### tests/support/evaluation/ (10 files) - Advisory judgment, evidence, and rubrics
+
+- `judge-client.ts`
+- `observation-judge-client.ts`
+- `report-formatters.ts`
+- `rubric-engine.ts`
+- `step-evaluation-issues.ts`
+- `test-attachments.ts`
+- `test-evaluator.ts`
+- `rubrics/exploratory-observation.rubric.ts`
+- `rubrics/path-evidence.rubric.ts`
+- `rubrics/step-evidence.rubric.ts`
+
+##### tests/support/pages/ (13 files) - Page objects and state assertions
+
+- `cart.page.ts`
+- `checkout.page.ts`
+- `favorites-list.page.ts`
+- `home.page.ts`
+- `listing.page.ts`
+- `login.page.ts`
+- `my-account.page.ts`
+- `page-fixtures.ts`
+- `pdp.page.ts`
+- `state-verifier.ts`
+- `store-details.page.ts`
+- `store-locator.page.ts`
+- `store-region.page.ts`
+
+##### tests/support/reporting/ (1 file) - Suite-level advisory reports
+
+- `llm-observation-reporter.ts`
+
+#### tests/ (1 file) - Shared Playwright fixtures
+
+- `fixtures.ts`
+
+### docs/ (16 files) - Current project documentation
+
+- `ARCHITECTURE.md`
+- `ASSUMPTIONS.md`
+- `CODEMAP.md`
+- `CONTEXT.md`
+- `DEPENDENCIES.md`
+- `INITIATIVE-TARGET-STATE.md`
+- `TECHSTACK.md`
+- `TODO.md`
+- `exploration-loop-investigation.md`
+
+#### docs/PATTERNS/ (7 files) - Reusable patterns
+
+- `CHANGES.md`
+- `INDEX.md`
+- `action-map.md`
+- `config-loader.md`
+- `machine-model.md`
+- `page-object.md`
+- `test-spec.md`
+
+### agents/ (3 files) - Rosetta memory and implementation log
+
+- `IMPLEMENTATION.md`
+- `MEMORY.md`
+- `init-workspace-flow-state.md`

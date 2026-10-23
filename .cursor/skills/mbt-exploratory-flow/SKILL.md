@@ -167,7 +167,7 @@ final: …
 
 ### Config
 
-Env knobs (e.g. `PRODUCT_PATH`) with defaults from the probe.
+Environment knobs required by the approved journey, such as optional advisory-evaluation settings, with defaults from the probe where applicable.
 
 Wait for explicit approval of **assertions and graph shape**.
 

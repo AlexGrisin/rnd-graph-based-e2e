@@ -164,11 +164,11 @@ Two capabilities are genuinely LLM-exclusive:
 
 ## Recommendation
 
-Build the no-LLM loop for systematic coverage — it replicates 80% of the value (gap detection, path variety, budget control) with zero API cost and provable completeness.
+The no-LLM loop is implemented for systematic coverage in `coverage-tracker.ts`, `exploration-loop.ts`, and the associated coverage-loop spec. It provides deterministic gap detection, path variety, budget control, and measurable coverage within the modelled state space.
 
 Split:
 
 - **XState loop** — default mode, guaranteed coverage of every modelled transition
 - **LLM generation** — optional exploratory mode for out-of-model behaviors and richer narrative
 
-Implementation scope: three files (`coverage-tracker.ts`, `exploration-loop.ts`, persona types) entirely within `src/mbt/graph/`, with no changes to specs, page objects, or the machine itself.
+The implementation remains bounded to the graph layer and its stub-only coverage-loop scenarios; it does not add live browser exploration outside the model.
