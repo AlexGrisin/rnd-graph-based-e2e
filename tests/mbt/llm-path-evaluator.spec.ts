@@ -17,6 +17,7 @@ import { createLlmGatewayObservationJudge } from '../support/evaluation/observat
 import type { ExploratoryObservationReport } from '../support/evaluation/rubrics/exploratory-observation.rubric.js';
 import { pathEvidenceRubric } from '../support/evaluation/rubrics/path-evidence.rubric.js';
 import { stepEvidenceRubric } from '../support/evaluation/rubrics/step-evidence.rubric.js';
+import type { CriterionAssessment } from '../support/evaluation/rubric-engine.js';
 import {
   formatJudgeIssues,
   formatJudgeReasoning,
@@ -728,7 +729,10 @@ function createAssessments(score: number, confidence: number) {
   }));
 }
 
-function createStepAssessments(score: number, confidence: number) {
+function createStepAssessments(
+  score: number,
+  confidence: number,
+): CriterionAssessment[] {
   return stepEvidenceRubric.criteria.map((criterion) => ({
     criterionId: criterion.id,
     status: 'met' as const,
