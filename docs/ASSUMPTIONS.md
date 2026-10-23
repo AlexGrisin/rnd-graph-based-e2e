@@ -6,19 +6,22 @@ Style: factual, confidence-qualified, concise; do not store credentials or secre
 ## Assumptions
 
 ### A1 - npm remains the package manager
+
 - Confidence: High.
 - Evidence: `package-lock.json` exists and `package.json` defines npm scripts.
 - Resolve into: `docs/TECHSTACK.md`, `docs/ARCHITECTURE.md`.
 
 ### A2 - Browser-free stub runs are sufficient for graph and wiring smoke
+
 - Confidence: High.
-- Evidence: Playwright `stub` project runs the shopping graph spec with log-only actions.
+- Evidence: Playwright `stub` project runs the auth, shopping, store-lookup, and evaluator specs with log-only actions or deterministic fixtures.
 - Resolve into: `docs/ARCHITECTURE.md`, `docs/TODO.md` if broader non-browser validation is requested.
 
-### A3 - Shopping live actions use a configured product-detail path
+### A3 - Shopping live actions use stable discovery behavior
+
 - Confidence: High.
-- Evidence: the model includes search and category discovery, while the live `OPEN_PDP` adapter navigates through the configured runtime product path.
-- Resolve into: `docs/CONTEXT.md`, `docs/PATTERNS/config-loader.md`.
+- Evidence: the live adapters use a fixed POC search term and category navigation before opening the first product listing.
+- Resolve into: `docs/CONTEXT.md`, `docs/PATTERNS/action-map.md`.
 
 ## Decisions
 

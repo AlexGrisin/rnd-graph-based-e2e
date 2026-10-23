@@ -88,13 +88,13 @@ Then run the matching browser-free project to confirm new paths generate. No edi
 
 ## Design constraints
 
-- `workers: 1`, `fullyParallel: false` — MBT paths are stateful and run sequentially.
+- `workers: 1`, `fullyParallel: true`, and `trace: 'retain-on-failure'` are the current Playwright settings.
 - `src/machines/` stays pure (no Playwright imports) so the model is testable/serializable independent of the browser.
-- Coverage model is `getShortestPaths` — one minimal path per reachable state. For non-shortest or named journeys, use `getPathsFromEvents` (resolves an explicit event list into a path, validated by the graph) — see README "Specific journeys when needed". For exhaustive coverage, extend `src/mbt/graph/path-generator.ts` (e.g. `getSimplePaths`).
+- Path selection is journey-specific: auth uses shortest paths, shopping uses cyclic paths, and store lookup uses transition paths. For named journeys, use `getPathsFromEvents` (resolves an explicit event list into a path, validated by the graph); additional generators belong in `src/mbt/graph/path-generator.ts`.
 
 ## Environment
 
-`.env` (copy from `.env.example`) is the runtime source for `BASE_URL`, `PRODUCT_PATH`, and credentials. `BASE_URL` is required for live tests; `PRODUCT_PATH` is required for the live shopping flow; `APP_EMAIL`/`APP_PASSWORD` are required for live auth. Loaded via `dotenv` in `playwright.config.ts`.
+`.env` (copy from `.env.example`) is the runtime source for `BASE_URL`, credentials, and optional advisory-evaluation configuration. `BASE_URL` is required for live tests; `APP_EMAIL`/`APP_PASSWORD` are required for live auth. The LLM judge remains disabled unless explicitly enabled and configured. Values are loaded through `dotenv` in `playwright.config.ts`.
 
 ## Note on docs
 

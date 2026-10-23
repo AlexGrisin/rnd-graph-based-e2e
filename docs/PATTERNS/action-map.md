@@ -65,6 +65,7 @@ export function createStubActions(): ActionMap {
 ## Reference implementations
 
 - `tests/support/actions/app-auth.actions.ts` - event handlers for auth states with credentials lookup inside `SUBMIT`
-- `tests/support/actions/app-purchase.actions.ts` - purchase flow handlers delegated to `pdpPage`, `cartPage`, and `checkoutPage`
+- `tests/support/actions/app-shopping.actions.ts` - shopping-flow handlers delegated to home, listing, PDP, cart, and checkout page objects
+- `tests/support/actions/app-store-lookup.actions.ts` - store-finder handlers delegated across locator, region, and detail page objects
 - `tests/support/actions/stub-actions.ts` - browser-free log-only implementation with the same event-key contract
-- `tests/fixtures.ts` - merges `createAppAuthActions(...)` and `createAppPurchaseActions(...)` for live runs
+- `tests/fixtures.ts` - merges auth, shopping, and store-lookup action maps for live runs

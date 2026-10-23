@@ -589,7 +589,7 @@ Connect the target capabilities to useful QE scenarios, showing what QE supplies
 
 **Main message:** Discovery, guided investigation and validation exploration support different QE needs, with clear inputs, activities and useful outputs.
 
-**Layout reference:** Preserve the original three-column layout from slide 4 of the [original deck](../Design.pdf). Use one column per use case, with the same three visible sections: **QE supplies**, **System does** and **QE receives**. Keep the meaningful explanation in each section. Do not replace this layout with a table, sparse outcome-only cards or a separate feature inventory.
+**Layout reference:** Preserve the original three-column layout from slide 4 of the original deck (the source deck is not retained in this repository). Use one column per use case, with the same three visible sections: **QE supplies**, **System does** and **QE receives**. Keep the meaningful explanation in each section. Do not replace this layout with a table, sparse outcome-only cards or a separate feature inventory.
 
 **Include on slide:**
 

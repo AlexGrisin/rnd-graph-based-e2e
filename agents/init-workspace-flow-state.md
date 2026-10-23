@@ -4,21 +4,21 @@
 - Mode: plugin
 - Plugin active: true
 - Composite: false
-- File count: 29
+- File count at 2026-07-22 initialization: 29
 
 ## Phases
 
-| Phase | Status | Notes |
-| --- | --- | --- |
-| 1. Context | complete | Plugin-mode upgrade detected 2026-07-22. |
-| 2. Shells | skipped | Active plugin mode requires shell generation to be skipped. |
-| 3. Discovery | complete | Root-only technical inventory refreshed; 29 TypeScript source/config files. |
-| 4. Rules | skipped | Permanently disabled by workflow. |
-| 5. Patterns | complete | Five reusable root-project patterns indexed; three added during this upgrade. |
-| 6. Code graph | complete | Selected built-in CODEMAP only; no third-party code graph or LSP installed. |
-| 7. Documentation | complete | Context, architecture, assumptions, TODO, implementation, and agent memory refreshed. |
-| 8. Questions | complete | Four user decisions integrated into workspace documentation. |
-| 9. Verification | complete | Independent re-audit passed after CODEMAP inventory refresh. |
+| Phase            | Status   | Notes                                                                                         |
+| ---------------- | -------- | --------------------------------------------------------------------------------------------- |
+| 1. Context       | complete | Plugin-mode upgrade detected 2026-07-22.                                                      |
+| 2. Shells        | skipped  | Active plugin mode requires shell generation to be skipped.                                   |
+| 3. Discovery     | complete | Root-only technical inventory refreshed; 29 TypeScript source/config files at initialization. |
+| 4. Rules         | skipped  | Permanently disabled by workflow.                                                             |
+| 5. Patterns      | complete | Five reusable root-project patterns indexed; three added during this upgrade.                 |
+| 6. Code graph    | complete | Selected built-in CODEMAP only; no third-party code graph or LSP installed.                   |
+| 7. Documentation | complete | Context, architecture, assumptions, TODO, implementation, and agent memory refreshed.         |
+| 8. Questions     | complete | Four user decisions integrated into workspace documentation.                                  |
+| 9. Verification  | complete | Independent re-audit passed after CODEMAP inventory refresh.                                  |
 
 ## Inventory
 

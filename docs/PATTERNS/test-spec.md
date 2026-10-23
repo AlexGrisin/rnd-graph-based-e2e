@@ -6,12 +6,12 @@ Graph-Driven MBT Spec
 
 ## Description
 
-A thin Playwright spec that generates one test per shortest path from an XState machine. Specs live in `tests/mbt/` and contain **no locators, selectors, or browser logic** — only path iteration and fixture injection.
+A thin Playwright spec that generates one test per graph path from an XState machine. Specs live in `tests/mbt/` and contain **no locators, selectors, or browser logic** — only path iteration and fixture injection.
 
 Use when:
 
 - Adding coverage for a new or updated application machine
-- Running all shortest paths against stub or live browser projects
+- Running generated paths against stub or live browser projects
 
 Do **not** write per-journey test cases. The graph is the source of truth; specs only orchestrate `testPath()`.
 
@@ -20,7 +20,7 @@ Do **not** write per-journey test cases. The graph is the source of truth; specs
 | Rule                                          | Rationale                                                               |
 | --------------------------------------------- | ----------------------------------------------------------------------- |
 | Import custom `test` from `tests/fixtures.ts` | Provides `mbtContext`, `actions`, `stateVerifier`, project-aware `page` |
-| Generate paths at module load                 | `getAllShortestPaths(machine)` runs once; tests register synchronously  |
+| Generate paths at module load                 | The selected graph generator runs once; tests register synchronously    |
 | `test.describe` groups related coverage       | Shared `beforeEach` for project-specific setup                          |
 | `describePath(path)` names each test          | Human-readable label: target state + event sequence                     |
 | Delegate to `testPath()`                      | Engine walks steps, dispatches actions, verifies states                 |
@@ -91,4 +91,6 @@ Run live E2E: `npm test -- --project=app`
 
 ## Reference implementation
 
-- `tests/mbt/auth-graph-driven.spec.ts` — canonical graph-driven spec for `appAuthMachine`
+- `tests/mbt/auth-graph-driven.spec.ts` — shortest-path suite for `appAuthMachine`
+- `tests/mbt/shopping-graph-driven.spec.ts` — cyclic-path suite for `appShoppingMachine`
+- `tests/mbt/store-lookup-graph-driven.spec.ts` — transition-path suite for `appStoreLookupMachine`

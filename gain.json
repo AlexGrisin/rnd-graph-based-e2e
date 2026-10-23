@@ -3,9 +3,7 @@
   "servicesDescription": {
     "e2e-mbt": "Generates and runs browser test paths from XState application models."
   },
-  "codingAgents": [
-    "codex"
-  ],
+  "codingAgents": ["codex"],
   "sdlc": {
     "issue_tracker": "[ISSUE_TRACKER]",
     "issue_tracker_project": "[ISSUE_TRACKER_URL]",

@@ -87,3 +87,4 @@ export function getExampleJourneyStateValue(
 
 - `src/machines/app-auth.machine.ts` - typed context plus `assign(...)` on `SUBMIT`
 - `src/machines/app-shopping.machine.ts` - shopping journey with discovery branches, home-return cycles, and checkout
+- `src/machines/app-store-lookup.machine.ts` - guarded store-detail return transitions based on typed origin context

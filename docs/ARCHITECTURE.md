@@ -7,7 +7,7 @@ Style: concise, factual, and complementary to `docs/CODEMAP.md`; use CODEMAP for
 
 - Single-package TypeScript/ESM Node project using npm and `package-lock.json`.
 - CODEMAP is the built-in structural index; no external graph or LSP backend is configured for this workspace.
-- Root TypeScript scope is 27 source/config files: 26 files under `src/` and `tests/`, plus `playwright.config.ts`.
+- Root TypeScript scope is 47 source/config files: 46 files under `src/` and `tests/`, plus `playwright.config.ts`.
 - See `docs/CODEMAP.md` for path-by-path navigation and `docs/TECHSTACK.md` for dependency versions.
 
 ## Runtime Stack
@@ -30,7 +30,8 @@ tests/mbt/            -> generated-path Playwright specs
 ## Journey Models
 
 - `app-auth.machine.ts`: auth journey states `home`, `login`, `credentialsRequired`, `homeAuth`, `myAccount`, `error`; includes successful login, empty-credential validation, invalid login, account navigation, and logout; `error` is final.
-- `app-shopping.machine.ts`: shopping journey states `home`, `search`, `category`, `pdp`, `favorites`, `cart`, `checkout`; models discovery, product selection, favorites, cart, home-return cycles, and guest checkout; `checkout` is final.
+- `app-shopping.machine.ts`: shopping journey states `home`, `search`, `category`, `pdp`, `favoritesAdded`, `favoritesList`, `bagAdded`, `cart`, `checkout`; models discovery, product selection, favorites, cart, home-return cycles, and guest checkout; `checkout` is final.
+- `app-store-lookup.machine.ts`: store-finder states cover validation, results, no-results, region, map selection, and store details; guarded return transitions preserve the detail page's origin.
 - Journey machines must not import Playwright, page objects, or environment configuration.
 
 ## MBT Engine
@@ -46,16 +47,18 @@ tests/mbt/            -> generated-path Playwright specs
 
 - Page objects live under `tests/support/pages/` and own selectors plus state assertions.
 - Action maps live under `tests/support/actions/` and translate machine events into page-object calls or stub log entries.
-- `tests/fixtures.ts` merges auth and shopping live action maps for the `app` project and uses log-only stub actions for the `stub` project.
+- `tests/fixtures.ts` merges auth, shopping, and store-lookup live action maps for the `app` project and uses log-only stub actions for the `stub` project.
 - Runtime config loaders under `tests/support/config/` centralize environment-backed inputs and fail fast for required values.
 
 ## Test Suites
 
 - `auth-graph-driven.spec.ts`: one Playwright test per auth shortest path.
-- `shopping-graph-driven.spec.ts`: one Playwright test per generated shopping path.
+- `shopping-graph-driven.spec.ts`: one Playwright test per generated cyclic shopping path.
+- `store-lookup-graph-driven.spec.ts`: one Playwright test per generated store-lookup transition path.
 - `coverage-loop.spec.ts`: stub-only coverage-loop scenarios for default coverage, personas, weights, state priority, and budget exhaustion.
-- Playwright config uses one worker, disables full parallelism, traces on first retry, and defines `stub` and `app` projects.
-- Live `app` runs are fail-fast at the test-result level: an observed storefront failure fails that run immediately.
+- `llm-path-evaluator.spec.ts`: stub-only evaluator and reporting scenarios.
+- Playwright config uses one worker with `fullyParallel: true`, retains traces on failures, and defines `stub` and `app` projects.
+- Live `app` runs report browser-test failures normally; local runs use no retries and CI runs retry once.
 
 ## Contributor Patterns
 

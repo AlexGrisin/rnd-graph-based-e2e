@@ -9,13 +9,13 @@ Maintain only two things as the application evolves:
 1. **The graph** — an XState machine that models real application behavior (`src/machines/`)
 2. **The adapters** — page objects, selectors, and action handlers that execute events in the browser (`tests/support/`)
 
-The test suite reads the machine, generates one Playwright test per shortest path, and runs each path by dispatching events to your action map.
+Each suite reads its machine, generates the selected graph paths, and runs each path by dispatching events to its action map.
 
 ```mermaid
 flowchart LR
     M["XState machine"]
-    G["getShortestPaths()"]
-    S["auth-graph-driven.spec.ts"]
+    G["Selected path generator"]
+    S["generated-path spec"]
     A["Action map"]
     P["Page objects"]
     M --> G --> S
@@ -54,25 +54,27 @@ tests/
   mbt/
     auth-graph-driven.spec.ts       # Auth graph — one test per shortest path
     shopping-graph-driven.spec.ts   # Shopping graph — discovery→product→favorites/cart→checkout
+    store-lookup-graph-driven.spec.ts # Store finder — validation/results/region/map/details
   fixtures.ts                       # Playwright fixtures (stub vs live)
   support/
     actions/                        # Event → page method adapters
     pages/                          # Page objects + should*() assertions per state
     app/                            # Site-specific overlay helpers
-    config/                         # Credentials + PRODUCT_PATH
+    config/                         # Credentials + optional advisory-evaluation config
+    evaluation/                     # Advisory route, step, and observation evidence
 ```
 
-| Layer             | Location                              | Role                                                                 |
-| ----------------- | ------------------------------------- | -------------------------------------------------------------------- |
-| Application model | `src/machines/*.machine.ts`           | States, transitions, events                                          |
-| Path engine       | `src/mbt/graph/`                      | `getShortestPaths`, `getPathsFromEvents`, `testPath`, `describePath` |
-| Action adapters   | `tests/support/actions/`              | Maps model events → Playwright calls                                 |
-| Page objects      | `tests/support/pages/`                | Locators, navigation, state assertions                               |
-| Generated tests   | `tests/mbt/auth-graph-driven.spec.ts` | One Playwright test per auth graph path                              |
+| Layer             | Location                    | Role                                                                 |
+| ----------------- | --------------------------- | -------------------------------------------------------------------- |
+| Application model | `src/machines/*.machine.ts` | States, transitions, events                                          |
+| Path engine       | `src/mbt/graph/`            | `getShortestPaths`, `getPathsFromEvents`, `testPath`, `describePath` |
+| Action adapters   | `tests/support/actions/`    | Maps model events → Playwright calls                                 |
+| Page objects      | `tests/support/pages/`      | Locators, navigation, state assertions                               |
+| Generated tests   | `tests/mbt/*.spec.ts`       | One Playwright test per selected path for each journey               |
 
 ## How tests are generated
 
-At module load time, `auth-graph-driven.spec.ts` calls `getAllShortestPaths(appAuthMachine)` from `@xstate/graph`. For each path it registers a Playwright test named after the target state and event sequence:
+At module load time, `auth-graph-driven.spec.ts` calls `getAllShortestPaths(appAuthMachine)`. The shopping and store-lookup suites select cyclic and transition paths respectively. Each suite registers Playwright tests named after the target state and event sequence:
 
 ```
 → myAccount: GO_LOGIN → SUBMIT
@@ -280,14 +282,15 @@ See [Specific journeys when needed](#specific-journeys-when-needed) for `--grep`
 
 ### Environment variables
 
-| Variable       | Default | Purpose                                                               |
-| -------------- | ------- | --------------------------------------------------------------------- |
-| `BASE_URL`     | —       | Application under test (required for live runs)                       |
-| `APP_EMAIL`    | —       | Login email (required for `app` project)                              |
-| `APP_PASSWORD` | —       | Login password (required for `app` project)                           |
-| `PRODUCT_PATH` | —       | PDP path relative to `BASE_URL` (required for the live shopping flow) |
+| Variable            | Default            | Purpose                                                     |
+| ------------------- | ------------------ | ----------------------------------------------------------- |
+| `BASE_URL`          | —                  | Application under test (required for live runs)             |
+| `APP_EMAIL`         | —                  | Login email (required for `app` project)                    |
+| `APP_PASSWORD`      | —                  | Login password (required for `app` project)                 |
+| `LLM_JUDGE_ENABLED` | `false`            | Enables the optional advisory evaluator for live `app` runs |
+| `LLM_JUDGE_SCOPE`   | `route` when unset | Advisory evaluation granularity: `route`, `step`, or `both` |
 
-Copy `.env.example` to `.env` and configure the target URL, product path, and credentials needed by the selected live flow.
+Copy `.env.example` to `.env` and configure the target URL and credentials needed by the selected live flow. Keep advisory evaluation disabled unless its gateway configuration is intentionally supplied.
 
 ## Coverage model
 

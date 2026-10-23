@@ -11,11 +11,12 @@ Style: concise, factual, grep-friendly, no implementation changelog.
 
 ## Domain Scope
 
-- The POC covers two live storefront journeys:
+- The POC covers three live storefront journeys:
   - Auth: visitor starts on the home page, opens login, reaches account on success, or reaches an error state on failure.
   - Shopping: visitor starts on the home page, searches or browses a category, opens a product detail page, adds it to favorites or cart, and can reach checkout shipping as a guest.
-- The POC evaluates both deterministic shortest-path coverage and exploration-loop coverage over those journeys.
-- Payment completion, catalog discovery, search behavior, account lifecycle, and post-checkout fulfillment are outside the current MBT POC scope.
+  - Store lookup: visitor opens the store finder, observes search validation, searches by city or postcode, handles no results, browses a region or map selection, opens store details, and returns to the originating view.
+- The POC evaluates shortest-path, cyclic-path, and transition-path generation, plus exploration-loop coverage where applicable.
+- Payment completion, full account lifecycle, and post-checkout fulfillment are outside the current MBT POC scope.
 - A browser-free smoke mode exists so graph wiring can be checked without depending on the live storefront.
 
 ## Target Outcomes

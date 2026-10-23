@@ -8,9 +8,9 @@ Keep entries brief, factual, and grep-friendly.
 
 - Plugin-mode Rosetta workspace upgrade is in progress for a root-only repository.
 - Project is an XState + Playwright model-based E2E testing POC.
-- Root TypeScript source/config scope is 29 files: 28 under `src/` and `tests/`, plus `playwright.config.ts`.
+- Root TypeScript source/config scope is 47 files: 46 under `src/` and `tests/`, plus `playwright.config.ts`.
 - Built-in CODEMAP is the selected code map; no external graph or LSP backend is configured.
-- Core implementation includes auth and purchase journey machines, graph/path helpers, coverage loop, MBT runner, Playwright fixtures, page objects, live action maps, and stub actions.
+- Core implementation includes auth, shopping, and store-lookup journey machines; graph/path helpers; coverage loop; Playwright fixtures; live action maps; stub actions; and optional advisory evaluation.
 
 ## Change Log
 
@@ -149,3 +149,8 @@ Keep entries brief, factual, and grep-friendly.
 - Logged each step criterion's concise LLM explanation alongside its inline verdict.
 - Added a final LLM-assisted exploratory-observation report that consolidates route and completed-step verdicts into evidence-backed successes, concerns, errors, and coverage gaps.
 - Added a Playwright reporter that rolls all per-test observation reports into `artifacts/llm-observations/llm-judge-suite-observations.md` after a suite run.
+
+### 2026-10-23 - Add store-lookup graph-driven coverage
+
+- Added the store-lookup machine and generated transition-path suite, covering search validation, city/postcode results, no-results, region and map selection, store details, and origin-aware return transitions.
+- Added store-finder page objects and action-map integration to the shared live and stub fixtures.
