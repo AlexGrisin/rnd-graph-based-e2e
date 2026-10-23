@@ -57,6 +57,7 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 **Minimum-output contract (asserted by this phase independent of skill internals):** `raw-data.md` MUST capture, at minimum — ticket: summary, description, status, priority, labels, components, comments; Wiki (when not skipped): page title, URL, content. Missing any of these = phase incomplete, regardless of what the `data-collection` role bindings define internally. The template below shows Jira/Confluence field names as canonical examples — adapt labels to the resolved providers.
 
 1. Create `plans/testgen-{TICKET-KEY}/raw-data.md` with structure:
+
    ```markdown
 
    ```
@@ -166,6 +167,7 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 - **Total Content Size**: [Approximate word count]
 - **Search Terms Used**: [List]
 - **Notes**: [Any issues during extraction]
+
   ```
 
   ```

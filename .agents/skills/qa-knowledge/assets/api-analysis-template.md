@@ -10,7 +10,7 @@ Skeletons for `plans/api-aqa-{IDENTIFIER}/api-analysis.md`. Phase defines sectio
 
 One entry per target endpoint, in this order; every subsection present with real values OR explicit `N/A -- <reason>` / `None`.
 
-````markdown
+```markdown
 ## Endpoint Contract: <METHOD> <path>
 
 **Source:** swagger | code | hybrid (both used)
@@ -52,7 +52,7 @@ One entry per target endpoint, in this order; every subsection present with real
 ### Notes / Discrepancies
 
 [Spec-vs-code mismatches, deprecated markers, missing schemas, undocumented status codes. `Source: hybrid` entries MUST have a non-empty Notes: a recorded mismatch OR explicit `None.` confirming reconciliation ran. Also record each applied redaction here.]
-````
+```
 
 **Worked entry** (`Source: hybrid` with a real discrepancy -- demonstrates code-as-supplement and a recorded gap):
 

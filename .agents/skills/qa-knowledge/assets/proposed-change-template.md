@@ -6,7 +6,7 @@ Shared QA proposed-change approval block, presented before any correction write.
 
 One block per change, presented BEFORE any write; empty fields use `None`. Phase supplies the **change-type enum**, **root-cause reference**, **state-file path**, **loop-back phase**; this asset owns the shape plus approval/iteration-cap rules.
 
-```markdown
+````markdown
 ### Proposed Change <N>: <one-line title>
 
 - **Source root cause:** <root-cause entry id -- e.g. execution-report ERR-3 (QA) / failure-analysis F3 (UI-AQA)>
@@ -19,6 +19,7 @@ One block per change, presented BEFORE any write; empty fields use `None`. Phase
 ```diff
 - <removed line(s)>
 ```
+````
 
 **After:**
 
@@ -30,7 +31,8 @@ One block per change, presented BEFORE any write; empty fields use `None`. Phase
 - **Impact:** <only the cited test? other tests sharing the helper/factory? page-object consumers?>
 - **Risk:** Low | Medium | High
 - **Approval status:** pending | approved (token: `<exact user token>`) | rejected | partial (hunks <list>)
-```
+
+````
 
 **Change-type enum (the phase supplies one):**
 
@@ -53,7 +55,7 @@ One block per change, presented BEFORE any write; empty fields use `None`. Phase
 
 ```diff
 -    expect(response.code).to eq("200")
-```
+````
 
 **After:**
 
@@ -65,7 +67,8 @@ One block per change, presented BEFORE any write; empty fields use `None`. Phase
 - **Impact:** orders_spec.rb only.
 - **Risk:** Low
 - **Approval status:** approved (token: `approved`)
-```
+
+````
 
 **Worked example -- UI-AQA / UI (approved state):**
 
@@ -81,7 +84,7 @@ One block per change, presented BEFORE any write; empty fields use `None`. Phase
 
 ```diff
 - await page.locator('[data-testid="logout-btn"]').click();
-```
+````
 
 **After:**
 
@@ -93,6 +96,8 @@ One block per change, presented BEFORE any write; empty fields use `None`. Phase
 - **Impact:** logout.spec.ts only -- no other test references the old selector.
 - **Risk:** Low
 - **Approval status:** approved (token: `approved`)
+
 ```
 
 </proposed-change-template>
+```
