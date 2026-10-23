@@ -34,7 +34,12 @@ export function getAllTransitionPaths<TLogic extends AnyActorLogic>(
     shortestPaths.map((path) => [getSnapshotKey(path.state), path]),
   );
 
-  const edges = adjacencyMapToArray(getAdjacencyMap(logic, {}));
+  // Drop events a guard rejects: the adjacency map still lists them as no-op
+  // self-edges, which are not real transitions and cannot be driven in a browser.
+  const edges = adjacencyMapToArray(getAdjacencyMap(logic, {})).filter(
+    ({ state, event }) =>
+      (state as { can?: (e: EventObject) => boolean }).can?.(event) ?? true,
+  );
 
   return edges.map(({ state, event, nextState }) => {
     const sourceKey = getSnapshotKey(state);

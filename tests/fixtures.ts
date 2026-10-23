@@ -3,6 +3,7 @@ import { test as base, expect, chromium } from '@playwright/test';
 import type { ActionMap } from '../src/mbt/types.js';
 import { createAppAuthActions } from './support/actions/app-auth.actions.js';
 import { createAppShoppingActions } from './support/actions/app-shopping.actions.js';
+import { createAppStoreLookupActions } from './support/actions/app-store-lookup.actions.js';
 import { createStubActions } from './support/actions/stub-actions.js';
 import { createLoggingContext } from './support/actions/stub-actions.js';
 import { HomePage } from './support/pages/home.page.js';
@@ -13,6 +14,9 @@ import { ListingPage } from './support/pages/listing.page.js';
 import { FavoritesListPage } from './support/pages/favorites-list.page.js';
 import { CartPage } from './support/pages/cart.page.js';
 import { CheckoutPage } from './support/pages/checkout.page.js';
+import { StoreLocatorPage } from './support/pages/store-locator.page.js';
+import { StoreRegionPage } from './support/pages/store-region.page.js';
+import { StoreDetailsPage } from './support/pages/store-details.page.js';
 import type { PageFixtures } from './support/pages/page-fixtures.js';
 import {
   createStateVerifier,
@@ -110,6 +114,15 @@ export const test = base.extend<MbtFixtures>({
   checkoutPage: async ({ page }, use) => {
     await use(new CheckoutPage(page));
   },
+  storeLocatorPage: async ({ page }, use) => {
+    await use(new StoreLocatorPage(page));
+  },
+  storeRegionPage: async ({ page }, use) => {
+    await use(new StoreRegionPage(page));
+  },
+  storeDetailsPage: async ({ page }, use) => {
+    await use(new StoreDetailsPage(page));
+  },
   mbtContext: async ({ page }, use) => {
     await use(createLoggingContext(page));
   },
@@ -151,6 +164,9 @@ export const test = base.extend<MbtFixtures>({
       favoritesListPage,
       cartPage,
       checkoutPage,
+      storeLocatorPage,
+      storeRegionPage,
+      storeDetailsPage,
     },
     use,
     testInfo,
@@ -168,10 +184,14 @@ export const test = base.extend<MbtFixtures>({
       favoritesListPage,
       cartPage,
       checkoutPage,
+      storeLocatorPage,
+      storeRegionPage,
+      storeDetailsPage,
     };
     await use({
       ...createAppAuthActions(pages),
       ...createAppShoppingActions(pages),
+      ...createAppStoreLookupActions(pages),
     });
   },
   stateVerifier: async (
@@ -184,6 +204,9 @@ export const test = base.extend<MbtFixtures>({
       favoritesListPage,
       cartPage,
       checkoutPage,
+      storeLocatorPage,
+      storeRegionPage,
+      storeDetailsPage,
     },
     use,
     testInfo,
@@ -202,6 +225,9 @@ export const test = base.extend<MbtFixtures>({
         favoritesListPage,
         cartPage,
         checkoutPage,
+        storeLocatorPage,
+        storeRegionPage,
+        storeDetailsPage,
       }),
     );
   },

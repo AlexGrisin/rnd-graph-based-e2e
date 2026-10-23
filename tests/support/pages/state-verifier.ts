@@ -17,6 +17,14 @@ export function createStateVerifier(pages: PageFixtures): StateVerifier {
     bagAdded: () => pages.pdpPage.shouldHaveItemInBag(),
     cart: () => pages.cartPage.shouldBeOnPage(),
     checkout: () => pages.checkoutPage.shouldBeOnPage(),
+    storeLocator: () => pages.storeLocatorPage.shouldBeOnPage(),
+    storeSearchInvalid: () =>
+      pages.storeLocatorPage.shouldShowValidationError(),
+    storeResults: () => pages.storeLocatorPage.shouldShowResults(),
+    storeNoResults: () => pages.storeLocatorPage.shouldShowNoResults(),
+    storeMapSelection: () => pages.storeLocatorPage.shouldShowMapSelection(),
+    storeRegion: () => pages.storeRegionPage.shouldBeOnPage(),
+    storeDetails: () => pages.storeDetailsPage.shouldBeOnPage(),
   };
 
   return async (expectedState) => {

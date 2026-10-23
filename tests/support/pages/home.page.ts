@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { dismissAppOverlays } from '../app/overlays.js';
 
 /** Beaverbrooks home is the bare origin — may render with or without a trailing slash. */
 export const isHomeUrl = (url: URL): boolean =>
@@ -13,6 +14,7 @@ export class HomePage {
   private readonly searchInput: Locator;
   private readonly searchSubmit: Locator;
   private readonly favoritesLink: Locator;
+  private readonly findStoreLink: Locator;
 
   constructor(private readonly page: Page) {
     const header = page.locator('header');
@@ -37,6 +39,7 @@ export class HomePage {
     this.favoritesLink = header
       .getByRole('link', { name: /favourites/i })
       .first();
+    this.findStoreLink = header.getByRole('link', { name: 'Find a store' });
   }
 
   async shouldBeOnPage(): Promise<void> {
@@ -66,6 +69,12 @@ export class HomePage {
     await this.favoritesLink.hover();
     await this.favoritesLink.click();
     await this.page.waitForURL(/\/favourites/, { timeout: 30_000 });
+  }
+
+  async openStoreLocator(): Promise<void> {
+    await dismissAppOverlays(this.page);
+    await this.findStoreLink.click();
+    await this.page.waitForURL(/\/stores$/, { timeout: 30_000 });
   }
 
   async search(query: string): Promise<void> {

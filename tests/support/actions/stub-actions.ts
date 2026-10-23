@@ -47,6 +47,47 @@ export function createStubActions(): ActionMap {
     GO_CHECKOUT: async ({ log }) => {
       log('GO_CHECKOUT → proceed to checkout (no payment)');
     },
+    OPEN_STORE_LOCATOR: async ({ log }) => {
+      log('OPEN_STORE_LOCATOR → open store locator from header');
+    },
+    SUBMIT_EMPTY_STORE_SEARCH: async ({ log }) => {
+      log('SUBMIT_EMPTY_STORE_SEARCH → submit store search with empty field');
+    },
+    SEARCH_STORES_BY_CITY: async ({ log }) => {
+      log('SEARCH_STORES_BY_CITY → search stores by city');
+    },
+    SEARCH_STORES_BY_POSTCODE: async ({ log }) => {
+      log('SEARCH_STORES_BY_POSTCODE → search stores by postcode');
+    },
+    SEARCH_STORES_NO_MATCH: async ({ log }) => {
+      log(
+        'SEARCH_STORES_NO_MATCH → search city with a brand that has no store',
+      );
+    },
+    SHOW_ALL_STORE_RESULTS: async ({ log }) => {
+      log('SHOW_ALL_STORE_RESULTS → expand store results list');
+    },
+    BROWSE_STORE_REGION: async ({ log }) => {
+      log('BROWSE_STORE_REGION → browse stores by region');
+    },
+    SELECT_STORE_ON_MAP: async ({ log }) => {
+      log('SELECT_STORE_ON_MAP → select a store marker on the map');
+    },
+    OPEN_STORE_DETAILS: async ({ log }) => {
+      log('OPEN_STORE_DETAILS → open full store details');
+    },
+    BACK_TO_STORE_RESULTS: async ({ log }) => {
+      log('BACK_TO_STORE_RESULTS → back to search results');
+    },
+    BACK_TO_STORE_REGION: async ({ log }) => {
+      log('BACK_TO_STORE_REGION → back to region store list');
+    },
+    BACK_TO_STORE_LOCATOR: async ({ log }) => {
+      log('BACK_TO_STORE_LOCATOR → back to store locator');
+    },
+    BACK_TO_STORE_FINDER: async ({ log }) => {
+      log('BACK_TO_STORE_FINDER → back to store finder from region page');
+    },
   };
 }
 

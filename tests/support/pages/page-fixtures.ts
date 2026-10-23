@@ -6,6 +6,9 @@ import type { ListingPage } from './listing.page.js';
 import type { FavoritesListPage } from './favorites-list.page.js';
 import type { CartPage } from './cart.page.js';
 import type { CheckoutPage } from './checkout.page.js';
+import type { StoreLocatorPage } from './store-locator.page.js';
+import type { StoreRegionPage } from './store-region.page.js';
+import type { StoreDetailsPage } from './store-details.page.js';
 
 export type PageFixtures = {
   homePage: HomePage;
@@ -16,4 +19,7 @@ export type PageFixtures = {
   favoritesListPage: FavoritesListPage;
   cartPage: CartPage;
   checkoutPage: CheckoutPage;
+  storeLocatorPage: StoreLocatorPage;
+  storeRegionPage: StoreRegionPage;
+  storeDetailsPage: StoreDetailsPage;
 };

@@ -24,17 +24,18 @@ export default defineConfig({
     trace: 'retain-on-failure',
     actionTimeout: 30_000,
     navigationTimeout: 60_000,
-    headless: true,
+    headless: false,
   },
   projects: [
     {
       name: 'stub',
       testMatch:
-        /\/(auth-graph-driven|shopping-graph-driven|llm-path-evaluator)\.spec\.ts/,
+        /\/(auth-graph-driven|shopping-graph-driven|store-lookup-graph-driven|llm-path-evaluator)\.spec\.ts/,
     },
     {
       name: 'app',
-      testMatch: /\/(auth-graph-driven|shopping-graph-driven)\.spec\.ts/,
+      testMatch:
+        /\/(auth-graph-driven|shopping-graph-driven|store-lookup-graph-driven)\.spec\.ts/,
     },
   ],
   tsconfig: './tsconfig.json',
