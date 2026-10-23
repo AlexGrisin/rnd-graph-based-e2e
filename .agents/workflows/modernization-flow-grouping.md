@@ -1,6 +1,6 @@
 ---
 name: modernization-flow-grouping
-description: "Phase 4 Class Grouping of modernization-flow"
+description: 'Phase 4 Class Grouping of modernization-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -12,6 +12,7 @@ baseSchema: docs/schemas/phase.md
 ## Phase Flow
 
 **Phase 4: Class Group Analysis**
+
 1. Complete Phase 2 (or Phase 3 if executed) first
 2. Identify tightly-coupled classes
 3. Define bounded contexts
@@ -24,6 +25,7 @@ baseSchema: docs/schemas/phase.md
 **PREREQUISITES:** Complete Phase 2 (all original code specs created), and Phase 3 if executed
 
 **OBJECTIVES:**
+
 - Identify tightly-coupled classes (bounded contexts)
 - Map flows between class groups
 - Trace dependencies deep (2-3 levels minimum)
@@ -39,12 +41,14 @@ baseSchema: docs/schemas/phase.md
 ## Define Class Groups
 
 **IMPORTANT**: A **class group** is a collection of tightly-coupled classes that work together within a single project to provide a cohesive capability. Class groups are identified within bounded contexts and represent classes that:
+
 - Share data or state (technical coupling)
 - Provide related business functionality (business cohesion)
 - Have frequent interactions and dependencies
 - Form a natural unit within the project structure
 
 For each class group, document:
+
 - **Name**: Descriptive name for the class group
 - **Classes**: List all classes in the group
 - **Purpose**: What business/technical capability does this group provide?
@@ -71,10 +75,10 @@ For each class group, document:
 MUST spawn separate subagent to validate grounding, truthfulness, gaps, consistency, reasoning, and overall completion of the phase.
 
 After each class group analysis, validate (in memory! do not write this section!):
+
 - [ ] Class group mappings supported by explicit findings (validate in 1-2 lines)
 - [ ] Flows traced with evidence
 - [ ] Dependencies clearly mapped
 - [ ] Cross class group interactions identified
 
 **DEPENDENTS:** Phase 5 (Cross-Project Analysis) depends on completion of all class group analyses
-

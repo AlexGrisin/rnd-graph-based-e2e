@@ -1,6 +1,6 @@
 ---
 name: modernization-flow-crossproject
-description: "Phase 5 Cross-Project Analysis of modernization-flow"
+description: 'Phase 5 Cross-Project Analysis of modernization-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -12,6 +12,7 @@ baseSchema: docs/schemas/phase.md
 ## Phase Flow
 
 **Phase 5: Cross-Project Analysis**
+
 1. Complete Phase 4 first
 2. Identify similarities and inconsistencies
 3. Document patterns across projects
@@ -27,6 +28,7 @@ baseSchema: docs/schemas/phase.md
 **PREREQUISITES:** Complete Phase 4 (all class group analyses complete)
 
 **OBJECTIVES:**
+
 - Identify similarities and inconsistencies across projects
 - Identify patterns used across projects
 - Map cross-project usage and references
@@ -47,7 +49,7 @@ baseSchema: docs/schemas/phase.md
 - **MUST** analyze ALL `docs/original-code-specs-<lib/project>.md` files together (and update!)
 - **MUST** analyze both `docs/LEGACY-INTERFACES-CATALOG.md`, `docs/TODO.md` (if they exist).
 - **MUST** create todo tasks for each phase and also split phase for each original code spec file to update. Also split validation phase as well.
-- **MUST** update original-* files in place to add cross-project flows and dependencies, put direct references to reference-* and other original-* files. 
+- **MUST** update original-_ files in place to add cross-project flows and dependencies, put direct references to reference-_ and other original-\* files.
 - **MUST** create explicit follow-up tasks for ambiguities
 - **MUST** create `docs/cross-project-analysis.md` as a single file!
 - **MUST** check assumptions and unknowns and cleanup those which are addressed (update respective parts of te original document and remove element completely from this section).
@@ -90,6 +92,7 @@ baseSchema: docs/schemas/phase.md
 MUST spawn separate subagent to validate grounding, truthfulness, gaps, consistency, reasoning, and overall completion of the phase.
 
 Before proceeding to Phase 6:
+
 - [ ] Cross-project flows documented without omissions
 - [ ] Similarities and inconsistencies identified
 - [ ] Patterns documented with evidence
@@ -97,4 +100,3 @@ Before proceeding to Phase 6:
 - [ ] Follow-up tasks created for ambiguities
 
 **DEPENDENTS:** Phase 6 (Implementation Mapping) depends on cross-project analysis
-

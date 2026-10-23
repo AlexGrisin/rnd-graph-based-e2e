@@ -1,6 +1,6 @@
 ---
 name: modernization-flow-reuse
-description: "Phase 1 Existing-Library Reuse of modernization-flow"
+description: 'Phase 1 Existing-Library Reuse of modernization-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -12,6 +12,7 @@ baseSchema: docs/schemas/phase.md
 ## Phase Flow
 
 **Phase 1: Existing Library Analysis**
+
 1. Process each project separately
 2. Analyze code and tests
 3. Create reference-code-specs files
@@ -27,6 +28,7 @@ baseSchema: docs/schemas/phase.md
 **PREREQUISITES:** None
 
 **OBJECTIVES:**
+
 - Create complete, factual specification of existing code
 - Understand functionality, requirements, edge cases, and usage
 - Identify unknowns and create follow-up tasks
@@ -45,6 +47,7 @@ baseSchema: docs/schemas/phase.md
 ## Address Edge Cases
 
 Edge cases **MUST** be explicitly identified and documented:
+
 - Case sensitivity handling
 - Reference parameters and side effects
 - Out parameters
@@ -117,6 +120,7 @@ Each specification **MUST** include:
 MUST spawn separate subagent to validate grounding, truthfulness, gaps, consistency, reasoning, and overall completion of the phase.
 
 Before proceeding to Phase 2:
+
 - [ ] All required sections present for each project
 - [ ] Free from generalizations (only facts documented)
 - [ ] All unknowns explicitly called out
@@ -124,4 +128,3 @@ Before proceeding to Phase 2:
 - [ ] Tests analyzed and documented
 
 **DEPENDENTS:** Phase 2 (existing old code analysis) depends on completion of all project specs
-

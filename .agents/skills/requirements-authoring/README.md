@@ -1,16 +1,21 @@
 # requirements-authoring
+
 Turns a request into atomic, testable, implementation-free `<req>` units with per-unit HITL approval and source→goal→req→test traceability, instead of a prose or vague spec.
 
 ## Why it exists
+
 Without it a capable model would draft compound/vague/implementation-coupled requirements, bundle several behaviors into one unit, skip boundary/error scenarios, self-mark units `Approved`, leak change rationale into spec text, and lose traceability. Pitfalls section names the failure modes directly: "Bundle multiple behaviors in one unit", "Add scope without explicit approval", "Skip boundary and failure scenarios", "Treat requirement groupings as mere organization when they are requirements themselves". `core_principles_to_enforce` adds "No AI slop", "No scope creep", and a meta-leak test: "Spec statements contain only requirements — never explanations of why a previous draft was wrong... If a sentence would not survive in a spec that was never revised, delete it."
 
 ## When to engage
-Compressed trigger (`when_to_use_skill`): creating, updating, reviewing, or refactoring requirements and building traceability coverage; requirements must be atomic, testable, implementation-free, measurable, and explicitly approved by user in a HITL loop. Frontmatter `agent: requirements-engineer, reviewer` names both actors without a role split; the drafts-vs-validates division comes from `requirements-authoring-flow.md`'s phases (requirements-engineer drafts phases 2-5/8, reviewer validates phase 6). Dependencies: Rosetta prep steps completed; `USE SKILL \`questioning\`` for Q&A; CONTEXT/ARCHITECTURE/IMPLEMENTATION/ASSUMPTIONS/TECHSTACK docs available. Driven mainly by the dedicated `workflows/requirements-authoring-flow.md` (all 8 phases require it) and optionally by `workflows/code-analysis-flow.md`'s extraction step.
+
+Compressed trigger (`when_to_use_skill`): creating, updating, reviewing, or refactoring requirements and building traceability coverage; requirements must be atomic, testable, implementation-free, measurable, and explicitly approved by user in a HITL loop. Frontmatter `agent: requirements-engineer, reviewer` names both actors without a role split; the drafts-vs-validates division comes from `requirements-authoring-flow.md`'s phases (requirements-engineer drafts phases 2-5/8, reviewer validates phase 6). Dependencies: Rosetta prep steps completed; `USE SKILL \`questioning\``for Q&A; CONTEXT/ARCHITECTURE/IMPLEMENTATION/ASSUMPTIONS/TECHSTACK docs available. Driven mainly by the dedicated`workflows/requirements-authoring-flow.md`(all 8 phases require it) and optionally by`workflows/code-analysis-flow.md`'s extraction step.
 
 ## How it works
+
 SKILL.md flow: `role` → `when_to_use_skill` → `dependencies` → `core_concepts` (default output sections: Intent Capture, Draft Requirements, Validation Pack, Traceability Matrix, Open Questions; HITL-gate list) → `core_principles_to_enforce` (SRP/DRY/KISS/YAGNI/MECE/MoSCoW) → `initialization` → srp/dry/kiss/mece/filesystem rule blocks → `information_architecture` (INDEX.md + CHANGES.md contract) → `unit_of_requirement` → `requirement_schema` → `id_rules` → `requirement_unit_template` (inline `<req>` XML) → `language_constructs` → `functional_requirements`/`ears_patterns` → `nonfunctional_requirements` (ISO 25010) → `acceptance_criteria` (Given/When/Then) → `verification_methods` → `traceability_rules` → `authoring_flow` → `validation_rules`/`conflict_checks`/`gap_checks` → `refactoring_rules` (300-line file cap) → `validation_checklist` → `best_practices` → `requirements_graph` (Graphviz, proactive offer) → `pitfalls` → `resources`.
 
 assets/ files, each answering one authoring-flow question:
+
 - `ra-intent-capture.md` — pre-draft template: goal/audience/ticketId, intent_summary, non_goals, scope, must_know/assumptions/open_questions, actors, MoSCoW constraints, requirements_areas, traceability_plan, validation_plan, `hitl_gates` (decision/why/default_if_unknown), success_criteria_smart.
 - `ra-requirement-unit.xml` — canonical `<req>` template (note the `.xml` extension, unlike the other three `.md` assets).
 - `ra-validation-rubric.md` — true/false scorecard across structure, quality, language, verification, traceability, conflicts, gaps, governance; mirrors SKILL.md's checklist/conflict/gap sections.
@@ -19,6 +24,7 @@ assets/ files, each answering one authoring-flow question:
 ID grammar: `FR-[AREA]-####` (functional), `NFR-####` (no area segment), `INT-[AREA]-####` (interfaces), `DATA-[AREA]-####` (data); IDs are never reused or renumbered once assigned. HITL gates fire on ambiguity/conflicts, structural changes, MoSCoW tradeoffs, every unit approval, and final delivery approval; approval must be explicit — "user questions/comments do not mean it was approved."
 
 ## Mental hooks & unexpected rules
+
 - "Requirements are absolute, no change explanations/rationale/logging" — rationale for a change belongs only in the ephemeral change-log asset, never in the requirement file.
 - "REQUIREMENTS/CHANGES.md is the ONLY change log, TERSE" — a second, persisted change-log concept that coexists with (and must not be conflated with) the ephemeral `ra-change-log.md` template.
 - "If a sentence would not survive in a spec that was never revised, delete it." — the meta-leak test, phrased as a thought experiment rather than a rule to check off.
@@ -29,6 +35,7 @@ ID grammar: `FR-[AREA]-####` (functional), `NFR-####` (no area segment), `INT-[A
 - `requirements_graph` tells the model to "Proactively ask to generate and show a graph of requirements" via Graphviz, unprompted.
 
 ## Invariants — do not change
+
 - Frontmatter `name: requirements-authoring` equals the folder name; registered (bare listing, no description) in `docs/definitions/skills.md`.
 - `description` is one sentence within the schema's ~25-token budget (`docs/schemas/skill.md`) — this skill respects the budget, unlike e.g. `hitl`, which deliberately exceeds it.
 - `disable-model-invocation: false` + `user-invocable: true` — auto-engaged and directly callable.
@@ -41,6 +48,7 @@ ID grammar: `FR-[AREA]-####` (functional), `NFR-####` (no area segment), `INT-[A
 - Filesystem contract: write only under `REQUIREMENTS/`, never edit outside it; `INDEX.md` (one header per file: `# file path: short description`) and `CHANGES.md` (terse, sole change log) are fixed filenames other tooling greps for.
 
 ## Editing guide
+
 - Safe: wording inside srp/dry/kiss/mece_rules, `best_practices`, `pitfalls` phrasing (same failure modes preserved); ISO 25010 detail; EARS example text.
 - Handle with care: `<req>` template fields/order, ID grammar, asset filenames (especially the `.xml` one), `resources`' typed-alias lines, the 300-line refactor threshold, the HITL gate list and "explicit approval only" rule (mirrors the `hitl` skill — check `hitl/SKILL.md` before diverging).
 - New standalone templates/checklists belong in `assets/` (one file per template, mirroring the existing four); new inline behavioral rules belong in SKILL.md's existing tag sections.

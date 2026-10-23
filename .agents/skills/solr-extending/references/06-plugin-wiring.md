@@ -6,16 +6,16 @@ This file covers getting your custom plugins from a Java project into a running 
 
 For each plugin type, the registration in `solrconfig.xml`:
 
-| Plugin type | XML element |
-|---|---|
-| `SearchComponent` | `<searchComponent name="X" class="..."/>` then add to a `<requestHandler>`'s components |
-| `RequestHandler` | `<requestHandler name="/path" class="..."/>` |
-| `QParserPlugin` | `<queryParser name="X" class="..."/>` |
-| `ValueSourceParser` | `<valueSourceParser name="X" class="..."/>` |
-| `TransformerFactory` | `<transformer name="X" class="..."/>` |
-| `UpdateRequestProcessorFactory` | `<processor class="..."/>` inside an `<updateRequestProcessorChain>` |
-| Custom Analyzer/Tokenizer/Filter | (in schema, not solrconfig — see solr-schema skill) |
-| `SimilarityFactory` (per-field) | (in schema fieldType, not solrconfig — USE SKILL `solr-query` to apply relevancy tuning) |
+| Plugin type                      | XML element                                                                              |
+| -------------------------------- | ---------------------------------------------------------------------------------------- |
+| `SearchComponent`                | `<searchComponent name="X" class="..."/>` then add to a `<requestHandler>`'s components  |
+| `RequestHandler`                 | `<requestHandler name="/path" class="..."/>`                                             |
+| `QParserPlugin`                  | `<queryParser name="X" class="..."/>`                                                    |
+| `ValueSourceParser`              | `<valueSourceParser name="X" class="..."/>`                                              |
+| `TransformerFactory`             | `<transformer name="X" class="..."/>`                                                    |
+| `UpdateRequestProcessorFactory`  | `<processor class="..."/>` inside an `<updateRequestProcessorChain>`                     |
+| Custom Analyzer/Tokenizer/Filter | (in schema, not solrconfig — see solr-schema skill)                                      |
+| `SimilarityFactory` (per-field)  | (in schema fieldType, not solrconfig — USE SKILL `solr-query` to apply relevancy tuning) |
 
 `name=` is the public name (used by users in queries / fl / etc.). `class=` is the fully-qualified Java class.
 
@@ -43,6 +43,7 @@ These arrive in the factory's `init(NamedList args)` method.
 ### Model 1: `sharedLib` directory (simplest)
 
 In `solr.xml`:
+
 ```xml
 <solr>
   <str name="sharedLib">${solr.install.dir}/contrib/myplugins/lib</str>
@@ -52,11 +53,13 @@ In `solr.xml`:
 All jars in that directory get loaded at startup, available to all cores. No per-core config needed.
 
 Best for:
+
 - Single deployment shared across all cores
 - Simple ops — drop a jar in a folder
 - Plugins that don't need versioning
 
 Caveats:
+
 - One classloader for everything in `sharedLib`
 - Cannot have two versions of the same dependency across plugins
 - Restart Solr to pick up new jars
@@ -74,6 +77,7 @@ Caveats:
 Loads listed jars per-core. Was the standard Solr 7-8 approach.
 
 Status in Solr 9.x: **deprecated and disabled by default** for security reasons (arbitrary jars from disk). To re-enable:
+
 ```bash
 SOLR_OPTS="$SOLR_OPTS -Dsolr.allowPaths=/path/to/jars"
 # or
@@ -87,6 +91,7 @@ Don't rely on `<lib>` for new code. Use Solr Packages or sharedLib.
 The package management system: jars are uploaded to the Package Store (in ZooKeeper), versioned, signed, and explicitly enabled per-collection.
 
 Workflow:
+
 ```bash
 # 1. Sign your jar (one-time setup, prepare a key pair)
 openssl dgst -sha1 -sign mykey.pem myplugin-1.0.jar | openssl enc -base64 | tr -d \\n
@@ -118,11 +123,13 @@ curl -X POST -H 'Content-Type: application/json' \
 ```
 
 In solrconfig.xml:
+
 ```xml
 <searchComponent name="myComp" class="myplugin:com.example.MyComponent"/>
 ```
 
 Best for:
+
 - SolrCloud production
 - Multiple plugin versions across collections
 - Compliance environments requiring signed jars
@@ -195,6 +202,7 @@ A standard Maven setup:
 ```
 
 Build:
+
 ```bash
 mvn clean package
 # produces target/my-solr-plugin-1.0.0.jar
@@ -226,6 +234,7 @@ Implications:
 - Solr's own classes (in System CL) are shared by all plugins
 
 If your plugin needs a dependency that Solr also bundles, beware:
+
 - Your version is preferred only if it's loaded above Solr's
 - For `sharedLib` and `<lib>`, your plugin's classloader is below System (Solr's) — Solr's bundled version wins
 - For Packages, you have isolated classloaders, so you can use your version
@@ -241,12 +250,14 @@ Solr's plugin API is **not** binary-compatible across major versions:
 - Within 9.x (9.0 → 9.7): mostly backward compatible, but minor breaking changes happen — read release notes
 
 Best practices:
+
 - Build against the **exact** Solr version you'll deploy to (use `${solr.version}` matched)
 - For multi-version targets, build separate jars
 - Run an integration test suite per Solr version
 - Pin transitive Lucene version to match Solr's exact Lucene
 
 To check what Solr ships:
+
 ```bash
 ls ${SOLR_HOME}/server/solr-webapp/webapp/WEB-INF/lib | grep -E '^(lucene|solr)-'
 ```
@@ -256,12 +267,14 @@ ls ${SOLR_HOME}/server/solr-webapp/webapp/WEB-INF/lib | grep -E '^(lucene|solr)-
 Most factories do their work in `init(NamedList args)` — runs once when the core loads. The instance returned by `getInstance(...)` (or `createParser(...)`, `create(...)`, etc.) handles per-request work.
 
 Init-time:
+
 - Read config params
 - Build expensive lookups (caches, models)
 - Validate that the schema has required fields
 - Register listeners
 
 Request-time:
+
 - Use the cached state
 - Don't do `init()`-style work on every request
 
@@ -301,6 +314,7 @@ Without `provided` scope, your jar contains a copy of Solr. At deploy time, Solr
 ### Conflicting transitive dependencies
 
 Common conflicts:
+
 - Guava (Solr ships 32.x; your transitive may be 31.x or 33.x)
 - Jackson (Solr's version may differ from yours)
 - SLF4J implementations (Solr ships logback-classic; do not bundle log4j)
@@ -311,6 +325,7 @@ Detect conflicts: `mvn dependency:tree`. Resolve via shade-relocate or by aligni
 ### Wrong jar in production
 
 Always validate the deployed jar's classes:
+
 ```bash
 unzip -l my-plugin.jar | grep MySearchComponent
 ```
@@ -338,11 +353,13 @@ Class is on classpath but no `<searchComponent>` / `<queryParser>` / etc. regist
 ## Reloading without restart
 
 In SolrCloud:
+
 ```bash
 curl 'http://localhost:8983/solr/admin/collections?action=RELOAD&name=mycollection'
 ```
 
 In standalone:
+
 ```bash
 curl 'http://localhost:8983/solr/admin/cores?action=RELOAD&core=mycore'
 ```
@@ -350,6 +367,7 @@ curl 'http://localhost:8983/solr/admin/cores?action=RELOAD&core=mycore'
 This re-reads `solrconfig.xml` and `schema.xml`, re-instantiates plugins. Required after editing config.
 
 If you change the jar itself, reload alone doesn't pick it up — Java's classloader caches loaded classes. You need to:
+
 - Restart Solr (definitive)
 - Or use Packages with versioning — install new version, the old is unloaded gracefully
 

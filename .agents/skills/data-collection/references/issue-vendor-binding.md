@@ -24,17 +24,17 @@ The phase supplies an issue handle or URL. Apply the resolved Issue Tracker's id
 
 ## Field map (normalize into the phase's section)
 
-| Field | Source | Notes |
-|---|---|---|
-| Ticket key + URL | input | canonical key + browse URL |
-| Summary | `summary` | required; empty → gap |
-| Type / Status / Priority | `issuetype` / `status` / `priority` | |
-| Created / Updated | `created` / `updated` | |
-| Description | `description` (rendered) | required; redact before write; empty → gap |
-| Labels / Components | `labels` / `components` | `None` if absent |
-| Assignee / Reporter | `assignee` / `reporter` | `<restricted by permissions>` if hidden; `None -- unassigned` if empty |
-| Comments (≤10) | `comment` | per-comment author + date + body; redact bodies |
-| Custom fields | `customfield_*` | resolve names via **search fields**; `None -- no custom fields populated` if empty |
+| Field                    | Source                              | Notes                                                                              |
+| ------------------------ | ----------------------------------- | ---------------------------------------------------------------------------------- |
+| Ticket key + URL         | input                               | canonical key + browse URL                                                         |
+| Summary                  | `summary`                           | required; empty → gap                                                              |
+| Type / Status / Priority | `issuetype` / `status` / `priority` |                                                                                    |
+| Created / Updated        | `created` / `updated`               |                                                                                    |
+| Description              | `description` (rendered)            | required; redact before write; empty → gap                                         |
+| Labels / Components      | `labels` / `components`             | `None` if absent                                                                   |
+| Assignee / Reporter      | `assignee` / `reporter`             | `<restricted by permissions>` if hidden; `None -- unassigned` if empty             |
+| Comments (≤10)           | `comment`                           | per-comment author + date + body; redact bodies                                    |
+| Custom fields            | `customfield_*`                     | resolve names via **search fields**; `None -- no custom fields populated` if empty |
 
 Per-field branch per SKILL `<collection>` step 3; restricted-gap message: `<field>: not visible to configured Issue Tracker credentials`. Continue extraction.
 
@@ -42,6 +42,7 @@ Per-field branch per SKILL `<collection>` step 3; restricted-gap message: `<fiel
 
 ```markdown
 ### PROJ-123 — Login returns 500 on empty username
+
 - **Type / Status / Priority:** Bug / In Progress / High
 - **Summary:** Login page throws 500 on empty username
 - **Description:** submitting the login form with a blank username returns HTTP 500 instead of a 400 validation error

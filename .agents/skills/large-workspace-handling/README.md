@@ -13,6 +13,7 @@ Triggers when a large workspace exceeds single-agent context. Actor is a "worksp
 ## How it works
 
 SKILL.md is a single flat file (no assets/, no references/): role → when_to_use_skill → core_concepts. Core_concepts branches into two mutually exclusive strategies:
+
 - **Summarize & Index** — research/analysis without code changes; produces a navigable index with per-module summaries, relevance-classified (High/Medium/Low) findings, and a fixed subagent output structure (scope, TLDR, quick nav, per-group details, cross-group map, follow-ups). Subagents may `USE SKILL reverse-engineering` for code analysis.
 - **Work distribution** — coordinated code changes via contract-scoped parallel subagents with explicit boundaries, operations, and success criteria; cross-scope dependencies resolved by execution ordering, shared-interface conflicts by an extra pass; ends in a unified result.
 

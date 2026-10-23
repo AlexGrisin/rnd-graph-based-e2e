@@ -18,9 +18,9 @@ Codex is OpenAI's AI-powered terminal-based coding CLI assistant. Supports custo
 - `.codex/hooks.json` - Lifecycle hooks
 - `.agents/skills/` - Agent skills (SKILL.md directories)
 - `.agents/plugins/` - Plugins (bundled skills, MCP servers, apps)
-- `.agents/rules/` - Agent rules/workflows/commands *.md files(not standard - our decision)
+- `.agents/rules/` - Agent rules/workflows/commands \*.md files(not standard - our decision)
 
-Because regular *.md rules/workflows/commands are not supported directly, we should copy *.md files to `.agents/rules/` as-is and then we reference them in `AGENTS.md` using INDEX style (template: "- `.agents/rules/file.md`: [Description from frontmatter verbatim, or description of why/when to use it inferred from the content] [Glob: if glob pattern used in frontmatter]").
+Because regular _.md rules/workflows/commands are not supported directly, we should copy _.md files to `.agents/rules/` as-is and then we reference them in `AGENTS.md` using INDEX style (template: "- `.agents/rules/file.md`: [Description from frontmatter verbatim, or description of why/when to use it inferred from the content] [Glob: if glob pattern used in frontmatter]").
 
 ---
 
@@ -91,13 +91,13 @@ prefix_rule(
 
 ### Fields
 
-| Field | Required | Type | Description |
-|-------|----------|------|-------------|
-| `pattern` | Yes | list | Command prefix to match. Literal strings or union alternatives `["view", "list"]` |
-| `decision` | No | string | `"allow"` (default), `"prompt"`, or `"forbidden"`. Hierarchy: forbidden > prompt > allow |
-| `justification` | No | string | Human-readable explanation |
-| `match` | No | list | Example commands that should match (validated at load) |
-| `not_match` | No | list | Example commands that should not match (validated at load) |
+| Field           | Required | Type   | Description                                                                              |
+| --------------- | -------- | ------ | ---------------------------------------------------------------------------------------- |
+| `pattern`       | Yes      | list   | Command prefix to match. Literal strings or union alternatives `["view", "list"]`        |
+| `decision`      | No       | string | `"allow"` (default), `"prompt"`, or `"forbidden"`. Hierarchy: forbidden > prompt > allow |
+| `justification` | No       | string | Human-readable explanation                                                               |
+| `match`         | No       | list   | Example commands that should match (validated at load)                                   |
+| `not_match`     | No       | list   | Example commands that should not match (validated at load)                               |
 
 ### Shell Command Handling
 
@@ -138,17 +138,17 @@ You are a senior code reviewer.
 
 ### Configuration Fields
 
-| Field | Required | Type | Description |
-|-------|----------|------|-------------|
-| `name` | Yes | string | Agent identifier for spawning |
-| `description` | Yes | string | Human-facing guidance for when to use |
-| `developer_instructions` | Yes | string | Core behavioral directives (system prompt) |
-| `nickname_candidates` | No | string[] | Display name pool for spawned instances |
-| `model` | No | string | LLM selection (inherits from parent if omitted), gpt-5.3-codex and  gpt-5.4 (workhorse with medium, and a little more expensive with high reasoning), gpt-5.5 (twice expensive, opus level, high reasoning is only applicable) |
-| `model_reasoning_effort` | No | string | `"minimal"`, `"low"`, `"medium"`, `"high"`, `"xhigh"` |
-| `sandbox_mode` | No | string | `"read-only"`, `"workspace-write"`, `"danger-full-access"` |
-| `mcp_servers` | No | table | MCP server configuration for this agent |
-| `skills.config` | No | array | Skill definitions for this agent |
+| Field                    | Required | Type     | Description                                                                                                                                                                                                                   |
+| ------------------------ | -------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                   | Yes      | string   | Agent identifier for spawning                                                                                                                                                                                                 |
+| `description`            | Yes      | string   | Human-facing guidance for when to use                                                                                                                                                                                         |
+| `developer_instructions` | Yes      | string   | Core behavioral directives (system prompt)                                                                                                                                                                                    |
+| `nickname_candidates`    | No       | string[] | Display name pool for spawned instances                                                                                                                                                                                       |
+| `model`                  | No       | string   | LLM selection (inherits from parent if omitted), gpt-5.3-codex and gpt-5.4 (workhorse with medium, and a little more expensive with high reasoning), gpt-5.5 (twice expensive, opus level, high reasoning is only applicable) |
+| `model_reasoning_effort` | No       | string   | `"minimal"`, `"low"`, `"medium"`, `"high"`, `"xhigh"`                                                                                                                                                                         |
+| `sandbox_mode`           | No       | string   | `"read-only"`, `"workspace-write"`, `"danger-full-access"`                                                                                                                                                                    |
+| `mcp_servers`            | No       | table    | MCP server configuration for this agent                                                                                                                                                                                       |
+| `skills.config`          | No       | array    | Skill definitions for this agent                                                                                                                                                                                              |
 
 ### Built-in Agents
 
@@ -184,11 +184,11 @@ job_max_runtime_seconds = 1800
 
 ### Discovery Locations (precedence order)
 
-| Scope | Path | Use Case |
-|-------|------|----------|
-| CWD | `.agents/skills/` | Folder-specific workflows |
-| Parent | `../.agents/skills/` | Nested folder organization |
-| Repo root | `$REPO_ROOT/.agents/skills/` | Repository-wide skills |
+| Scope     | Path                         | Use Case                   |
+| --------- | ---------------------------- | -------------------------- |
+| CWD       | `.agents/skills/`            | Folder-specific workflows  |
+| Parent    | `../.agents/skills/`         | Nested folder organization |
+| Repo root | `$REPO_ROOT/.agents/skills/` | Repository-wide skills     |
 
 ### Skill Directory Structure
 
@@ -226,30 +226,30 @@ Run the deployment script: `scripts/deploy.sh <environment>`
 
 ### Frontmatter Fields
 
-| Field | Required | Type | Description |
-|-------|----------|------|-------------|
-| `name` | Yes | string | Skill identifier (lowercase, hyphens). Must match parent folder name |
-| `description` | Yes | string | What the skill does and when to use it |
+| Field         | Required | Type   | Description                                                          |
+| ------------- | -------- | ------ | -------------------------------------------------------------------- |
+| `name`        | Yes      | string | Skill identifier (lowercase, hyphens). Must match parent folder name |
+| `description` | Yes      | string | What the skill does and when to use it                               |
 
 ### Optional Metadata (agents/openai.yaml)
 
 ```yaml
 interface:
-  display_name: "User-facing name"
-  short_description: "UI description"
-  icon_small: "./assets/small-logo.svg"
-  icon_large: "./assets/large-logo.png"
-  brand_color: "#3B82F6"
-  default_prompt: "Surrounding context"
+  display_name: 'User-facing name'
+  short_description: 'UI description'
+  icon_small: './assets/small-logo.svg'
+  icon_large: './assets/large-logo.png'
+  brand_color: '#3B82F6'
+  default_prompt: 'Surrounding context'
 
 policy:
   allow_implicit_invocation: false
 
 dependencies:
   tools:
-    - type: "mcp"
-      value: "toolName"
-      description: "Tool description"
+    - type: 'mcp'
+      value: 'toolName'
+      description: 'Tool description'
 ```
 
 ### Invocation
@@ -309,13 +309,13 @@ The inner array is `"hooks"` (not `"handlers"`). `type` is always `"command"`; `
 
 ### Supported Events (Rosetta-relevant)
 
-| Event | Matcher basis | Purpose |
-|-------|---------------|---------|
-| `SessionStart` | source: `startup`, `resume`, `clear`, `compact` | inject `additionalContext` |
-| `PreToolUse` | tool name: `Bash`, `apply_patch` (aliases `Edit`/`Write`), MCP (`mcp__…`) | deny / rewrite input / advise before a tool runs |
-| `PostToolUse` | same tool names | inject `additionalContext` / block after a tool runs |
-| `SubagentStop` | subagent type | `decision:"block"` to continue the subagent |
-| `Stop` | (matcher ignored) | `decision:"block"` to continue the turn |
+| Event          | Matcher basis                                                             | Purpose                                              |
+| -------------- | ------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `SessionStart` | source: `startup`, `resume`, `clear`, `compact`                           | inject `additionalContext`                           |
+| `PreToolUse`   | tool name: `Bash`, `apply_patch` (aliases `Edit`/`Write`), MCP (`mcp__…`) | deny / rewrite input / advise before a tool runs     |
+| `PostToolUse`  | same tool names                                                           | inject `additionalContext` / block after a tool runs |
+| `SubagentStop` | subagent type                                                             | `decision:"block"` to continue the subagent          |
+| `Stop`         | (matcher ignored)                                                         | `decision:"block"` to continue the turn              |
 
 **(!) Partial tool interception:** `PreToolUse`/`PostToolUse` intercept ONLY `Bash`, `apply_patch` (`Edit`/`Write`), and MCP tools — not every shell path.
 
@@ -327,12 +327,12 @@ Delivered as snake_case JSON on stdin; `tool_input` is a parsed object. Common (
 
 Context/permission output is **nested under `hookSpecificOutput`**; block decisions are **top-level**. Pick one path per call — except PostToolUse, which may combine a top-level `decision:"block"`+`reason` with nested `additionalContext`.
 
-| Purpose | Event(s) | Shape |
-|---------|----------|-------|
-| Inject context | `SessionStart`, `PostToolUse`, `PreToolUse` (advise) | `{"hookSpecificOutput":{"hookEventName":"<Event>","additionalContext":"text"}}` |
-| Deny a tool | `PreToolUse` | `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"reason"}}` |
-| Rewrite tool input | `PreToolUse` | `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","updatedInput":{"command":"…"}}}` |
-| Block / continue | `PostToolUse`, `Stop`, `SubagentStop` | `{"decision":"block","reason":"reason"}` (top-level) |
+| Purpose            | Event(s)                                             | Shape                                                                                                                   |
+| ------------------ | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Inject context     | `SessionStart`, `PostToolUse`, `PreToolUse` (advise) | `{"hookSpecificOutput":{"hookEventName":"<Event>","additionalContext":"text"}}`                                         |
+| Deny a tool        | `PreToolUse`                                         | `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"reason"}}` |
+| Rewrite tool input | `PreToolUse`                                         | `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow","updatedInput":{"command":"…"}}}`     |
+| Block / continue   | `PostToolUse`, `Stop`, `SubagentStop`                | `{"decision":"block","reason":"reason"}` (top-level)                                                                    |
 
 - `permissionDecisionReason` / `reason` is **REQUIRED** whenever `permissionDecision` is `"deny"` or `decision` is `"block"`.
 - **(!) `permissionDecision:"ask"` is NOT supported** (parsed but rejected → the hook run is marked failed and the tool call proceeds unhooked). Same for legacy `decision:"approve"` and `continue`/`stopReason`/`suppressOutput` on `PreToolUse`.
@@ -342,11 +342,11 @@ Context/permission output is **nested under `hookSpecificOutput`**; block decisi
 
 ### Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | Success; stdout JSON parsed |
-| `2` | Special per event — reason read from **stderr**: PreToolUse = block tool; PostToolUse = block result; Stop/SubagentStop = continue |
-| other non-zero | Hook failed; error reported, normal processing continues |
+| Code           | Meaning                                                                                                                            |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `0`            | Success; stdout JSON parsed                                                                                                        |
+| `2`            | Special per event — reason read from **stderr**: PreToolUse = block tool; PostToolUse = block result; Stop/SubagentStop = continue |
+| other non-zero | Hook failed; error reported, normal processing continues                                                                           |
 
 ---
 
@@ -387,15 +387,15 @@ bearer_token_env_var = "MCP_TOKEN"
 
 ### Universal MCP Options
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `enabled` | boolean | true | Enable/disable without deletion |
-| `required` | boolean | false | Fail startup if unavailable |
-| `startup_timeout_sec` | number | 10 | Server startup timeout |
-| `tool_timeout_sec` | number | 60 | Tool execution timeout |
-| `enabled_tools` | string[] | - | Tool allowlist |
-| `disabled_tools` | string[] | - | Tool denylist |
-| `cwd` | string | - | Working directory |
+| Field                 | Type     | Default | Description                     |
+| --------------------- | -------- | ------- | ------------------------------- |
+| `enabled`             | boolean  | true    | Enable/disable without deletion |
+| `required`            | boolean  | false   | Fail startup if unavailable     |
+| `startup_timeout_sec` | number   | 10      | Server startup timeout          |
+| `tool_timeout_sec`    | number   | 60      | Tool execution timeout          |
+| `enabled_tools`       | string[] | -       | Tool allowlist                  |
+| `disabled_tools`      | string[] | -       | Tool denylist                   |
+| `cwd`                 | string   | -       | Working directory               |
 
 ### OAuth
 

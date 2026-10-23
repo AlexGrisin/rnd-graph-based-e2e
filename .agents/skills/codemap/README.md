@@ -8,11 +8,12 @@ Without this skill an agent dropped into an unfamiliar workspace either greps ar
 
 ## When to engage
 
-Not model-auto-invoked and not user-slash-invocable (`disable-model-invocation: true`, `user-invocable: false`) — it only runs when another instruction explicitly does `USE SKILL \`codemap\``. Any agent tier can trigger it this way: workflows (`init-workspace-flow.md`, `init-workspace-flow-discovery.md`, `init-workspace-flow-documentation.md`, `coding-flow.md`), and skills `reverse-engineering` and `coding` before/during structural discovery. `<when_to_use_skill>` is absent from SKILL.md — entry is purely via these external references, there is no self-contained trigger text to read.
+Not model-auto-invoked and not user-slash-invocable (`disable-model-invocation: true`, `user-invocable: false`) — it only runs when another instruction explicitly does `USE SKILL \`codemap\``. Any agent tier can trigger it this way: workflows (`init-workspace-flow.md`, `init-workspace-flow-discovery.md`, `init-workspace-flow-documentation.md`, `coding-flow.md`), and skills `reverse-engineering`and`coding`before/during structural discovery.`<when_to_use_skill>` is absent from SKILL.md — entry is purely via these external references, there is no self-contained trigger text to read.
 
 ## How it works
 
 SKILL.md is one flow with a tool-precedence gate up front (LSP > graphify > gitnexus > shell scripts, first one **REQUESTED** and available), then three tag groups:
+
 - `<lsp>` — use whatever LSP/semantic-search tools are already in context.
 - `<graphify>` — routes to `USE SKILL \`graphify\`` for querying/building the graph if graphify is already requested; otherwise gives setup steps.
 - `<gitnexus>` — routes to the four `assets/gitnexus-*.md` files by task (use, CLI, setup, examples) if gitnexus is already requested.
@@ -41,11 +42,11 @@ No `references/` subfolder exists.
 - `disable-model-invocation: true` / `user-invocable: false` — deliberate: this is a routed-to helper, not a standalone entry point; flipping either changes who can trigger it and duplicates entry paths already owned by the callers listed above.
 - `description: "To generate, populate, and use a project codemap for structural discovery."` — short, keyword-dense, matches the "To <verb>..." convention used elsewhere; since model-invocation is disabled it does not drive auto-activation here, but it still is what a human/agent reads when scanning the skill list, so keep it accurate.
 - Precedence order "LSPs > graphify > gitnexus > shell scripts" and the **REQUESTED**-gating — callers and the setup instructions for graphify/gitnexus assume this exact ordering.
-- Cross-skill references use intent form (`MUST USE SKILL \`graphify\``) never file paths; asset routing uses `MUST APPLY SKILL FILE \`assets/gitnexus-*.md\`` — per-file, never a bare skill name, since these are files inside this skill's own folder, not another skill.
+- Cross-skill references use intent form (`MUST USE SKILL \`graphify\``) never file paths; asset routing uses `MUST APPLY SKILL FILE \`assets/gitnexus-\*.md\`` — per-file, never a bare skill name, since these are files inside this skill's own folder, not another skill.
 - The six asset filenames (`codemap.sh.txt`, `codemap.ps1.txt`, `gitnexus-cli.md`, `gitnexus-examples.md`, `gitnexus-setup.md`, `gitnexus-use.md`) are referenced by exact path from SKILL.md — renaming any breaks its `READ`/`APPLY SKILL FILE` lines.
 - `CODEMAP.md` output contract: markdown headers of the form `path (N files) — description`, immediate-children file list, 3-4 levels deep, written to the workspace root. `large-workspace-handling` literally greps `#` headers of this file to draw scope boundaries before dispatching subagents — changing the heading shape breaks that grep, independent of any `USE SKILL` link (the coupling is to the generated file, not to this skill).
 - External CLI/MCP contracts belong to gitnexus and graphify, not to Rosetta: `npx -y gitnexus@latest analyze|status|clean|wiki|list|setup` (+ `--force`, `--embeddings`, `--skip-agents-md`, `--worker-timeout`), `gitnexus://repo/{name}/...` MCP resource URIs, gitnexus tool names (`query`, `context`, `impact`, `detect_changes`, `rename`, `cypher`); graphify commands (`graphify query/path/explain`, `/graphify <path>`, `graphify update .`). Do not rephrase these — they must match the tools' own CLI/API exactly.
-- `docs/CODEMAP.md` in this repo is a generated *instance* of the output contract, not this skill — do not conflate edits to that file with edits to the skill.
+- `docs/CODEMAP.md` in this repo is a generated _instance_ of the output contract, not this skill — do not conflate edits to that file with edits to the skill.
 - `<when_to_use_skill>` is structurally absent from SKILL.md; nothing to compress (verified by grep, not by omission).
 
 ## Editing guide

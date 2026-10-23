@@ -52,7 +52,7 @@ Note the **`s`** on `booleans`, `plongs`, `pdoubles` — the stock schemaless co
 
 Schemaless optimizes for "index anything, ask no questions." That convenience produces several traps:
 
-1. **Wrong type from a misleading first value.** Guessing keys off the **first** document's string value. A ZIP/postal code `"01001"` parses as a `Long` and the field is created numeric — the leading zero is gone and `"00420"` no longer matches. A SKU `"123456"` becomes numeric and loses prefix/wildcard search. A field that is *sometimes* `"12"` and *sometimes* `"12A"` flips type depending on document order.
+1. **Wrong type from a misleading first value.** Guessing keys off the **first** document's string value. A ZIP/postal code `"01001"` parses as a `Long` and the field is created numeric — the leading zero is gone and `"00420"` no longer matches. A SKU `"123456"` becomes numeric and loses prefix/wildcard search. A field that is _sometimes_ `"12"` and _sometimes_ `"12A"` flips type depending on document order.
 
 2. **`multiValued=true` by default.** The stock type mappings point at multiValued types (`strings`, `plongs`, …). Once a field is created multiValued you **cannot** sort on it normally, and some function/grouping operations behave differently. You wanted a single-valued `price`; you got a multiValued one.
 
@@ -76,15 +76,15 @@ The Schema API lets you **read and modify** the schema of a running collection o
 
 All writes are a single **POST** of JSON to `/solr/<collection>/schema`. The JSON keys name the operation:
 
-| Command | Purpose |
-|---|---|
-| `add-field` | Add a new explicit field |
-| `replace-field` | Redefine an existing field (full replacement — you must restate all attributes) |
-| `delete-field` | Remove a field |
-| `add-field-type` | Add a new `fieldType` (analyzer chain, class, params) |
-| `replace-field-type` / `delete-field-type` | Redefine / remove a field type |
-| `add-dynamic-field` | Add a dynamic field rule (e.g. `*_s`) |
-| `add-copy-field` | Add a `copyField` source→dest rule |
+| Command                                    | Purpose                                                                         |
+| ------------------------------------------ | ------------------------------------------------------------------------------- |
+| `add-field`                                | Add a new explicit field                                                        |
+| `replace-field`                            | Redefine an existing field (full replacement — you must restate all attributes) |
+| `delete-field`                             | Remove a field                                                                  |
+| `add-field-type`                           | Add a new `fieldType` (analyzer chain, class, params)                           |
+| `replace-field-type` / `delete-field-type` | Redefine / remove a field type                                                  |
+| `add-dynamic-field`                        | Add a dynamic field rule (e.g. `*_s`)                                           |
+| `add-copy-field`                           | Add a `copyField` source→dest rule                                              |
 
 A value can be a single object or an **array** of objects to add several in one request. Multiple different commands can be combined in one POST body; Solr applies them in order.
 
@@ -132,7 +132,15 @@ curl -X POST -H 'Content-type: application/json' \
 `add-dynamic-field` follows the same shape, with `name` as a glob pattern:
 
 ```json
-{ "add-dynamic-field": { "name": "*_dt", "type": "pdate", "indexed": true, "docValues": true, "stored": true } }
+{
+  "add-dynamic-field": {
+    "name": "*_dt",
+    "type": "pdate",
+    "indexed": true,
+    "docValues": true,
+    "stored": true
+  }
+}
 ```
 
 ### Reading the schema

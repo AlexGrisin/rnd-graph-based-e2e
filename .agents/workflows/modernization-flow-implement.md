@@ -1,6 +1,6 @@
 ---
 name: modernization-flow-implement
-description: "Phase 8 Implementation of modernization-flow"
+description: 'Phase 8 Implementation of modernization-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -11,7 +11,8 @@ baseSchema: docs/schemas/phase.md
 
 ## Context
 
-**PREREQUISITES:** 
+**PREREQUISITES:**
+
 - Complete Phase 7 (final cross-project review)
 - **EXPLICIT HUMAN APPROVAL** of all target specs
 
@@ -68,6 +69,7 @@ baseSchema: docs/schemas/phase.md
 ### WHY WE REPEAT THESE RULES
 
 AI agents commonly:
+
 - Rush to implementation without thorough analysis
 - Provide code examples in specs (causing spec/implementation mismatch)
 - Generalize instead of documenting specific facts
@@ -115,6 +117,7 @@ AI agents commonly:
 ## SUCCESS CRITERIA
 
 A modernization phase is complete when:
+
 - [ ] All required documentation created
 - [ ] All evidence provided for findings
 - [ ] All unknowns explicitly called out

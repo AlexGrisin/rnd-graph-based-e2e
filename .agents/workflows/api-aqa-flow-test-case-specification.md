@@ -1,6 +1,6 @@
 ---
 name: api-aqa-flow-test-case-specification
-description: "Phase 4 Test Case Specification of api-aqa-flow (HITL APPROVAL GATE)"
+description: 'Phase 4 Test Case Specification of api-aqa-flow (HITL APPROVAL GATE)'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -14,6 +14,7 @@ Convert test cases into detailed, implementation-ready API test specifications u
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 4 of 8 in `api-aqa-flow`
 - Input: all phase 1-3 outputs (raw data, API analysis, gap analysis)
 - Output: `plans/api-aqa-{IDENTIFIER}/test-specs.md` with Given-When-Then scenarios, file mapping, shared utilities
@@ -21,19 +22,21 @@ Convert test cases into detailed, implementation-ready API test specifications u
 - HITL: explicit user approval required before Phase 5
 - Required skills: `qa-knowledge` (`scenario_design` mode + test-specs skeleton + ATC conventions), `sensitive-data` (redaction), `qa-structure` (`{IDENTIFIER}` + artifact path)
 - Recommended skills: `hitl` (explicit approval)
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Load all previous phase outputs
 2. Execute test specification authoring
 3. Produce test specs document
 4. Present for user approval
 5. Update state
-</phase_steps>
+   </phase_steps>
 
 <load_inputs step="4.1">
 
 Read completely:
+
 1. `plans/api-aqa-{IDENTIFIER}/raw-data.md` — original test cases and patterns
 2. `plans/api-aqa-{IDENTIFIER}/api-analysis.md` — endpoint contracts
 3. `plans/api-aqa-{IDENTIFIER}/analysis.md` — clarifications and resolved gaps
@@ -57,12 +60,14 @@ Create `plans/api-aqa-{IDENTIFIER}/test-specs.md` per `qa-knowledge`'s test-spec
 </produce_output>
 
 <present_for_approval step="4.4">
+
 1. Present summary to user: total scenarios, priority breakdown, endpoints covered.
 2. **Approval gate:** USE SKILL `qa-knowledge` to run its shared approval gate; USE SKILL `hitl`. Approval = an exact token from the closed list `approved` / `approve` / `yes` (case-insensitive), scoped to the presented specs — no `"or equivalent"` / `"or similar"` phrasing extends it. Comments, questions, suggestions, edits, and partial review are REVIEW, not approval. Bindings: re-present step = 4.3; full-reject revisit target = Phase 3. Treat partial approve as a change request that drops the rejected scenarios.
 3. **DO NOT PROCEED** to Phase 5 without explicit approval.
-</present_for_approval>
+   </present_for_approval>
 
 <update_state step="4.5">
+
 1. **GATE — before marking complete:** re-run `<validation_checklist>` and confirm every item is checked off — **in particular that every `ATC-NNN` traces to a Phase 3 source** (`test-specs.md` is Phase 5's contract; an untraceable ATC means Phase 5 implements unverifiable tests). Report `Phase 4 checklist: N/N items satisfied` in chat. Do NOT mark complete if any item fails.
 2. Update `agents/TEMP/<FEATURE>/api-aqa-state.md`:
    - Test Cases Specified: [count]
@@ -71,9 +76,10 @@ Create `plans/api-aqa-{IDENTIFIER}/test-specs.md` per `qa-knowledge`'s test-spec
    - User Approval: [datetime + exact approval statement]
    - Phase 4 completion timestamp
 3. Mark Phase 4 complete, Phase 5 current
-</update_state>
+   </update_state>
 
 <validation_checklist>
+
 - All source test cases converted to detailed specifications
 - Given-When-Then format used for every scenario
 - **Every `ATC-NNN` traces to a Phase 3 source** — its `**Source:**` line cites a `raw-data.md` test case (`TC-NNN`) and/or an `analysis.md` finding (`G[N]`/`C[N]`/`A[N]`); no untraceable ATC
@@ -83,13 +89,14 @@ Create `plans/api-aqa-{IDENTIFIER}/test-specs.md` per `qa-knowledge`'s test-spec
 - Test file mapping defined
 - Shared utilities identified
 - Explicit user approval received (comments, questions, or suggestions are not approval)
-</validation_checklist>
+  </validation_checklist>
 
 <failure_handling>
+
 - **Missing input file** (`raw-data.md`, `api-analysis.md`, or `analysis.md` absent or empty): stop Phase 4, record `Phase 4 blocked: missing [artifact]` in `agents/TEMP/<FEATURE>/api-aqa-state.md`, ask user to re-run the producing phase.
 - **Unresolved Phase 3 gaps** (analysis.md still has `BLOCKING ASSUMPTION` entries): stop, record `Phase 4 blocked: Phase 3 has open Critical questions`, send user back to Phase 3.
 - **Mode produces zero scenarios** (`qa-knowledge` scenario_design returns empty): stop, record the failure, ask user to verify inputs and re-run.
 - **Repeated rejection cycle:** after the 3rd cycle of reject-and-re-present per `<present_for_approval>` step 3, stop and ask the user whether to re-open Phase 3 or escalate scope.
-</failure_handling>
+  </failure_handling>
 
 </api_aqa_flow_test_case_specification>

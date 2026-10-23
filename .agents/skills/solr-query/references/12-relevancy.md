@@ -28,7 +28,7 @@ where:
 
 ```
 idf(t) = log(1 + (N - n + 0.5) / (n + 0.5))
-                          
+
                           N = total docs with this field
                           n = docs containing term t
 
@@ -47,12 +47,12 @@ Defaults: `k1=1.2`, `b=0.75`.
 `k1` controls **term frequency saturation**. As `freq` grows, `tf` grows but with diminishing returns:
 
 | freq | tf with k1=1.2 (avgdl) | tf with k1=2.0 |
-|---|---|---|
-| 1 | 0.45 | 0.33 |
-| 2 | 0.62 | 0.50 |
-| 5 | 0.81 | 0.71 |
-| 10 | 0.89 | 0.83 |
-| 100 | 0.99 | 0.98 |
+| ---- | ---------------------- | -------------- |
+| 1    | 0.45                   | 0.33           |
+| 2    | 0.62                   | 0.50           |
+| 5    | 0.81                   | 0.71           |
+| 10   | 0.89                   | 0.83           |
+| 100  | 0.99                   | 0.98           |
 
 Higher `k1` = slower saturation, more reward for term repetition. Lower `k1` = faster saturation, terms count quickly to 1 and repetition stops mattering.
 
@@ -62,11 +62,11 @@ For e-commerce: lower `k1` (try 0.6-1.0) since repeated keywords in product name
 
 `b` controls **length normalization**. `b=1` fully penalizes long docs (tf decreases linearly with `dl/avgdl`); `b=0` ignores length entirely.
 
-| b | Effect |
-|---|---|
-| 0.0 | No length normalization. Long docs not penalized. Use for fields where length doesn't reflect topic concentration (titles, brand names). |
-| 0.75 | Default. Length matters but capped. |
-| 1.0 | Maximum normalization. Use when you really want short docs to win (e.g., Q&A short-answer scoring). |
+| b    | Effect                                                                                                                                   |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 0.0  | No length normalization. Long docs not penalized. Use for fields where length doesn't reflect topic concentration (titles, brand names). |
+| 0.75 | Default. Length matters but capped.                                                                                                      |
+| 1.0  | Maximum normalization. Use when you really want short docs to win (e.g., Q&A short-answer scoring).                                      |
 
 ### When to tune
 
@@ -125,18 +125,19 @@ For per-field similarity to work, the global `<similarity>` must be `solr.Schema
 
 You don't usually need these. Awareness, when relevant:
 
-| Class | Use case |
-|---|---|
-| `BM25SimilarityFactory` | Default. The right answer for almost everything. |
-| `ClassicSimilarityFactory` | Old TF-IDF + length norm. Use only if migrating from a Solr 4.x setup that depended on it; otherwise BM25 is strictly better. |
-| `DFRSimilarityFactory` | Divergence From Randomness. Theoretically motivated alternative; in practice, similar to BM25 with different tuning surface. |
-| `IBSimilarityFactory` | Information-Based. Same family as DFR. |
-| `LMDirichletSimilarityFactory` | Language Model with Dirichlet smoothing. Different paradigm; handles short queries against long docs well. |
-| `LMJelinekMercerSimilarityFactory` | LM with Jelinek-Mercer smoothing. Tunable smoothing parameter. |
-| `BooleanSimilarityFactory` | Returns boost-only score (no IDF, no TF). For "matched/not matched" semantics where you only care about which clauses fired. |
-| `SweetSpotSimilarityFactory` | TF-IDF variant with a "sweet spot" range for optimal length. Custom and rarely seen. |
+| Class                              | Use case                                                                                                                      |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `BM25SimilarityFactory`            | Default. The right answer for almost everything.                                                                              |
+| `ClassicSimilarityFactory`         | Old TF-IDF + length norm. Use only if migrating from a Solr 4.x setup that depended on it; otherwise BM25 is strictly better. |
+| `DFRSimilarityFactory`             | Divergence From Randomness. Theoretically motivated alternative; in practice, similar to BM25 with different tuning surface.  |
+| `IBSimilarityFactory`              | Information-Based. Same family as DFR.                                                                                        |
+| `LMDirichletSimilarityFactory`     | Language Model with Dirichlet smoothing. Different paradigm; handles short queries against long docs well.                    |
+| `LMJelinekMercerSimilarityFactory` | LM with Jelinek-Mercer smoothing. Tunable smoothing parameter.                                                                |
+| `BooleanSimilarityFactory`         | Returns boost-only score (no IDF, no TF). For "matched/not matched" semantics where you only care about which clauses fired.  |
+| `SweetSpotSimilarityFactory`       | TF-IDF variant with a "sweet spot" range for optimal length. Custom and rarely seen.                                          |
 
 Most "my BM25 isn't working well" problems are actually:
+
 - Wrong field analyzers
 - Wrong `qf` boosts
 - Stopword removal at wrong time
@@ -173,6 +174,7 @@ clauseScore = boost × idf(brand_name, "nike") × tf(...)
 ```
 
 Which means:
+
 - A **rare** brand (low corpus frequency, high IDF) gets a much higher final score than a **common** one — because BM25 treats rarity as informative
 - Brand names with longer text representations get penalized by length normalization
 - Repeated brand mentions in the field saturate via `tf`
@@ -223,7 +225,7 @@ If all three match: total score = 100 + 90 + 80 = 270.
 If only brand + terminology: 100 + 90 = 190.
 If only one matches: clause-level still scores, but mm=2 rejects (no result).
 
-This is **deterministic** and matches what the config says. Two products with different brand-term frequencies in the corpus rank identically as long as they match the same set of clauses. That's precisely what a tag-based system wants — the *match itself* is the signal, not corpus statistics.
+This is **deterministic** and matches what the config says. Two products with different brand-term frequencies in the corpus rank identically as long as they match the same set of clauses. That's precisely what a tag-based system wants — the _match itself_ is the signal, not corpus statistics.
 
 ### When `BooleanSimilarity` is the right default
 
@@ -239,14 +241,14 @@ This is **deterministic** and matches what the config says. Two products with di
 
 In a multi-stage semantic search pipeline (config below), the typical setup is:
 
-| Field | Similarity | Why |
-|---|---|---|
-| `brand_name_concept` | BooleanSimilarity | tag — boost is the signal |
-| `product_category_name_concept` | BooleanSimilarity | tag |
-| `category_concept` | BooleanSimilarity | tag |
-| `*_shingle` (multi-word concept variants) | BooleanSimilarity | tag |
-| `product_title_descriptions` | BM25 | free-text, IDF helps |
-| `description_text` | BM25 | free-text, length norm helps |
+| Field                                     | Similarity        | Why                          |
+| ----------------------------------------- | ----------------- | ---------------------------- |
+| `brand_name_concept`                      | BooleanSimilarity | tag — boost is the signal    |
+| `product_category_name_concept`           | BooleanSimilarity | tag                          |
+| `category_concept`                        | BooleanSimilarity | tag                          |
+| `*_shingle` (multi-word concept variants) | BooleanSimilarity | tag                          |
+| `product_title_descriptions`              | BM25              | free-text, IDF helps         |
+| `description_text`                        | BM25              | free-text, length norm helps |
 
 Then `qf`/clause boosts in your generated queries match the config's boost values one-to-one with no surprises.
 
@@ -262,6 +264,7 @@ Stages config defines:
 ```
 
 User types "left sony ear pads". Tagger produces:
+
 - `sony` → `brand_name:sony` (concept match)
 - `ear pads` → `product_category_name:ear_pads` (concept match)
 - `left` → `position_name:left` (concept match, but depends on product_category presence)
@@ -290,6 +293,7 @@ In `debug=true` output, look at the `explain` section. With BooleanSimilarity, t
 ```
 
 Not the BM25 nested structure with idf/tf/k1/b. If you see BM25-style explain, your similarity isn't actually applied — usually because:
+
 - Global similarity isn't `SchemaSimilarityFactory`
 - The fieldType is missing the `<similarity>` element
 - You overrode the `<similarity>` in `<fieldType>` but the field uses a different fieldType
@@ -313,14 +317,15 @@ Not the BM25 nested structure with idf/tf/k1/b. If you see BM25-style explain, y
 
 When multiple clauses match, Lucene's `BooleanQuery` combines their scores. The composition depends on clause type:
 
-| Occur | Contributes to score? | In SHOULD count? | Comment |
-|---|---|---|---|
-| `MUST` (+) | Yes | No | Must match; score added |
-| `SHOULD` | Yes | Yes | Score added; counts toward `mm` |
-| `MUST_NOT` (-) | No | No | Must not match |
-| `FILTER` | No | No | Must match; score ignored |
+| Occur          | Contributes to score? | In SHOULD count? | Comment                         |
+| -------------- | --------------------- | ---------------- | ------------------------------- |
+| `MUST` (+)     | Yes                   | No               | Must match; score added         |
+| `SHOULD`       | Yes                   | Yes              | Score added; counts toward `mm` |
+| `MUST_NOT` (-) | No                    | No               | Must not match                  |
+| `FILTER`       | No                    | No               | Must match; score ignored       |
 
 Final score:
+
 ```
 score = sum(MUST clause scores) + sum(matched SHOULD clause scores)
 ```
@@ -339,11 +344,13 @@ score = sum(MUST clause scores) + sum(matched SHOULD clause scores)
 For a user query "red running shoes":
 
 **All MUST** (`q.op=AND`):
+
 - Doc must match every term
 - Score = sum of three contributions
 - High precision, low recall
 
 **All SHOULD** (`q.op=OR`):
+
 - Doc matches if any term matches
 - Score = sum of matched-term contributions
 - Low precision, high recall
@@ -358,6 +365,7 @@ eDisMax's `mm=2<75%` formula: ≤2 terms = all required (effectively MUST); >2 t
 ### `bf=` (additive function boost) in eDisMax
 
 Score after applying `bf`:
+
 ```
 final_score = base_score + bf_value
 ```
@@ -417,6 +425,7 @@ query: "ducati fuel pump"
 ```
 
 Sources:
+
 - Manual scoring of top results from production logs
 - User click data (proxy: click ≈ partial relevance)
 - Pre-existing taxonomy/business rules
@@ -426,12 +435,12 @@ Sources:
 
 ### Step 2: Pick a metric
 
-| Metric | What it measures |
-|---|---|
-| **NDCG@10** | How well top-10 ranking matches ideal ranking. Best for "the top results matter most." |
+| Metric                           | What it measures                                                                              |
+| -------------------------------- | --------------------------------------------------------------------------------------------- |
+| **NDCG@10**                      | How well top-10 ranking matches ideal ranking. Best for "the top results matter most."        |
 | **MAP** (Mean Average Precision) | Aggregate precision across recall levels. Good for "all relevant docs should be ranked high." |
-| **MRR** (Mean Reciprocal Rank) | Position of first relevant doc. Good for "users care only about the top hit." |
-| **P@k** (Precision at k) | Fraction of top-k that are relevant. Simple, interpretable. |
+| **MRR** (Mean Reciprocal Rank)   | Position of first relevant doc. Good for "users care only about the top hit."                 |
+| **P@k** (Precision at k)         | Fraction of top-k that are relevant. Simple, interpretable.                                   |
 
 For e-commerce, NDCG@10 is the standard.
 
@@ -442,6 +451,7 @@ Run all queries against your current Solr config. Compute the metric. This is yo
 ### Step 4: Change one thing
 
 Pick one knob:
+
 - Adjust `qf` weights
 - Add/change `pf` boost
 - Add/tune `bf=log(popularity)`
@@ -486,6 +496,7 @@ Offline metrics correlate with but don't equal user behavior. A judgment-list-wi
 Common mistake: cranking up boosts to fix one query and breaking dozens of others.
 
 Discipline:
+
 - Always check if a boost change affects multiple queries via judgment list
 - Prefer tuning **inputs** (fields, analyzers) over **outputs** (boosts) — it ages better
 - Keep boost values within an order of magnitude (e.g., `qf=title_t^10 brand_s^5 desc_t^1`); 100x ratios are red flags
@@ -504,6 +515,7 @@ Solr ships an `ltr` contrib module that supports machine-learned ranking models 
 5. Re-rank top-N candidates using `rq={!ltr model=myModel reRankDocs=200}`
 
 LTR shines when:
+
 - You have substantial click/conversion data
 - Hand-tuned BM25+boosts have plateaued
 - You can invest in ML infrastructure

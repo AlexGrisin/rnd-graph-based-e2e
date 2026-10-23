@@ -43,13 +43,13 @@ The correct division of labor: let `autoSoftCommit` own **visibility** (cheap, f
 
 ### Commit pitfalls to flag
 
-| Pitfall | Why it hurts |
-|---|---|
+| Pitfall                                                                 | Why it hurts                                                                                                         |
+| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Client sends `commit=true` per request (per-request / explicit commits) | Each request forces a full commit + searcher open; throughput collapses, caches never warm. Use auto-commit instead. |
-| `openSearcher=true` on a frequent hard `autoCommit` | Redundant expensive searcher opens; let soft commit own visibility, hard commit keeps `openSearcher=false`. |
-| Sub-second `autoSoftCommit` with large autowarmed caches | Constant cache invalidation + autowarm storms; GC churn and NRT instability. |
-| No `autoCommit` at all | Transaction log grows unbounded; very slow restart/recovery, risk on crash. |
-| `commitWithin` and `autoSoftCommit` both very aggressive | Double commit pressure; pick one visibility mechanism and tune it. |
+| `openSearcher=true` on a frequent hard `autoCommit`                     | Redundant expensive searcher opens; let soft commit own visibility, hard commit keeps `openSearcher=false`.          |
+| Sub-second `autoSoftCommit` with large autowarmed caches                | Constant cache invalidation + autowarm storms; GC churn and NRT instability.                                         |
+| No `autoCommit` at all                                                  | Transaction log grows unbounded; very slow restart/recovery, risk on crash.                                          |
+| `commitWithin` and `autoSoftCommit` both very aggressive                | Double commit pressure; pick one visibility mechanism and tune it.                                                   |
 
 ---
 
@@ -164,22 +164,22 @@ An `updateRequestProcessorChain` is a pipeline every document passes through on 
 
 Each row: the symptom to look for → the finding → the fix.
 
-| # | Look for | Finding | Fix |
-|---|---|---|---|
-| 1 | Client sends `commit=true` per request | Per-request commits crush throughput; caches never warm | Remove explicit commits; rely on `autoCommit` + `autoSoftCommit` |
-| 2 | `autoCommit` with `openSearcher=true` and a short `maxTime` | Frequent expensive searcher opens on the durability commit | Set `openSearcher=false`; let `autoSoftCommit` own visibility |
-| 3 | No `autoCommit` block | Unbounded transaction log; slow/risky recovery | Add `autoCommit` (`maxTime` ~15s, `openSearcher=false`) |
-| 4 | `autoSoftCommit maxTime` sub-second with big autowarm | Cache-invalidation + autowarm storms, GC churn, NRT instability | Raise soft-commit interval and/or lower `autowarmCount` |
-| 5 | Cache `class` not `solr.CaffeineCache` | Pre-9.x cache class (`LRUCache`/`FastLRUCache`) | Switch all caches to `solr.CaffeineCache` |
-| 6 | `filterCache size` far above reused-filter count | Wasted heap (each entry up to `maxDoc/8` bytes), low hit gain | Size to distinct reused filters; check hit ratio in admin stats |
-| 7 | Large `autowarmCount` + frequent commits | Warming outlasts commit interval, stalls visibility | Lower `autowarmCount` (or `0` for sub-second soft commits) |
-| 8 | `ClassicIndexSchemaFactory` but Schema API expected | Runtime schema edits silently rejected (read-only) | Switch to `ManagedIndexSchemaFactory` (9.x default) |
-| 9 | Stale `luceneMatchVersion` after an upgrade | Components run in unintended back-compat behavior | Set to the deployed Solr/Lucene version |
-| 10 | `<lib>` directive present in a 9.x config | Deprecated/disabled-by-default jar loading | Confirm intent; migrate to `sharedLib`/Packages — USE SKILL `solr-extending` to apply plugin wiring |
-| 11 | `AddSchemaFieldsUpdateProcessorFactory` active in prod | Field-guessing creates wrong-typed fields from typos | Set `update.autoCreateFields=false`; define fields explicitly |
-| 12 | A processor after `RunUpdateProcessorFactory` | That processor never runs (Run writes the doc) | Make `RunUpdateProcessorFactory` last in the chain |
-| 13 | Giant `OR` chains hitting `maxBooleanClauses` | `too many boolean clauses` errors | Use `{!terms}` (TermInSetQuery); raise `maxBooleanClauses` only if needed |
-| 14 | `/select` missing/wrong `df` | Un-fielded queries target wrong field | Set a correct `df` (or require fielded queries) |
+| #   | Look for                                                    | Finding                                                         | Fix                                                                                                 |
+| --- | ----------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| 1   | Client sends `commit=true` per request                      | Per-request commits crush throughput; caches never warm         | Remove explicit commits; rely on `autoCommit` + `autoSoftCommit`                                    |
+| 2   | `autoCommit` with `openSearcher=true` and a short `maxTime` | Frequent expensive searcher opens on the durability commit      | Set `openSearcher=false`; let `autoSoftCommit` own visibility                                       |
+| 3   | No `autoCommit` block                                       | Unbounded transaction log; slow/risky recovery                  | Add `autoCommit` (`maxTime` ~15s, `openSearcher=false`)                                             |
+| 4   | `autoSoftCommit maxTime` sub-second with big autowarm       | Cache-invalidation + autowarm storms, GC churn, NRT instability | Raise soft-commit interval and/or lower `autowarmCount`                                             |
+| 5   | Cache `class` not `solr.CaffeineCache`                      | Pre-9.x cache class (`LRUCache`/`FastLRUCache`)                 | Switch all caches to `solr.CaffeineCache`                                                           |
+| 6   | `filterCache size` far above reused-filter count            | Wasted heap (each entry up to `maxDoc/8` bytes), low hit gain   | Size to distinct reused filters; check hit ratio in admin stats                                     |
+| 7   | Large `autowarmCount` + frequent commits                    | Warming outlasts commit interval, stalls visibility             | Lower `autowarmCount` (or `0` for sub-second soft commits)                                          |
+| 8   | `ClassicIndexSchemaFactory` but Schema API expected         | Runtime schema edits silently rejected (read-only)              | Switch to `ManagedIndexSchemaFactory` (9.x default)                                                 |
+| 9   | Stale `luceneMatchVersion` after an upgrade                 | Components run in unintended back-compat behavior               | Set to the deployed Solr/Lucene version                                                             |
+| 10  | `<lib>` directive present in a 9.x config                   | Deprecated/disabled-by-default jar loading                      | Confirm intent; migrate to `sharedLib`/Packages — USE SKILL `solr-extending` to apply plugin wiring |
+| 11  | `AddSchemaFieldsUpdateProcessorFactory` active in prod      | Field-guessing creates wrong-typed fields from typos            | Set `update.autoCreateFields=false`; define fields explicitly                                       |
+| 12  | A processor after `RunUpdateProcessorFactory`               | That processor never runs (Run writes the doc)                  | Make `RunUpdateProcessorFactory` last in the chain                                                  |
+| 13  | Giant `OR` chains hitting `maxBooleanClauses`               | `too many boolean clauses` errors                               | Use `{!terms}` (TermInSetQuery); raise `maxBooleanClauses` only if needed                           |
+| 14  | `/select` missing/wrong `df`                                | Un-fielded queries target wrong field                           | Set a correct `df` (or require fielded queries)                                                     |
 
 ---
 

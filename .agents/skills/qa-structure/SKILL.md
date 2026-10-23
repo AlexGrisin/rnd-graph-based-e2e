@@ -1,6 +1,6 @@
 ---
 name: qa-structure
-description: "To resolve QA session paths, identifiers/slugs, and state-file shape for test-automation flows."
+description: 'To resolve QA session paths, identifiers/slugs, and state-file shape for test-automation flows.'
 license: Apache-2.0
 disable-model-invocation: true
 user-invocable: false
@@ -33,14 +33,14 @@ Use when you need to create the QA session folder, resolve or name an artifact p
 
 Router -- READ SKILL FILE for the one your current step needs (point-of-use, never all at once):
 
-| When you need to… | Command |
-|---|---|
-| resolve API-AQA paths, `{IDENTIFIER}` derivation, or the QA state-file shape | READ SKILL FILE `references/api-aqa-layout.md` |
-| resolve UI-AQA paths, the `<test-name>` slug rules, the page-sources contract, or the UI-AQA state-file shape | READ SKILL FILE `references/ui-aqa-layout.md` |
-| load or validate the API-AQA per-run config keys (keys + consumer + accepted `N/A` forms) | READ SKILL FILE `references/config-schema.md` |
-| write the API-AQA project-config file | READ SKILL FILE `assets/api-aqa-project-config-template.md` |
-| run the user interview when the config is missing | READ SKILL FILE `assets/api-aqa-config-interview.md` |
-| seed the UI-AQA state file | READ SKILL FILE `assets/ui-aqa-state-template.md` |
+| When you need to…                                                                                             | Command                                                     |
+| ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| resolve API-AQA paths, `{IDENTIFIER}` derivation, or the QA state-file shape                                  | READ SKILL FILE `references/api-aqa-layout.md`              |
+| resolve UI-AQA paths, the `<test-name>` slug rules, the page-sources contract, or the UI-AQA state-file shape | READ SKILL FILE `references/ui-aqa-layout.md`               |
+| load or validate the API-AQA per-run config keys (keys + consumer + accepted `N/A` forms)                     | READ SKILL FILE `references/config-schema.md`               |
+| write the API-AQA project-config file                                                                         | READ SKILL FILE `assets/api-aqa-project-config-template.md` |
+| run the user interview when the config is missing                                                             | READ SKILL FILE `assets/api-aqa-config-interview.md`        |
+| seed the UI-AQA state file                                                                                    | READ SKILL FILE `assets/ui-aqa-state-template.md`           |
 
 The API-AQA state-file seed and the API-AQA per-run initial-data skeleton are tiny + always-needed, so they stay **inline** in the consuming step rather than as assets -- avoids extra reads on the critical path.
 

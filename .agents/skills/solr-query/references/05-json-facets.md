@@ -7,6 +7,7 @@ For multi-select faceting (tag/exclude pattern), see `06-tag-exclude.md`.
 ## Why JSON Facets
 
 The legacy facet API can't:
+
 - Nest facets (sub-facets per bucket)
 - Compute multiple metrics per bucket
 - Transition between block scopes within faceting
@@ -58,6 +59,7 @@ There are exactly four:
 ```
 
 Useful params:
+
 - `limit` — top N (default 10; `-1` for unlimited)
 - `mincount` — minimum count to include (default 1)
 - `sort` — `count desc` (default), `count asc`, `index asc`, or by sub-metric: `"my_metric desc"`
@@ -86,8 +88,15 @@ Useful params:
 `include` controls bucket boundary inclusion: `"lower"` (default; `[start, end)`), `"upper"`, `"edge"`, `"outer"`, `"all"`.
 
 For dates:
+
 ```json
-{ "type": "range", "field": "created_dt", "start": "NOW/DAY-7DAYS", "end": "NOW/DAY+1DAY", "gap": "+1DAY" }
+{
+  "type": "range",
+  "field": "created_dt",
+  "start": "NOW/DAY-7DAYS",
+  "end": "NOW/DAY+1DAY",
+  "gap": "+1DAY"
+}
 ```
 
 ### `query` — single bucket from arbitrary filter
@@ -108,7 +117,8 @@ A metric is a string-valued aggregation, used as a sibling of nested facets:
 
 ```json
 {
-  "type": "terms", "field": "brand_s",
+  "type": "terms",
+  "field": "brand_s",
   "facet": {
     "avg_price": "avg(price_f)",
     "max_price": "max(price_f)",
@@ -120,6 +130,7 @@ A metric is a string-valued aggregation, used as a sibling of nested facets:
 ```
 
 Available metrics:
+
 - `sum(field)`, `avg(field)`, `min(field)`, `max(field)`, `sumsq(field)`
 - `unique(field)` — approximate cardinality (HyperLogLog)
 - `hll(field)` — same, explicit
@@ -169,13 +180,18 @@ A facet can nest more facets inside. They run in the scope of the parent bucket:
 ```json
 {
   "by_brand": {
-    "type": "terms", "field": "brand_s", "limit": 10,
+    "type": "terms",
+    "field": "brand_s",
+    "limit": 10,
     "facet": {
       "by_color": { "type": "terms", "field": "color_s", "limit": 5 },
       "avg_rating": "avg(rating_f)",
       "price_distribution": {
-        "type": "range", "field": "price_f",
-        "start": 0, "end": 500, "gap": 100
+        "type": "range",
+        "field": "price_f",
+        "start": 0,
+        "end": 500,
+        "gap": 100
       }
     }
   }
@@ -185,10 +201,13 @@ A facet can nest more facets inside. They run in the scope of the parent bucket:
 Reads: "for each top brand, give me the top colors, the average rating, and a price-range histogram."
 
 You can sort the parent facet by a sub-metric:
+
 ```json
 {
   "by_brand": {
-    "type": "terms", "field": "brand_s", "limit": 10,
+    "type": "terms",
+    "field": "brand_s",
+    "limit": 10,
     "sort": "avg_rating desc",
     "facet": { "avg_rating": "avg(rating_f)" }
   }
@@ -234,6 +253,7 @@ The value is, again, the **parent filter** (Block Mask). The facet now sees pare
 Adds a filter applied just to this facet's domain.
 
 To use a request-param reference:
+
 ```json
 "domain": { "filter": "{!query v=$sf}" }
 ```
@@ -269,6 +289,7 @@ In SolrCloud (sharded), JSON Facets gather counts per shard, then merge. This ha
 If a term is the 11th most common in shard A but the 1st in shard B, a `limit=10` per-shard query may miss it from A. The merged top-N can be wrong.
 
 Mitigation:
+
 - `overrequest=N` — fetch N more per shard to improve merge accuracy (default 10; use 50-100 for high-cardinality)
 - `refine=true` — second-pass refinement: shards report exact counts for the merged candidates. Slower but accurate.
 
@@ -299,12 +320,14 @@ If blocks are split across shards (e.g., custom routing without `_root_` conside
 ## Common mistakes
 
 ### `uniqueBlock` as a facet type
+
 ```json
 "x": { "type": "uniqueBlock", "field": "_root_" }    // WRONG
 "x": "uniqueBlock(_root_)"                            // CORRECT
 ```
 
 ### `uniqueBlock` as a property
+
 ```json
 "x": { "type": "terms", "field": "color", "uniqueBlock": "_root_" }   // WRONG
 "x": { "type": "terms", "field": "color",
@@ -312,18 +335,22 @@ If blocks are split across shards (e.g., custom routing without `_root_` conside
 ```
 
 ### Excluded tag name doesn't match
+
 Tag names are case-sensitive. `{!tag=BRAND}` matches `excludeTags=["BRAND"]` but not `excludeTags=["Brand"]` or `excludeTags=["brand"]`.
 
 ### `excludeFilters` instead of `excludeTags`
+
 Wrong key name. Solr silently ignores unknown `domain` keys. The facet runs as if no exclusion was specified.
 
 ### `blockChildren` value is a child filter
+
 ```json
 "domain": { "blockChildren": "type_s:sku" }    // WRONG: this is a child filter
 "domain": { "blockChildren": "type_s:product" } // CORRECT: parent (Block Mask)
 ```
 
 ### Nested facet on a metric
+
 ```json
 "by_brand": {
   "type": "terms", "field": "brand_s",
@@ -338,9 +365,11 @@ Wrong key name. Solr silently ignores unknown `domain` keys. The facet runs as i
 Metrics are leaves. Only facet types (terms/range/query/heatmap) can have nested `facet`.
 
 ### `mincount=0` requesting all values
+
 For a `terms` facet, `mincount=0` is dangerous on high-cardinality fields — Solr will enumerate every distinct value, not just the matching ones. Use this only for low-cardinality enums.
 
 ### Sort by a metric that doesn't exist in the bucket scope
+
 ```json
 "by_brand": {
   "type": "terms", "field": "brand_s",

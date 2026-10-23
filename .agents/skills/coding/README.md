@@ -14,11 +14,11 @@ Without this skill a model implementing a task would: skip impact analysis on "s
 
 `SKILL.md` is a single flat pass: `role` → `when_to_use_skill` → `core_concepts` (principles, project docs to keep current, validation methodology) → `sensitive-data` → `validation_checklist` → `best_practices` → `pitfalls` → `resources` (routes to `codemap`, `debugging`, `planning`, `tech-specs`).
 
-`assets/iac.md` is not a short reference — it is a near-complete second skill body for IaC work, mandatorily pulled in via `MUST APPLY SKILL FILE \`assets/iac.md\`` whenever the change touches Terraform/Pulumi/CloudFormation/ARM/Bicep/Helm/Kustomize. It duplicates the parent's `<role>` and `<when_to_use_skill>` verbatim, then adds its own `<planning>` (intent decomposition, conflict/CIDR/naming checks before any plan), `<coding>` (module/template catalog first, LLM only as fallback, CLI restricted to read-only), `<review>` (static analysis, ≥2 security scanners, secrets scan, cost estimate, policy enforcement), `<documentation>`, `<error-handling>` (per-stage: Planner/Coder/Syntax/Security/Validator/Cloud/Check-step-failure), and `<self-healing-logic>` (retry loop, max 3 attempts, stop on fundamental errors).
+`assets/iac.md` is not a short reference — it is a near-complete second skill body for IaC work, mandatorily pulled in via `MUST APPLY SKILL FILE \`assets/iac.md\``whenever the change touches Terraform/Pulumi/CloudFormation/ARM/Bicep/Helm/Kustomize. It duplicates the parent's`<role>`and`<when_to_use_skill>`verbatim, then adds its own`<planning>`(intent decomposition, conflict/CIDR/naming checks before any plan),`<coding>`(module/template catalog first, LLM only as fallback, CLI restricted to read-only),`<review>`(static analysis, ≥2 security scanners, secrets scan, cost estimate, policy enforcement),`<documentation>`, `<error-handling>`(per-stage: Planner/Coder/Syntax/Security/Validator/Cloud/Check-step-failure), and`<self-healing-logic>` (retry loop, max 3 attempts, stop on fundamental errors).
 
 ## Mental hooks & unexpected rules
 
-- `no pre-existing excuses (pre-existing = documented in advance; otherwise fix it)` — "pre-existing" is not a blanket excuse; it only exempts an issue if it was documented *before* this task started, otherwise the executor must fix it now.
+- `no pre-existing excuses (pre-existing = documented in advance; otherwise fix it)` — "pre-existing" is not a blanket excuse; it only exempts an issue if it was documented _before_ this task started, otherwise the executor must fix it now.
 - `all code MUST compile (including pre-existing)` — compilation is judged on the whole codebase, not just the diff.
 - `Files stay under 300 LOC` — a hard line-count ceiling in the validation checklist, not a suggestion.
 - `databases (queries/statements) → APIs (curl/similar) → Web (Chrome DevTools/Playwright) → Mobile (Appium/similar), solid foundation first` — validation order is fixed; do not test the UI before the API/DB layer beneath it is confirmed.
@@ -51,4 +51,4 @@ New generic coding guidance belongs in `SKILL.md`. New IaC-specific procedure be
 
 Known adjacent artifact, not a coupling: `rules/coding-iac-best-practices.md` overlaps this skill's IaC scope but neither references nor is referenced by it — check before assuming it's wired in.
 
-Referenced by: `agents/engineer.md`, `agents/validator.md` (both `USE SKILL \`coding\``), `skills/testing/SKILL.md` (`skill \`coding\`` for implementation context), `workflows/init-workspace-flow-verification.md` (`skill \`coding\`` as file-creation reference).
+Referenced by: `agents/engineer.md`, `agents/validator.md` (both `USE SKILL \`coding\``), `skills/testing/SKILL.md` (`skill \`coding\``for implementation context),`workflows/init-workspace-flow-verification.md` (`skill \`coding\`` as file-creation reference).

@@ -42,6 +42,7 @@ The five keys to know:
 The Java toString of the resulting Lucene Query object. **Always check this first** when debugging "my query doesn't match what I expect."
 
 Common surprises:
+
 - `solr and lucene` → parsedquery shows `solr OR and OR lucene` (lowercase `and` is a term)
 - `field:[* TO 100]` → parsedquery shows `field:[* TO 100]` for string field but `IntPoint.newRangeQuery(field, MIN, 100)` for numeric — different types use different range query implementations
 - `{!edismax qf=title_t pf=title_t^10}red` → parsedquery shows the disjunction expansion plus the phrase boost; if a phrase clause is missing, your `pf` config didn't apply
@@ -97,6 +98,7 @@ Reading top-down:
 - `idf` and `tf` are the BM25 components
 
 When debugging "doc A should rank above doc B but doesn't":
+
 1. Get explain for both A and B
 2. Compare the top-level score
 3. Identify which clauses contribute differently
@@ -111,10 +113,12 @@ score = boost × idf × tf
 ```
 
 Where:
+
 - `idf = log(1 + (N - n + 0.5) / (n + 0.5))` — N=total docs, n=docs with term
 - `tf = freq / (freq + k1 × (1 - b + b × dl / avgdl))` — saturating function of frequency
 
 Implications you'll see in explain:
+
 - **Common terms have low idf**. A term in 90% of docs scores ~0; a term in 1% scores high.
 - **TF saturates**. Going from 1 to 2 occurrences boosts much more than 10 to 11.
 - **Long documents are penalized** (vs short) when `b > 0`. A single match in a 1000-word doc scores less than the same match in a 10-word doc.
@@ -133,6 +137,7 @@ eDisMax produces a DisMax (disjunction-max) tree:
 This is "winner takes max + tie × sum of losers" — your `tie` parameter shows here as the multiplier.
 
 If `tie=0`:
+
 ```
 0.45 = max of:
   0.45 = title_t:red ...
@@ -200,6 +205,7 @@ Doc B explain (score 1.8):
 ```
 
 Conclusion: B has the phrase "red shoes" in its title; A only has "red" + "shoes" non-adjacent. The `pf` boost is the differentiator. Either:
+
 - Re-index A with keywords reordered (if you control content)
 - Increase `pf` weight if phrase match should dominate
 - Decrease `pf` if you want loose matching to win
@@ -209,6 +215,7 @@ Conclusion: B has the phrase "red shoes" in its title; A only has "red" + "shoes
 ### "My boost has no effect"
 
 Check explain for the boost clause. If `0.5 = bf log(popularity)` and the rest of the score is `15.0`, the boost is irrelevant. Either:
+
 - Increase the boost magnitude (`bf=mul(log(popularity),5)`)
 - Switch to multiplicative (`boost=` instead of `bf=`)
 - Reconsider whether the boost should apply at all
@@ -216,6 +223,7 @@ Check explain for the boost clause. If `0.5 = bf log(popularity)` and the rest o
 ### "All results have similar scores"
 
 Check `idf` values in explain. If they're all near zero, your terms are too common — every doc has them. The query carries no discriminative power. Solutions:
+
 - Tighter `mm` to require more matching terms
 - More-specific user query
 - `bq=`/`bf=` to inject domain-relevant signals
@@ -223,6 +231,7 @@ Check `idf` values in explain. If they're all near zero, your terms are too comm
 ### "One field dominates"
 
 Check explain. If one field's contribution is 10× others, either:
+
 - Its boost in `qf` is too high
 - Its analyzer over-tokenizes (more matches → higher tf-summed contribution)
 - Different field types (e.g., `_t` for tokenized vs `_s` for string) cause IDF to differ wildly
@@ -271,6 +280,7 @@ Easier to parse for tools. Useful for building "why this result" UIs in your app
 ## Debug for facets
 
 `debug=true` doesn't show facet computation by default. For facet debug:
+
 ```
 facet.debug=true
 ```

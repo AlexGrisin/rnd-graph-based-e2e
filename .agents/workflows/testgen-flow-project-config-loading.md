@@ -1,6 +1,6 @@
 ---
 name: testgen-flow-project-config-loading
-description: "Phase 0 Project Config Loading of testgen-flow"
+description: 'Phase 0 Project Config Loading of testgen-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -14,41 +14,46 @@ Find or create the project config file, obtain project-specific data retrieval c
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 0 of 7 in `testgen-flow`
 - Input: user request with an Issue Tracker ticket key/URL (Jira `PROJ-123` is the canonical example)
 - Output: `initial-data.md`, project config file, initialized state
 - Prerequisite: user provided an Issue Tracker ticket key or URL
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Parse initial user input for ticket key
 2. Setup output directory
 3. Load or create project config
 4. Obtain project info from user (if config is new)
 5. Create initial-data file
 6. Update state file
-</phase_steps>
+   </phase_steps>
 
 <parse_input step="0.1">
+
 1. Extract the Issue Tracker ticket key or URL from the user prompt (REQUIRED) — Jira shapes are the canonical examples; adapt parsing to the resolved tracker.
 2. Accept formats:
    - **Ticket only:** `PROJ-123`, a full ticket URL, or `Analyze requirements for PROJ-123`.
    - **Ticket + Wiki:** the ticket key/URL plus one or more Wiki page URLs, e.g. `Analyze PROJ-123, docs: https://<wiki>/pages/123`.
    - **Ticket + other documentation URLs** (e.g. Google Drive): the ticket plus any documentation links the project config lists as data sources.
 3. Any non-ticket links pasted here are captured verbatim into `initial-data.md` and carried into Phase 1 data collection, resolved there per the project config's data sources. A recognizable provider URL is valid provider evidence.
-</parse_input>
+   </parse_input>
 
 <setup_directory step="0.2">
+
 1. Create `plans/testgen-{TICKET-KEY}/` (full per-ticket layout in `<output_directory>` below).
 2. Initialize `testgen-state.md` from `<state_file_template>` below. At init the Phase 0 row is `[ ] Phase 0: Project Config Loading - In progress` (all others Not started); step 0.6 flips it to `[x] ... Completed` only after the config and initial-data files exist.
-</setup_directory>
+   </setup_directory>
 
 <load_project_config step="0.3">
+
 1. Search for `testgen-project-config.md` at `plans/testgen-{TICKET-KEY}/testgen-project-config.md` (per-ticket, inside this ticket's feature plan folder — one copy per run, **not** a shared project-wide file, so parallel sessions and commits never collide).
 2. **Branches (exhaustive):**
    - **File exists AND non-empty:** skip to step 0.5.
    - **File missing OR exists but empty:** proceed to step 0.4 (do NOT create an empty placeholder file — step 0.4 will write the populated file).
-</load_project_config>
+     </load_project_config>
 
 <obtain_project_info step="0.4">
 
@@ -65,13 +70,16 @@ Contiguous 1–5 sequence. The `<example_format_of_question>` block below is the
    **Validation failure paths:**
    - If user said YES to default but the default cannot run in the environment (no MCP, no auth): re-prompt up to 2 times naming exactly which field(s) are absent. After 2 unsuccessful re-prompts, stop Phase 0, record `Phase 0 blocked: default unrunnable — missing <field>` in `testgen-state.md`, and ask the user to supply a complete answer before continuing.
    - If user said NO but did not name source / method / auth: re-prompt up to 2 times naming the missing fields explicitly. After 2 unsuccessful re-prompts, stop Phase 0, record `Phase 0 blocked: incomplete config answer` in `testgen-state.md`, and ask the user to supply a complete answer before continuing.
+
 5. **Apply the `<safety_boundaries>` redaction-at-intake gate**, then save the validated configuration to `plans/testgen-{TICKET-KEY}/testgen-project-config.md` (path per step 0.3).
 
 <example_format_of_question>
+
 ```markdown
 According to test generation process rules, I require more details related to your project - How should I retrieve the information necessary for test case generation?
 As a reference, I provide the default Data Retrieval scheme below:
 ** Default Setup **
+
 - retrieve the Issue Tracker ticket fields (summary+description) — e.g. Jira
 - retrieve provided Wiki documents, if any — e.g. Confluence
 - search the Wiki for pages using keywords extracted from the ticket
@@ -79,15 +87,18 @@ As a reference, I provide the default Data Retrieval scheme below:
 
 Is the above accurate for your project?
 Please answer YES or NO
+
 - If your answer is NO then please provide details about data retrieval for your project.
 - If you have links to any additional documentation or materials that need to be considered,
-you can provide them here as well.
+  you can provide them here as well.
 ```
+
 </example_format_of_question>
 
 </obtain_project_info>
 
 <create_initial_data step="0.5">
+
 1. **Apply the `<safety_boundaries>` redaction-at-intake gate** (the user prompt + pasted links written here can carry credentials), then create `plans/testgen-{TICKET-KEY}/initial-data.md`:
 
 ```markdown
@@ -96,12 +107,14 @@ you can provide them here as well.
 **Initial user prompt:** [USER PROMPT]
 **Project config file - USE AS REFERENCE FOR THE NEXT PHASE:** [PROJECT CONFIG FILENAME]
 ```
+
 </create_initial_data>
 
 <update_state step="0.6">
+
 1. Update `plans/testgen-{TICKET-KEY}/testgen-state.md` with Phase 0 complete
 2. Tell user: "Phase 0 complete. Project setup ready."
-</update_state>
+   </update_state>
 
 <state_file_template>
 
@@ -128,6 +141,7 @@ you can provide them here as well.
 ## Phase Details
 
 ### Phase 1
+
 - Completed: [DateTime]
 - Ticket: [KEY]
 - Files Created: [List]
@@ -179,11 +193,12 @@ plans/testgen-{TICKET-KEY}/
 </safety_boundaries>
 
 <validation_checklist>
+
 - `plans/testgen-{TICKET-KEY}/` directory exists
 - `plans/testgen-{TICKET-KEY}/testgen-project-config.md` (per-ticket, in the feature plan folder) exists with non-empty content covering data sources, retrieval method, and auth assumptions
 - `plans/testgen-{TICKET-KEY}/initial-data.md` created with user prompt and config reference
 - `plans/testgen-{TICKET-KEY}/testgen-state.md` created with Phase 0 marked complete
 - Redaction pre-write gate ran — `sensitive-data` scan executed against the config + `initial-data.md` before write (fail-closed); no literal credential persisted; any redaction noted in `## Additional Notes`
-</validation_checklist>
+  </validation_checklist>
 
 </testgen_flow_project_config_loading>

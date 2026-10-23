@@ -1,6 +1,6 @@
 ---
 name: solr-extending
-description: "To build Solr plugins: SearchComponent, QParser, URP, DocTransformer."
+description: 'To build Solr plugins: SearchComponent, QParser, URP, DocTransformer.'
 license: Apache-2.0
 tags:
   - solr
@@ -41,28 +41,28 @@ This SKILL.md is a router. For any non-trivial question, read the relevant `refe
 
 <references>
 
-| When the user asks about… | Read |
-|---|---|
-| `SearchComponent` lifecycle (prepare/process), distributed mode, registration | READ SKILL FILE `references/01-search-component.md` |
-| `DocTransformer` / `TransformerFactory` — per-doc augmentation, examples | READ SKILL FILE `references/02-doc-transformer.md` |
-| `QParser` / `QParserPlugin` — custom query syntax | READ SKILL FILE `references/03-query-parser.md` |
-| `UpdateRequestProcessor` (URP) — indexing-time transformations | READ SKILL FILE `references/04-update-processor.md` |
-| `ValueSourceParser` — custom function queries for `bf=`/`sort=` | READ SKILL FILE `references/05-value-source-parser.md` |
-| `solrconfig.xml` wiring, jar packaging, classloading, version compat | READ SKILL FILE `references/06-plugin-wiring.md` |
+| When the user asks about…                                                     | Read                                                   |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `SearchComponent` lifecycle (prepare/process), distributed mode, registration | READ SKILL FILE `references/01-search-component.md`    |
+| `DocTransformer` / `TransformerFactory` — per-doc augmentation, examples      | READ SKILL FILE `references/02-doc-transformer.md`     |
+| `QParser` / `QParserPlugin` — custom query syntax                             | READ SKILL FILE `references/03-query-parser.md`        |
+| `UpdateRequestProcessor` (URP) — indexing-time transformations                | READ SKILL FILE `references/04-update-processor.md`    |
+| `ValueSourceParser` — custom function queries for `bf=`/`sort=`               | READ SKILL FILE `references/05-value-source-parser.md` |
+| `solrconfig.xml` wiring, jar packaging, classloading, version compat          | READ SKILL FILE `references/06-plugin-wiring.md`       |
 
 </references>
 
 <picking_the_extension_point>
 
-| You want to... | Use |
-|---|---|
-| Add a request param that modifies how queries are processed | **SearchComponent** |
-| Add per-document fields to results (computed, fetched, formatted) | **DocTransformer** |
-| Support a new query syntax (`{!myparser ...}`) | **QParser** |
-| Compute something from doc fields usable in `bf=` / `sort=` | **ValueSourceParser** |
-| Modify documents during indexing (clean fields, derive values, dedupe) | **UpdateRequestProcessor** |
-| Wholly new request endpoint with custom output | **RequestHandlerBase** subclass |
-| Custom analyzer/tokenizer/filter | (USE SKILL `solr-schema`) |
+| You want to...                                                         | Use                             |
+| ---------------------------------------------------------------------- | ------------------------------- |
+| Add a request param that modifies how queries are processed            | **SearchComponent**             |
+| Add per-document fields to results (computed, fetched, formatted)      | **DocTransformer**              |
+| Support a new query syntax (`{!myparser ...}`)                         | **QParser**                     |
+| Compute something from doc fields usable in `bf=` / `sort=`            | **ValueSourceParser**           |
+| Modify documents during indexing (clean fields, derive values, dedupe) | **UpdateRequestProcessor**      |
+| Wholly new request endpoint with custom output                         | **RequestHandlerBase** subclass |
+| Custom analyzer/tokenizer/filter                                       | (USE SKILL `solr-schema`)       |
 
 The most common mistake is SearchComponent vs DocTransformer confusion:
 
@@ -73,16 +73,16 @@ The most common mistake is SearchComponent vs DocTransformer confusion:
 
 <lifecycle_hooks>
 
-| Method | Called when |
-|---|---|
-| `init(NamedList args)` | Once at factory load; configure from solrconfig.xml params |
+| Method                                       | Called when                                                           |
+| -------------------------------------------- | --------------------------------------------------------------------- |
+| `init(NamedList args)`                       | Once at factory load; configure from solrconfig.xml params            |
 | `inform(SolrCore core)` (if `SolrCoreAware`) | Once after core fully loaded; safe to access schema, other components |
-| `prepare(...)` | Per-request setup (SearchComponent only) |
-| `process(...)` | Main work (SearchComponent) |
-| `transform(SolrDocument, int)` | Per-doc work (DocTransformer) |
-| `getQuery()` / `parse()` | Build Lucene Query (QParser) |
-| `processAdd/Delete/Commit` | Per-doc indexing (URP) |
-| `close()` | Resource cleanup |
+| `prepare(...)`                               | Per-request setup (SearchComponent only)                              |
+| `process(...)`                               | Main work (SearchComponent)                                           |
+| `transform(SolrDocument, int)`               | Per-doc work (DocTransformer)                                         |
+| `getQuery()` / `parse()`                     | Build Lucene Query (QParser)                                          |
+| `processAdd/Delete/Commit`                   | Per-doc indexing (URP)                                                |
+| `close()`                                    | Resource cleanup                                                      |
 
 </lifecycle_hooks>
 

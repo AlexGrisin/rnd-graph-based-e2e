@@ -15,10 +15,12 @@ Non-empty report, sections:
 - **Patterns** -- cross-failure patterns, or `No cross-failure patterns identified`.
 
 **Variant deltas:**
+
 - **API-AQA (`execution-report.md`):** ID prefix `ERR-N` (from `ERR-1`); final field **Priority** (Critical/High/Medium/Low); also emit **Failures by Category** (count + tests affected, per taxonomy category) and **Recommendations** (actionable items for the correction phase).
 - **UI-AQA (`plans/ui-aqa-<test-name>/failure-analysis.md`):** ID prefix `F-N` (from `F-1`); the Category field is labelled **Error type**; final field **Recommendation** (one-line remediation, applied downstream); Root cause cites Page Source Analysis for selector errors.
 
 **Examples** (Root cause vs Evidence rationale -- commonly conflated):
+
 > API · **ID:** ERR-1 · **Failure name:** test_checkout_payment_timeout · **Category:** Timing / Race Condition · **Root cause:** API latency spike on `/payment` · **Evidence label:** Confirmed · **Evidence rationale:** CI log line 847 shows a 30s timeout · **Priority:** High.
 > UI · **ID:** F-1 · **Failure name:** test_login_submit · **Error type:** Selector / Locator · **Root cause:** `#submit-btn` id removed in the latest deploy · **Evidence label:** Confirmed · **Evidence rationale:** page-source diff line 42 shows the id changed to `data-testid="login-submit"` · **Recommendation:** update the selector to `[data-testid="login-submit"]`.
 

@@ -5,6 +5,7 @@ The `lucene` parser is Solr's default. It is also what fires when you write a qu
 ## What `lucene` actually is
 
 The parser is `org.apache.solr.parser.SolrQueryParser` (a slight extension of Lucene's `QueryParser`). It produces:
+
 - `TermQuery` for `field:value` where `value` is a single tokenizer-output term
 - `PhraseQuery` for `field:"two words"`
 - `BooleanQuery` for combinations
@@ -31,6 +32,7 @@ q=solr AND lucene        # parses as: +solr +lucene
 The default operator is `OR` unless `q.op=AND` is set or the parser is configured otherwise. For `defType=edismax`, `q.op` defaults to `OR` but `mm` controls actual matching.
 
 `+` and `-` are positional (no space between operator and term):
+
 ```
 +required -forbidden optional
 ```
@@ -57,6 +59,7 @@ field:*foo*      # contains-search — VERY slow
 ```
 
 Leading wildcards work but cost O(N terms) in the field's term dictionary. For 50M+ docs this means seconds. Solutions:
+
 - Index an `EdgeNGramFilter` field for autocomplete/prefix scenarios
 - Index a reversed-token field (`ReversedWildcardFilterFactory`) for suffix search
 - Use a `path_s` field or `n-gram` for substring search
@@ -88,11 +91,13 @@ Fuzzy search does not work on a per-term basis inside phrases — `~` after a ph
 ## Special characters that need escaping
 
 These have meaning in Lucene syntax:
+
 ```
 + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
 ```
 
 To match a literal one in a query, escape with backslash:
+
 ```
 q=path_s:\/var\/log\/app    # match the literal /var/log/app
 q=name_s:C\+\+              # match "C++"
@@ -101,6 +106,7 @@ q=name_s:C\+\+              # match "C++"
 URL-encoding the backslash is needed for HTTP transport. In JSON Request API, JSON-escape the backslash (`\\`).
 
 The escape problem is the #1 reason people use `{!term}`:
+
 ```
 fq={!term f=sku_id}ABC-123/XL    # no escaping needed; one TermQuery
 ```
@@ -110,12 +116,14 @@ fq={!term f=sku_id}ABC-123/XL    # no escaping needed; one TermQuery
 ## Phrase queries and complexphrase
 
 A standard phrase query supports slop but not wildcards inside the phrase:
+
 ```
 title_t:"red shoes"~2     # OK
 title_t:"red sho*"        # parses but * is a literal char in the phrase, won't match prefixes
 ```
 
 For wildcards inside phrases, use `{!complexphrase}`:
+
 ```
 {!complexphrase inOrder=true}title_t:"red sho*"
 {!complexphrase}title_t:"(red OR crimson) shoes"
@@ -152,23 +160,29 @@ Multiplies the score contribution of that subquery. For eDisMax, prefer `qf=titl
 ## Common parse errors
 
 ### `Cannot parse '...': Encountered "<EOF>"`
+
 You probably have unbalanced quotes or parens. Search for unmatched `"` first.
 
 ### `Cannot parse '...': Encountered " "AND" "AND ""`
+
 You wrote `AND AND` — usually because of a stray operator. Common when concatenating fragments programmatically without filtering empty strings.
 
 ### `org.apache.solr.search.SyntaxError: Cannot parse '...': Lexical error at line 1, column N. Encountered: "/" (47), after : ""`
+
 Unescaped special char. Identify with the column number, then escape or wrap with `{!term}`.
 
 ### `undefined field: ...`
+
 The field is not in the schema. Schema may be in `managed-schema` mode and your local copy is stale. Check `/schema/fields/{name}`.
 
 ### `Multiple docs/queries with same value for ...` (in `{!parent}`)
+
 Block join sees children outside parents. This is **Error 17** territory — see `04-block-join.md`.
 
 ## Specifying the parser
 
 Three ways:
+
 ```
 q={!edismax qf=title_t}red shoes      # local params (recommended for q)
 defType=edismax&q=red shoes            # request param
@@ -180,11 +194,13 @@ For `fq` you almost always use local params — `defType` does not apply to `fq`
 ## Lucene vs eDisMax decision
 
 Use **lucene** when:
+
 - The query string is constructed by code, not user input
 - You want exact control over field selection, boolean logic
 - Filters (`fq` is almost always lucene)
 
 Use **eDisMax** when:
+
 - The query string comes from a user typing into a search box
 - You want multi-field search with per-field boosts
 - You want phrase boost, minimum-match, or boost queries

@@ -213,11 +213,12 @@ Use case: you have a `category_full_phrase_concept` field that should match only
 
 Some fields aren't independently meaningful. Example: `attr_position` (front/rear) only makes sense with a `category_concept` (ear_pad). A query for `attr_position:front` alone is too vague.
 
-`DependencyGroupService.findAllGroups(tags)` finds groups: each group has **roots** (the parent fields, e.g., category) and **dependents** (the dependent fields, e.g., attr_*).
+`DependencyGroupService.findAllGroups(tags)` finds groups: each group has **roots** (the parent fields, e.g., category) and **dependents** (the dependent fields, e.g., attr\_\*).
 
 Output: list of `DependencyGroup`s. Each represents one possible root-dependent combination from the path.
 
 For each found group:
+
 1. Generate a query that combines root + dependents as MUST
 2. Add this as a separate path query alongside the no-dependency version
 
@@ -237,6 +238,7 @@ Combined: Q1 OR Q2
 ```
 
 Without dependency awareness, the query would just be:
+
 ```
 category:ear_pad AND attr_position:front
 ```
@@ -247,13 +249,13 @@ Which fails for any product missing the position attribute, even if it's a valid
 
 `calculateMinShouldMatch(phraseTokensCount, minShouldMatchSpec)`:
 
-| spec | phraseTokensCount=1 | =2 | =5 | =10 |
-|---|---|---|---|---|
-| `100%` | 1 | 2 | 5 | 10 |
-| `2<-1` | 1 | 2 | 4 | 9 |
-| `2<-25%` | 1 | 2 | 4 | 8 |
-| `1<-25%` | 1 | 2 | 4 | 8 |
-| `1<-1 5<80%` | 1 | 1 | 4 | 8 |
+| spec         | phraseTokensCount=1 | =2  | =5  | =10 |
+| ------------ | ------------------- | --- | --- | --- |
+| `100%`       | 1                   | 2   | 5   | 10  |
+| `2<-1`       | 1                   | 2   | 4   | 9   |
+| `2<-25%`     | 1                   | 2   | 4   | 8   |
+| `1<-25%`     | 1                   | 2   | 4   | 8   |
+| `1<-1 5<80%` | 1                   | 1   | 4   | 8   |
 
 Same syntax as eDisMax mm — USE SKILL `solr-query` to apply eDisMax for the full spec.
 
@@ -278,6 +280,7 @@ For each tag, we use its **minimum** field boost (worst-case scoring). Sum acros
 If the min boost (e.g., the path's weakest single field) makes the sum fall below the threshold, the path is dropped. This guards against paths that are technically complete but full of low-value matches.
 
 Tuning:
+
 - `minPatternScore=0` — accept any path
 - `minPatternScore=100` — require strong concept matches throughout
 - `minPatternScore=1000` — extreme strictness
@@ -329,6 +332,7 @@ This is experimental — the gains depend on per-domain token frequencies. Tune 
 ## BLM tag handling
 
 `RECOGNIZED_PRODUCT` tags are special:
+
 - They occupy graph positions but don't generate queries
 - Their effect is **lowering the effective phrase token count** for mm calculation
 
@@ -344,6 +348,7 @@ for (StagedTag stagedTag : stagedTags) {
 ```
 
 For phrase "sony wh-1000xm5 ear pads" with BLM recognized:
+
 - Phrase tokens: 5
 - BLM tag spans positions 0-3 (3 tokens)
 - Effective phrase tokens for mm: 5 - 3 = 2
@@ -405,6 +410,7 @@ public class BrandLineModelProcessor {
 ```
 
 The result feeds back into the staging service: a recognized BLM becomes both:
+
 - A `RECOGNIZED_PRODUCT` synthetic tag (so positions are accounted for in mm)
 - A direct filter on the catalog query (`brand_id_s:SONY AND line_id_s:WH AND model_id_s:WH-1000XM5`)
 
@@ -412,19 +418,19 @@ The result feeds back into the staging service: a recognized BLM becomes both:
 
 Each `SmQuery` subtype has a corresponding `Sm*SolrQP` (Solr query parser) that converts to Lucene Query:
 
-| Sm class | Translates to |
-|---|---|
-| `SmBooleanQuery` | `BooleanQuery` |
-| `SmTermQuery` | `TermQuery` |
-| `SmBoostQuery` | `BoostQuery` |
-| `SmDisjunctionMaxQuery` | `DisjunctionMaxQuery` |
-| `SmParentWrappedQuery` | `ToParentBlockJoinQuery` |
-| `SmChildWrappedQuery` | `ToChildBlockJoinQuery` |
-| `SmToParentBlockJoinQuery` | block-join with score mode |
-| `SmTermsQuery` | `TermsQuery` (multi-term) |
-| `SmCollapseFilter` | applies CollapseQParser semantics |
-| `SmEdismaxBoostQuery` | edismax-style boost |
-| `SmEdismaxQuery` | edismax-built query |
+| Sm class                   | Translates to                     |
+| -------------------------- | --------------------------------- |
+| `SmBooleanQuery`           | `BooleanQuery`                    |
+| `SmTermQuery`              | `TermQuery`                       |
+| `SmBoostQuery`             | `BoostQuery`                      |
+| `SmDisjunctionMaxQuery`    | `DisjunctionMaxQuery`             |
+| `SmParentWrappedQuery`     | `ToParentBlockJoinQuery`          |
+| `SmChildWrappedQuery`      | `ToChildBlockJoinQuery`           |
+| `SmToParentBlockJoinQuery` | block-join with score mode        |
+| `SmTermsQuery`             | `TermsQuery` (multi-term)         |
+| `SmCollapseFilter`         | applies CollapseQParser semantics |
+| `SmEdismaxBoostQuery`      | edismax-style boost               |
+| `SmEdismaxQuery`           | edismax-built query               |
 
 The `SolrQueryParserFabric` walks the Sm tree and produces the Lucene Query. Same translation can be implemented for ES (`ESQueryParserFabric`) — that's how the same staging pipeline serves both backends.
 
@@ -433,6 +439,7 @@ For the **complete code** of every `Sm*Query` class, the `SmClause` enum, the pa
 ## Combining stage queries
 
 After all stages run, `CommonSemanticSearcher.processStagesSequentially` returns a list of `StageInfo`. Each StageInfo has:
+
 - The Lucene query for that stage
 - A "cutoff" — minimum hits needed for this stage to be considered "successful"
 
@@ -445,6 +452,7 @@ If no stage hits its cutoff: fall back to the lowest-priority stage's query (bes
 ### Path produces empty query
 
 `buildWeightedSmQuery` returns `Optional.empty()` when:
+
 - Path's tag count < mm (can't satisfy)
 - After must/should classification, must+should < mm (still can't)
 - All tags filtered out by must-have-terms
@@ -454,9 +462,10 @@ Diagnose by emitting tag list + mm value. Often it's a stage config too strict f
 ### Dependency group never fires
 
 `DependencyGroupService.findAllGroups()` returns empty list. Check:
+
 - Are root and dependent fields actually configured for dependency? (StagesConfig)
 - Are both root and dependent tags present in the path?
-- Is the field naming consistent (e.g., attr_* prefix matches expected)?
+- Is the field naming consistent (e.g., attr\_\* prefix matches expected)?
 
 Use `dot=true` and look at the tag colors and field names.
 
@@ -467,6 +476,7 @@ Use `dot=true` and look at the tag colors and field names.
 ### `removeWeakTokens` underperforming
 
 This optimization works only when:
+
 - `stageConfig.isRemoveWeakTokens()` is true
 - Some fields are marked `weak=true` in stage config
 - A complete concept-coverage path exists from non-weak tokens alone

@@ -10,6 +10,7 @@ description: Windsurf supports custom rules, workflows, commands, and skills thr
 Windsurf supports custom configuration through repository-committed files. These files configure Cascade (Windsurf's AI agent).
 
 **Configuration Locations:**
+
 - `AGENTS.md` - Cascade behavior instructions
 - `.windsurf/rules/` - Path-specific rules for Cascade
 - `.windsurf/commands/` - Slash commands for Cascade
@@ -34,18 +35,21 @@ Windsurf supports custom configuration through repository-committed files. These
 # Project Agent Instructions
 
 ## Tech Stack
+
 - Next.js 14 with App Router
 - TypeScript strict mode
 - Prisma ORM with PostgreSQL
 - Tailwind CSS for styling
 
 ## Code Standards
+
 - Use server components by default
 - Client components only for interactivity
 - Follow Container/Presenter pattern
 - 80% test coverage minimum
 
 ## Testing Requirements
+
 - Jest for unit tests
 - Playwright for E2E tests
 - Mock external dependencies
@@ -66,6 +70,7 @@ Rules that apply only to specific file patterns.
 ### Creating Rules
 
 1. **Create Rules Directory:**
+
    ```bash
    mkdir -p .windsurf/rules
    ```
@@ -125,6 +130,7 @@ paths: src/api/**/*.ts, app/api/**/*.ts
 ### Rule File Structure
 
 **YAML Frontmatter:**
+
 - `paths`: Comma-separated glob patterns (NOT YAML array)
   - Example: `**/*.ts, **/*.tsx`
   - Example: `src/components/**/*.tsx`
@@ -144,6 +150,7 @@ paths:
 ```
 
 **Content:**
+
 - Markdown-formatted rules
 - Applies only to files matching `paths` pattern
 - Rules without `paths` frontmatter apply to all files
@@ -163,6 +170,7 @@ Reusable prompts invoked with `/command-name`.
 ### Creating Commands
 
 1. **Create Commands Directory:**
+
    ```bash
    mkdir -p .windsurf/commands
    ```
@@ -188,28 +196,33 @@ model: claude-3-5-sonnet-20241022
 Perform comprehensive code review:
 
 ## Current Changes
+
 !`git diff HEAD`
 
 ## Review Criteria
 
 ### Code Quality
+
 - Readability and clarity
 - Proper naming conventions
 - DRY principle adherence
 - Function/file size limits
 
 ### Security
+
 - Input validation
 - SQL injection prevention
 - XSS vulnerabilities
 - Exposed secrets
 
 ### Performance
+
 - Algorithmic efficiency
 - Database query optimization
 - Unnecessary computations
 
 ### Testing
+
 - Test coverage
 - Edge cases handled
 
@@ -262,12 +275,14 @@ Report any failures with detailed error messages.
 ### Command Configuration Fields
 
 **YAML Frontmatter:**
+
 - `description`: Command description (optional)
 - `allowed-tools`: Bash commands allowed - format: `Bash(command:*)`
 - `model`: Specific model to use (optional)
 - `argument-hint`: Hint for expected arguments (optional)
 
 **Content:**
+
 - Instructions for agent to execute
 - Use `$1`, `$2`, `$3` for positional arguments
 - Use `$ARGUMENTS` for all arguments as string
@@ -276,10 +291,12 @@ Report any failures with detailed error messages.
 ### Using Commands
 
 **Invocation:**
+
 - Type `/command-name` to invoke command
 - With arguments: `/deploy production`
 
 **Example:**
+
 ```
 You: /review
 Agent: [Executes code review on current changes]
@@ -304,6 +321,7 @@ Automation workflows for multi-step tasks.
 ### Creating Workflows
 
 1. **Create Workflows Directory:**
+
    ```bash
    mkdir -p .windsurf/workflows
    ```
@@ -347,9 +365,11 @@ description: Deploy application to production with full validation
 ### Workflow Structure
 
 **YAML Frontmatter:**
+
 - `description`: Required. Workflow description
 
 **Content:**
+
 - Step-by-step instructions
 - Agent executes sequentially
 
@@ -375,17 +395,19 @@ Multi-step tasks with supporting resources. Skills are folder-based with `SKILL.
 
 **YAML Frontmatter (Required):**
 
-| Field | Required | Format | Purpose |
-|-------|----------|--------|---------|
-| `name` | Yes | lowercase-with-hyphens | Unique identifier |
-| `description` | Yes | Brief sentence | Auto-invocation matching |
+| Field         | Required | Format                 | Purpose                  |
+| ------------- | -------- | ---------------------- | ------------------------ |
+| `name`        | Yes      | lowercase-with-hyphens | Unique identifier        |
+| `description` | Yes      | Brief sentence         | Auto-invocation matching |
 
 **Markdown Content:**
+
 - Instructions for the workflow
 - References to supporting files: `[file.md](./file.md)`
 - No specific structure required
 
 **Example:**
+
 ```markdown
 ---
 name: my-skill-name
@@ -410,13 +432,13 @@ Cascade hooks run shell scripts at agent lifecycle events. Full verified contrac
 
 ### Hook Locations
 
-| Path | Scope |
-|------|-------|
-| `.devin/hooks.json` | Project (**current**) |
-| `.windsurf/hooks.json` | Project (legacy alias — same format) |
-| `~/.codeium/windsurf/hooks.json` | User |
-| `~/.codeium/hooks.json` | User (JetBrains plugin) |
-| Enterprise (`/Library/Application Support/Windsurf/`, `/etc/windsurf/`, `C:\ProgramData\Windsurf\`) | Org-wide |
+| Path                                                                                                | Scope                                |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `.devin/hooks.json`                                                                                 | Project (**current**)                |
+| `.windsurf/hooks.json`                                                                              | Project (legacy alias — same format) |
+| `~/.codeium/windsurf/hooks.json`                                                                    | User                                 |
+| `~/.codeium/hooks.json`                                                                             | User (JetBrains plugin)              |
+| Enterprise (`/Library/Application Support/Windsurf/`, `/etc/windsurf/`, `C:\ProgramData\Windsurf\`) | Org-wide                             |
 
 ### Registration Format (flat Cascade)
 
@@ -424,7 +446,12 @@ Cascade hooks run shell scripts at agent lifecycle events. Full verified contrac
 {
   "hooks": {
     "<event_name>": [
-      { "command": "path/to/script", "powershell": "windows-command", "show_output": false, "working_directory": "optional" }
+      {
+        "command": "path/to/script",
+        "powershell": "windows-command",
+        "show_output": false,
+        "working_directory": "optional"
+      }
     ]
   }
 }
@@ -436,13 +463,13 @@ Cascade hooks run shell scripts at agent lifecycle events. Full verified contrac
 
 Tool events are **split per operation** — there is no generic `PreToolUse`/`PostToolUse`. Only `pre_*` hooks can block (exit 2); all `post_*` hooks are observational.
 
-| Rosetta event | Windsurf event(s) | Blockable |
-|---------------|-------------------|:---------:|
-| PreToolUse (read) | `pre_read_code` | yes |
-| PreToolUse (write) | `pre_write_code` | yes |
-| PreToolUse (shell) | `pre_run_command` | yes |
-| PreToolUse (MCP) | `pre_mcp_tool_use` | yes |
-| PostToolUse | `post_read_code` / `post_write_code` / `post_run_command` / `post_mcp_tool_use` | no |
+| Rosetta event      | Windsurf event(s)                                                               | Blockable |
+| ------------------ | ------------------------------------------------------------------------------- | :-------: |
+| PreToolUse (read)  | `pre_read_code`                                                                 |    yes    |
+| PreToolUse (write) | `pre_write_code`                                                                |    yes    |
+| PreToolUse (shell) | `pre_run_command`                                                               |    yes    |
+| PreToolUse (MCP)   | `pre_mcp_tool_use`                                                              |    yes    |
+| PostToolUse        | `post_read_code` / `post_write_code` / `post_run_command` / `post_mcp_tool_use` |    no     |
 
 **(!) No session-lifecycle events** — there is no `SessionStart`, `SessionEnd`, `Stop`, `AgentStop`, or `SubagentStop`. The closest analogs are `pre_user_prompt` (turn start) and `post_cascade_response` (turn end); they are per-turn, not per-session, and post-hooks cannot block.
 
@@ -454,20 +481,20 @@ Delivered as JSON on stdin. Common (all events): `agent_action_name`, `trajector
 
 **(!) Cascade never parses stdout as JSON.** There is no `permissionDecision`/`additionalContext`/`continue`/`hookSpecificOutput` contract — emitting such JSON has zero effect. A hook communicates through exactly two channels:
 
-| Channel | Behavior |
-|---------|----------|
-| process exit code | the decision — `0` proceed, `2` block (see below) |
+| Channel                                 | Behavior                                                                                                                                                               |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| process exit code                       | the decision — `0` proceed, `2` block (see below)                                                                                                                      |
 | **stderr** (on a blocking `pre_*` hook) | **the only hook→model text channel** — the deny reason. Cascade delivers it verbatim, appending `: action blocked by hook`. Write the reason to stderr, then `exit 2`. |
 
 There is **no non-blocking context injection**: exit-0 hooks and all post-hooks pass nothing to the model.
 
 ### Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | success — action proceeds |
-| `2` | **pre-hooks only:** blocks the action; the hook's stderr is surfaced to the agent. Post-hooks cannot block. |
-| other non-zero | error — non-blocking, action proceeds |
+| Code           | Meaning                                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------------------- |
+| `0`            | success — action proceeds                                                                                   |
+| `2`            | **pre-hooks only:** blocks the action; the hook's stderr is surfaced to the agent. Post-hooks cannot block. |
+| other non-zero | error — non-blocking, action proceeds                                                                       |
 
 ### Matchers
 
@@ -529,4 +556,3 @@ your-project/
 ## Version
 
 Configuration format for Windsurf as of December 2024.
-

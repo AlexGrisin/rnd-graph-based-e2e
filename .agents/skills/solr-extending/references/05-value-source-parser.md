@@ -12,6 +12,7 @@ For built-in functions and how to use them, USE SKILL `solr-query` to apply func
 - The expression is so common in your queries that named function is cleaner than `mul(div(...),...)` chains
 
 Not justified:
+
 - "I want a shorter name for `log(sum(x,1))`" — that's what request param defaults are for
 - One-off math you'll use once
 
@@ -78,11 +79,13 @@ class MyValueSource extends ValueSource {
 ```
 
 Register in solrconfig.xml:
+
 ```xml
 <valueSourceParser name="myfunc" class="com.example.MyValueSourceParser"/>
 ```
 
 Use:
+
 ```
 bf=myfunc(popularity_i, ratings_avg_f)
 boost=myfunc(field1_f, field2_f)
@@ -128,6 +131,7 @@ List<ValueSource> args = fp.parseValueSourceList();
 `getValues(context, readerContext)` is called **once per segment**. The returned `FunctionValues` then has `doubleVal(int doc)` called for each doc within the segment.
 
 For docValues-backed fields:
+
 ```java
 @Override
 public FunctionValues getValues(Map context, LeafReaderContext readerContext) throws IOException {
@@ -146,12 +150,14 @@ public FunctionValues getValues(Map context, LeafReaderContext readerContext) th
 ```
 
 For multivalued fields with docValues:
+
 ```java
 SortedNumericDocValues sndv = DocValues.getSortedNumeric(readerContext.reader(), fieldName);
 // per doc, advance and call sndv.docValueCount() and sndv.nextValue()
 ```
 
 For text/string fields with docValues:
+
 ```java
 SortedDocValues sdv = DocValues.getSorted(readerContext.reader(), fieldName);
 // per doc, sdv.advanceExact(doc) → sdv.lookupOrd(sdv.ordValue()).utf8ToString()
@@ -184,14 +190,14 @@ If your function depends on external state that varies across requests (e.g., us
 
 The base class declares many; you must override the ones your function actually returns:
 
-| Method | When to implement |
-|---|---|
-| `doubleVal(int)` | Almost always (default scoring) |
-| `floatVal(int)` | If used in sort or score |
-| `longVal(int)`, `intVal(int)` | For integer-typed functions |
-| `strVal(int)` | If function should be sortable as string |
-| `exists(int)` | Check if value defined for doc |
-| `toString(int)` | For explain output |
+| Method                        | When to implement                        |
+| ----------------------------- | ---------------------------------------- |
+| `doubleVal(int)`              | Almost always (default scoring)          |
+| `floatVal(int)`               | If used in sort or score                 |
+| `longVal(int)`, `intVal(int)` | For integer-typed functions              |
+| `strVal(int)`                 | If function should be sortable as string |
+| `exists(int)`                 | Check if value defined for doc           |
+| `toString(int)`               | For explain output                       |
 
 Default implementations of unimplemented methods throw `UnsupportedOperationException`. If a downstream operation uses one you didn't override (e.g., sorting by your function in long mode), you'll see a runtime error.
 
@@ -238,6 +244,7 @@ class CapValueSource extends ValueSource {
 ```
 
 Use:
+
 ```
 bf=cap(popularity_i, 1000.0)
 ```
@@ -269,6 +276,7 @@ class MultiValuedCountValueSource extends ValueSource {
 ```
 
 Use:
+
 ```
 boost=mvcount(tag_ss)
 ```
@@ -303,6 +311,7 @@ class WeightedSumValueSource extends ValueSource {
 ```
 
 Use:
+
 ```
 boost=wsum(rating_f, 0.5, popularity_log_f, 0.3, recency_score_f, 0.2)
 ```

@@ -1,4 +1,3 @@
-
 <best_practices>
 
 - Prompt must have clearly defined problem statement, proposed solution, and **valid proof** that solution solves the problem

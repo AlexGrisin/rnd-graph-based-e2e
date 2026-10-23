@@ -7,12 +7,14 @@ For built-in parsers and how to use them (`{!term}`, `{!terms}`, `{!parent}`, et
 ## When to write a custom QParser
 
 Justified cases:
+
 - Domain DSL: `{!product q="red shoes" brand=Nike}` is cleaner than the equivalent edismax + fq combination
 - Wrap a complex Lucene query type that has no built-in parser (rare; most do)
 - Inject business logic: `{!secured q=$qq user=$u}` enforces ACL filters
 - Custom score combiner: build an `SmBooleanQuery` or similar that combines paths your way
 
 Not justified:
+
 - "I want shorter syntax" — usually a request handler `defaults` block does the same job without code
 - Wrapping eDisMax with extra params — use `defType` + `defaults` in the handler
 - Anything you can do via `bq=` / `bf=` / `boost=` in eDisMax
@@ -56,11 +58,13 @@ class MyQParser extends QParser {
 ```
 
 Register in solrconfig.xml:
+
 ```xml
 <queryParser name="myparser" class="com.example.MyQParserPlugin"/>
 ```
 
 Use:
+
 ```
 q={!myparser f=color_s}red
 fq={!myparser f=brand_s}Nike
@@ -72,14 +76,15 @@ fq={!myparser f=brand_s}Nike
 QParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
 ```
 
-| Parameter | Contents |
-|---|---|
-| `qstr` | The query body — everything after `}` in `{!myparser ...}body`. May be `null` if user used `v=$param` |
-| `localParams` | Just the local params: `{!myparser key=value}` → SolrParams with `key=value` |
-| `params` | Full request params (q, fq, defType, sort, etc.) |
-| `req` | The request object — `req.getSchema()`, `req.getSearcher()`, `req.getCore()` |
+| Parameter     | Contents                                                                                              |
+| ------------- | ----------------------------------------------------------------------------------------------------- |
+| `qstr`        | The query body — everything after `}` in `{!myparser ...}body`. May be `null` if user used `v=$param` |
+| `localParams` | Just the local params: `{!myparser key=value}` → SolrParams with `key=value`                          |
+| `params`      | Full request params (q, fq, defType, sort, etc.)                                                      |
+| `req`         | The request object — `req.getSchema()`, `req.getSearcher()`, `req.getCore()`                          |
 
 The body of the query (`qstr`) can come from three places:
+
 1. After `}` in the local params: `{!myparser}body`
 2. From `localParams.get("v")`: `{!myparser v="body"}`
 3. From a request param ref: `{!myparser v=$qq}` with `qq=body`
@@ -120,12 +125,14 @@ return new BoostQuery(innerQuery, 2.5f);
 ```
 
 For block-join queries (parent ↔ child):
+
 ```java
 return new ToParentBlockJoinQuery(childQuery, parentBitSet, ScoreMode.Max);
 return new ToChildBlockJoinQuery(parentQuery, parentBitSet);
 ```
 
 For function queries:
+
 ```java
 ValueSource vs = ...;
 return new FunctionScoreQuery(matchAll, vs.asDoubleValuesSource());
@@ -144,6 +151,7 @@ Query childQuery = childParser.getQuery();
 `subQuery(string, defaultParserName)` is a helper on the base class — it invokes whatever parser the embedded `{!parser}` says, or `defaultParserName` if no `{!}` present.
 
 This is how `{!parent which=...}` parses its own body via the standard Lucene parser:
+
 ```java
 String childQueryStr = qstr;
 QParser childParser = subQuery(childQueryStr, "lucene");
@@ -180,6 +188,7 @@ For large derived state, build query lazily inside the Query subclass, not in `p
 Each shard parses independently. The Query you return is **not** serialized across shards — only the original `q`/`fq` strings are sent. Each shard runs its own QParser to produce its Query.
 
 This means:
+
 - The Query class your parser produces must be available on every shard's classpath (i.e., your jar deployed everywhere)
 - The parsing must be deterministic — same inputs produce equivalent queries
 - Don't depend on shard-local state during `parse()`; that's where Query goes wrong
@@ -220,6 +229,7 @@ public Query parse() throws SyntaxError {
 ```
 
 Use:
+
 ```
 q={!product brand=Nike category=running}red shoes
 ```

@@ -23,16 +23,16 @@ The phase supplies a test-case handle or URL. Apply the resolved TMS's identifie
 
 ## Field map (normalize into the phase's section)
 
-| Field | Notes |
-|---|---|
-| Case ID + Title | Title required; empty → gap |
-| Section path | section the case lives under |
-| Priority / Type | |
-| Test Goal | what is being tested and why |
-| Preconditions | list; `None` if absent |
-| Test Steps | step-by-step actions, each with an expected result; a step missing its expected result is a gap (`gap: expected result missing`), not an acceptable record |
-| Expected Overall Result | required; empty → gap |
-| Custom fields | API endpoint, HTTP method, etc. when present; resolve via **get case fields** |
+| Field                   | Notes                                                                                                                                                      |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Case ID + Title         | Title required; empty → gap                                                                                                                                |
+| Section path            | section the case lives under                                                                                                                               |
+| Priority / Type         |                                                                                                                                                            |
+| Test Goal               | what is being tested and why                                                                                                                               |
+| Preconditions           | list; `None` if absent                                                                                                                                     |
+| Test Steps              | step-by-step actions, each with an expected result; a step missing its expected result is a gap (`gap: expected result missing`), not an acceptable record |
+| Expected Overall Result | required; empty → gap                                                                                                                                      |
+| Custom fields           | API endpoint, HTTP method, etc. when present; resolve via **get case fields**                                                                              |
 
 Per-field branch per SKILL `<collection>` step 3 (redact sensitive values first); gap note: `missing in <TMS> source` -- never blank, assume, or fabricate.
 
@@ -40,6 +40,7 @@ Per-field branch per SKILL `<collection>` step 3 (redact sensitive values first)
 
 ```markdown
 ### C12345 — Refund a paid order
+
 - **Section:** Billing / Refunds · **Priority:** High · **Type:** Functional
 - **Test Goal:** verify a paid order can be fully refunded
 - **Preconditions:** order `o-12345` exists with status `PAID`

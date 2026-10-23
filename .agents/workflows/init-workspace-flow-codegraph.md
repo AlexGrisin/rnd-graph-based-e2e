@@ -1,7 +1,7 @@
 ---
 name: init-workspace-flow-codegraph
-description: "Phase 6 Code-graph of init-workspace-flow"
-tags: ["init", "workspace", "codegraph", "phase"]
+description: 'Phase 6 Code-graph of init-workspace-flow'
+tags: ['init', 'workspace', 'codegraph', 'phase']
 disable-model-invocation: true
 user-invocable: false
 baseSchema: docs/schemas/phase.md
@@ -14,23 +14,25 @@ Suggests user to install LSPs xor Code graphs only.
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 6 of 9 in init-workspace-flow
 - Input: state.mode, state.plugin_active, IDEs
 - Output: LSP/codegraph configs, CONTEXT.md additions
 - Prerequisite: Phase 1-5 complete, state.mode set
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Check state
 2. Learn
-3. Suggest LSPs, codegraphs 
+3. Suggest LSPs, codegraphs
 4. Update state with phase status
-</phase_steps>
+   </phase_steps>
 
 <check_state step="6.1">
 
 1. Read `agents/init-workspace-flow-state.md`
-2. Check if LSPs or GitNexus or Graphify is already installed 
+2. Check if LSPs or GitNexus or Graphify is already installed
 3. If upgrade mode: check whether user wants to change anything => basically confirm and allow to switch
 
 </check_mode>
@@ -53,7 +55,7 @@ Suggests user to install LSPs xor Code graphs only.
 - GitNexus: https://raw.githubusercontent.com/abhigyanpatwari/GitNexus/refs/heads/main/README.md
 - GitNexus Licensing: https://github.com/abhigyanpatwari/GitNexus?tab=readme-ov-file#enterprise
 - Graphify: https://raw.githubusercontent.com/safishamsi/graphify/HEAD/README.md
-- Claude Code: 
+- Claude Code:
   - User must install the language server binary separately.
   - User installs them from the official marketplace: search for lsp keyword using the `/plugin` command Discover tab.
   - List of available: typescript-lsp, pyright-lsp, csharp-lsp, gopls-lsp, rust-analyzer-lsp, jdtls-lsp (Java Eclipse JDT.LS), php-lsp, clangd-lsp, kotlin-lsp, swift-lsp, lua-lsp, ruby-lsp, liquid-lsp (Shopify Liquid), clojure-lsp

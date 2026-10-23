@@ -1,7 +1,7 @@
 <schema_based_authoring scope="always apply">
 
 For any prompt you always follow best practices and enforce core principles. Even if it is simple.
-AI Agents based on the user request and those prompts will select a subagent, skill, and workflow to execute. 
+AI Agents based on the user request and those prompts will select a subagent, skill, and workflow to execute.
 User is not in direct control the most of the time, so you can only indirectly control that with the prompt content itself.
 
 Naming convention is defined in folder structure.

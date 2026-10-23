@@ -1,6 +1,6 @@
 ---
 name: modernization-flow-mapping
-description: "Phase 6 Implementation Mapping of modernization-flow"
+description: 'Phase 6 Implementation Mapping of modernization-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -12,6 +12,7 @@ baseSchema: docs/schemas/phase.md
 ## Phase Flow
 
 **Phase 6: Implementation Mapping**
+
 1. Complete Phase 5 first
 2. Define technical approaches
 3. Compare multiple alternatives
@@ -27,6 +28,7 @@ baseSchema: docs/schemas/phase.md
 **PREREQUISITES:** Complete Phase 5 (cross-project analysis)
 
 **OBJECTIVES:**
+
 - Define technical approaches for modernization
 - Identify and compare multiple options (especially with edge cases)
 - Map source code to target code
@@ -39,16 +41,16 @@ baseSchema: docs/schemas/phase.md
 - Design principle: backward compatibility (names, signature, behavior) and less code is better
 - In case of strong cases of idiomatic target make sure to have two implementations: compatible non-idiomatic and idiomatic new (examples: original enumerator methods and normal IEnumerable implementation, original methods with refs/outs and new methods, original methods and new properties, new async methods)
 - YOU MUST EMPHASIS IN THE OUTPUT DOCUMENT:
-  * Backward compatibility is a MUST, additional ctor/fields/properties/methods/classes/enums are allowed.
-  * To PORT code file-by-file, class by class, method by method, re-read-source-write-target one-by-one. Do not reinvent! Require creation of todo tasks.
-  * To PORT tests! Test by test, re-read-source-write-target one-by-one! Require creation of todo tasks.
-  * To VALIDATE all tests and code from target matching the source (logic and contract).
+  - Backward compatibility is a MUST, additional ctor/fields/properties/methods/classes/enums are allowed.
+  - To PORT code file-by-file, class by class, method by method, re-read-source-write-target one-by-one. Do not reinvent! Require creation of todo tasks.
+  - To PORT tests! Test by test, re-read-source-write-target one-by-one! Require creation of todo tasks.
+  - To VALIDATE all tests and code from target matching the source (logic and contract).
 - YOU MUST STRESS IN THE OUTPUT DOCUMENT:
-  * To perform code and tests file-by-file comparison source vs target of original and implemented *contract* and *logic*, until there are no gaps and inconsistencies, re-read both source and target.
-  * To perform EXACT behavior copy, excluding async and enumerators.
-  * To put mapping which file to match to which file.
-  * To implement async and enumerators.
-  * To update `docs/target-code-specs-<lib/project>.md` to match ACTUAL implementation with actual contracts, paths, API, async, additional methods/properties, enumerables implemented AS IF it was planned so good (DO NOT: create new sections, green checkboxes, "implemented" statuses, and so on).
+  - To perform code and tests file-by-file comparison source vs target of original and implemented _contract_ and _logic_, until there are no gaps and inconsistencies, re-read both source and target.
+  - To perform EXACT behavior copy, excluding async and enumerators.
+  - To put mapping which file to match to which file.
+  - To implement async and enumerators.
+  - To update `docs/target-code-specs-<lib/project>.md` to match ACTUAL implementation with actual contracts, paths, API, async, additional methods/properties, enumerables implemented AS IF it was planned so good (DO NOT: create new sections, green checkboxes, "implemented" statuses, and so on).
 
 ## Requirements
 
@@ -116,6 +118,7 @@ For each class or enum or any language construct, specify:
 MUST spawn separate subagent to validate grounding, truthfulness, gaps, consistency, reasoning, and overall completion of the phase.
 
 After implementation mapping:
+
 - [ ] Mapping completeness verified
 - [ ] Traceability ensured (source → target clear)
 - [ ] Edge cases addressed
@@ -123,4 +126,3 @@ After implementation mapping:
 - [ ] Public API compatibility verified or documented
 
 **DEPENDENTS:** Phase 7 (Final Cross-Project Review) depends on all target specs
-

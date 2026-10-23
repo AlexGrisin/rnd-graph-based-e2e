@@ -14,7 +14,7 @@ a `<fieldType>` but can be configured independently:
 If only a single `<analyzer>` (no `type`) is declared, the **same** chain is used
 for both — symmetric by construction. The danger arises when the two chains
 diverge: index produces one set of terms, query produces a non-overlapping set,
-and a search that *should* match returns **zero hits with no error**. Nothing in
+and a search that _should_ match returns **zero hits with no error**. Nothing in
 the Solr log, response, or HTTP status flags it. This is the single most
 common "my query returns nothing and I don't know why" cause, and it is content
 the **solr-query** skill defers here: a query is only correct if its query-time
@@ -24,7 +24,7 @@ tokens can land on the index-time tokens stored in the term dictionary.
 
 A document matches a term query iff the **term produced by the query analyzer**
 exists in the index for that field — i.e. it equals a **term produced by the
-index analyzer** at write time. Matching happens on the *post-analysis* tokens,
+index analyzer** at write time. Matching happens on the _post-analysis_ tokens,
 never on the raw text. So the only question that matters is:
 
 > Do the index-time token stream and the query-time token stream **overlap** for
@@ -63,14 +63,14 @@ overlap, non-highlighted index tokens are dead weight for that query.
 
 ## Common asymmetries (and the symptom each produces)
 
-| Asymmetry | What happens | Symptom |
-|---|---|---|
-| **Synonyms only on one side** | Expansion exists in one chain, not the other | Synonym searches miss (see below) |
-| **One-sided stemming** | e.g. `PorterStemFilter` at index only; query keeps full form | Singular/plural & inflected queries miss documents |
+| Asymmetry                                      | What happens                                                                  | Symptom                                             |
+| ---------------------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------- |
+| **Synonyms only on one side**                  | Expansion exists in one chain, not the other                                  | Synonym searches miss (see below)                   |
+| **One-sided stemming**                         | e.g. `PorterStemFilter` at index only; query keeps full form                  | Singular/plural & inflected queries miss documents  |
 | **`WordDelimiterGraphFilter` config mismatch** | Different `splitOnCaseChange`/`catenateWords`/`preserveOriginal` on each side | `WiFi`/`Wi-Fi`/`wifi` variants match inconsistently |
-| **Differing stopword sets** | Query strips a word the index kept (or vice versa) | Phrase position gaps; some phrase/`mm` queries miss |
-| **Different tokenizers** | e.g. `Standard` vs `Keyword` per side | Wholesale mismatch; almost everything misses |
-| **Folding/lowercasing on one side** | `ASCIIFoldingFilter`/`LowerCaseFilter` only on index | Case- or accent-variant queries miss |
+| **Differing stopword sets**                    | Query strips a word the index kept (or vice versa)                            | Phrase position gaps; some phrase/`mm` queries miss |
+| **Different tokenizers**                       | e.g. `Standard` vs `Keyword` per side                                         | Wholesale mismatch; almost everything misses        |
+| **Folding/lowercasing on one side**            | `ASCIIFoldingFilter`/`LowerCaseFilter` only on index                          | Case- or accent-variant queries miss                |
 
 ### One-sided stemming — worked symptom
 
@@ -116,7 +116,7 @@ and per-clause logic over the analyzed tokens, and a multi-word synonym injected
 at query time produces a token graph the parser may flatten or mis-count. The
 `sow` (split-on-whitespace) flag governs whether the parser pre-splits the input
 before analysis; in Solr 9.x `sow` defaults to **`false`** for eDisMax and the
-standard parser (so multi-token synonyms *can* form), but it can be set to
+standard parser (so multi-token synonyms _can_ form), but it can be set to
 `true`, and the graph-handling behavior is still parser- and field-dependent:
 
 - **`mm` miscount** — a 2-word synonym expanding to 1 term (or vice versa) throws
@@ -124,7 +124,7 @@ standard parser (so multi-token synonyms *can* form), but it can be set to
 - **Phrase breakage** — `pf`/explicit phrase queries built over a graph put the
   synonym alternatives at the wrong positions, so the phrase never matches.
 - **`sow` sensitivity** — `sow` defaults to `false` in 9.x, so the multi-token
-  synonym *can* form, but the resulting graph behavior then varies by parser and
+  synonym _can_ form, but the resulting graph behavior then varies by parser and
   field, which is fragile; explicitly setting `sow=true` pre-splits and the
   multi-token synonym never forms at all.
 
@@ -149,7 +149,7 @@ is exactly why the audit checklist flags query-time multi-word synonyms.
 
 Divergence is a tool, not always a bug. Legitimate one-sided configurations:
 
-- **Query-time-only synonym expansion, done deliberately.** Some teams *prefer*
+- **Query-time-only synonym expansion, done deliberately.** Some teams _prefer_
   query-time single-word synonyms so they can edit `synonyms.txt` and reload
   without reindexing the whole corpus. This is valid **for single-word synonyms**
   (no graph hazard). Accept it when it's a conscious recall-vs-reindex tradeoff —
@@ -161,7 +161,7 @@ Divergence is a tool, not always a bug. Legitimate one-sided configurations:
   that can't change which terms match.
 
 The discriminator: an **intentional** asymmetry is one whose author can state
-*why* and has confirmed (via `/analysis`) it doesn't drop wanted matches. An
+_why_ and has confirmed (via `/analysis`) it doesn't drop wanted matches. An
 **accidental** asymmetry is a filter someone added to one chain and forgot to
 mirror. Treat every asymmetry as a bug until proven intentional.
 

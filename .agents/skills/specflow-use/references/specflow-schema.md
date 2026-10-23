@@ -6,17 +6,17 @@ Public docs: https://griddynamics.github.io/cto-rnd-gain-mcp/
 
 ## Session Files
 
-| File | Owner | Purpose | Commit? |
-|------|-------|---------|---------|
-| `gain.json`             | User / SpecFlow MCP | Umbrella project context; Rosetta reads it. | Yes |
-| `specflow_session.json` | SpecFlow MCP        | Active `generation_id`, project root anchor. | No  |
+| File                    | Owner               | Purpose                                      | Commit? |
+| ----------------------- | ------------------- | -------------------------------------------- | ------- |
+| `gain.json`             | User / SpecFlow MCP | Umbrella project context; Rosetta reads it.  | Yes     |
+| `specflow_session.json` | SpecFlow MCP        | Active `generation_id`, project root anchor. | No      |
 
 ## Version Channels
 
-| `gain.json` field   | Meaning |
-|---------------------|---------|
+| `gain.json` field   | Meaning                                           |
+| ------------------- | ------------------------------------------------- |
 | `versions.rosetta`  | Required Rosetta version for skill compatibility. |
-| `versions.specflow`     | SpecFlow umbrella version. |
+| `versions.specflow` | SpecFlow umbrella version.                        |
 
 ## Status Enum
 

@@ -82,13 +82,13 @@ Status enum: `open | in_progress | complete | blocked | failed`.
 
 Propagation (bottom-up, steps → phases → plan root; root always derived):
 
-| Children condition | Derived status |
-|---|---|
-| All `complete` | `complete` |
-| Any `failed` | `failed` |
-| Any `blocked` | `blocked` |
-| Any `in_progress` or `complete` | `in_progress` |
-| Otherwise | `open` |
+| Children condition              | Derived status |
+| ------------------------------- | -------------- |
+| All `complete`                  | `complete`     |
+| Any `failed`                    | `failed`       |
+| Any `blocked`                   | `blocked`      |
+| Any `in_progress` or `complete` | `in_progress`  |
+| Otherwise                       | `open`         |
 
 Dependencies:
 

@@ -3,7 +3,7 @@ name: bootstrap-speckit-policy
 description: Invoke if directly requested, provides integration with the speckit
 alwaysApply: false
 trigger: model_decision
-tags: ["speckit", "integration", "policy"]
+tags: ['speckit', 'integration', 'policy']
 baseSchema: docs/schemas/rule.md
 ---
 

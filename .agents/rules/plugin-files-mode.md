@@ -2,7 +2,7 @@
 name: plugin-files-mode
 description: Rosetta Plugin Mode Bootstrap
 alwaysApply: true
-applyTo: "**"
+applyTo: '**'
 trigger: always_on
 baseSchema: docs/schemas/rule.md
 ---

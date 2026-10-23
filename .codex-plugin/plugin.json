@@ -28,10 +28,7 @@
     "longDescription": "Rosetta 2.0 for Codex. Includes reusable skills and bundled local rules and workflow references generated from the Rosetta instruction set.",
     "developerName": "Grid Dynamics",
     "category": "Productivity",
-    "capabilities": [
-      "Read",
-      "Write"
-    ],
+    "capabilities": ["Read", "Write"],
     "defaultPrompt": [
       "Use the load-context skill first, then consult rules/INDEX.md and workflows/INDEX.md from the Rosetta plugin bundle when you need local Rosetta guidance.",
       "Use Rosetta for structured planning, coding, requirements, and validation workflows."

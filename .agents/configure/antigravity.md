@@ -165,9 +165,11 @@ description: Create new feature branch synchronized with main
 ### Workflow Structure
 
 **YAML Frontmatter:**
+
 - `description`: Required. Brief workflow description
 
 **Content:**
+
 - Numbered steps with clear instructions
 - Use `[placeholder]` for user input variables
 - Can call other workflows using `/workflow-name`
@@ -215,14 +217,17 @@ description: Helps with a specific task. Use when you need to do X or Y.
 Detailed instructions for the agent.
 
 ## When to use this skill
+
 - Use this when...
 - This is helpful for...
 
 ## How to use it
+
 Step-by-step guidance, conventions, and patterns.
 ```
 
 **YAML Frontmatter:**
+
 - `name`: Optional. Defaults to folder name. Lowercase, hyphens for spaces
 - `description`: Required. What the skill does and when to use it. Used for agent's decision-making
 
@@ -237,6 +242,7 @@ Step-by-step guidance, conventions, and patterns.
 ```
 
 **Optional Folders:**
+
 - `scripts/`: Executable helper scripts. SKILL.md instructs agent to run scripts (e.g., with `--help` flag first)
 - `examples/`: Reference implementations, code samples. Agent reads these as examples when following skill instructions
 - `resources/`: Templates, configuration files, reference documents. Agent can read and use these as assets when executing skill
@@ -287,7 +293,7 @@ your-project/
 ```markdown
 ---
 trigger: glob
-globs: "**/*.ts,**/*.tsx"
+globs: '**/*.ts,**/*.tsx'
 ---
 
 # TypeScript Rules

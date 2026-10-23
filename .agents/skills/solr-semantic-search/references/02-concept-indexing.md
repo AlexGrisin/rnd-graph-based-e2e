@@ -19,16 +19,17 @@ The concept collection is small and tightly purpose-built. A concept doc is a **
 
 Five core fields:
 
-| Field | Type | Role |
-|---|---|---|
-| `id` | string, uniqueKey | concat of field+token, ensures uniqueness |
-| `field` | string | catalog field name this concept maps back to |
-| `token` | text/string analyzed | the actual term to be matched at query time |
-| `weight` | int | importance signal (typically term frequency in catalog) |
-| `lang` | string multivalued | language codes; "all" matches any |
-| `source` | string | which source built this entry; lets multiple sources coexist |
+| Field    | Type                 | Role                                                         |
+| -------- | -------------------- | ------------------------------------------------------------ |
+| `id`     | string, uniqueKey    | concat of field+token, ensures uniqueness                    |
+| `field`  | string               | catalog field name this concept maps back to                 |
+| `token`  | text/string analyzed | the actual term to be matched at query time                  |
+| `weight` | int                  | importance signal (typically term frequency in catalog)      |
+| `lang`   | string multivalued   | language codes; "all" matches any                            |
+| `source` | string               | which source built this entry; lets multiple sources coexist |
 
 Optionally:
+
 - `tokenId` — the canonical id when the token represents a structured entity (a Brand ID, Model ID)
 
 The `token` field uses the same analyzer chain as the catalog fields it represents — that's how you guarantee the user-typed term, the catalog token, and the concept token all normalize to the same form.
@@ -58,6 +59,7 @@ The `token` field uses the same analyzer chain as the catalog fields it represen
 ```
 
 A few practical notes:
+
 - `token` is analyzed because the same term may have variants (case, accents) that all should match.
 - `weight` and `field` and `lang` have docValues for filterCache efficiency.
 - The schema is small enough that it's worth keeping it identical across environments — variations create silent inconsistencies.
@@ -90,6 +92,7 @@ public class IndexConceptsHandler extends SearchHandler {
 ```
 
 Triggered by:
+
 ```
 POST /solr/concepts/indexConcepts?sourceCollection=catalog&sourceType=semantic&clearCollection=true
 ```
@@ -132,6 +135,7 @@ private void createConcepts(SolrQueryRequest req, UpdateRequestProcessor proc,
 Why fields ending in `_concept` / `_shingle` / `_text`?
 
 The convention encodes how the catalog field should be matched:
+
 - `*_concept` — exact match. Each indexed term is one concept (e.g., `brand_name_concept` indexed with full brand name as one token)
 - `*_shingle` — multi-token shingles. Useful for partial brand/model matching (e.g., `model_name_shingle` for "WH-1000XM5 Wireless" matching "WH-1000XM5" alone)
 - `*_text` — analyzed text, every token a concept (broader match, lower precision)
@@ -143,12 +147,14 @@ The tagger doesn't care about the suffix — it indexes them the same way. But d
 Do NOT add `description_text` or `notes_text` or anything free-form to the concepts. They contribute high-cardinality, low-signal entries that match noisily.
 
 The concept collection should hold:
+
 - Authoritative names (brand, line, model, category)
 - Validated synonyms (curated externally)
 - Identifier fields (model numbers, SKUs)
 - BLM-decomposed components
 
 Not:
+
 - Free-text description fields
 - User-generated content
 - Comment threads or reviews
@@ -158,6 +164,7 @@ If you index everything, the tagger fires on everything, ambiguity resolution ca
 ## BLM-specific indexing
 
 Brand/Line/Model is a special case. The catalog typically has a multi-valued field `blm_concept_ss` holding entries like `2018|SONY|WH-1000XM5|SILVER`. This isn't a single concept — it's four:
+
 - ReleaseYear: 2018
 - Brand: SONY
 - Model: WH-1000XM5
@@ -217,6 +224,7 @@ private void createBlmConcepts(SolrQueryRequest req, UpdateRequestProcessor proc
 ```
 
 Result: from one source entry `2018|SONY|WH-1000XM5|SILVER`, you get up to ~6 concept entries:
+
 - year_dt_concept: "2018"
 - year_short_concept: "18"
 - brand_name_concept: "sony" (with tokenId=SONY)
@@ -230,12 +238,12 @@ Each carries its `tokenId` so downstream code can validate combinations: a tag w
 
 The concept collection can hold entries from multiple sources, distinguished by `source`:
 
-| sourceType | Origin | When to use |
-|---|---|---|
-| `semantic` | Main catalog | Default; user search hits this |
+| sourceType   | Origin                               | When to use                               |
+| ------------ | ------------------------------------ | ----------------------------------------- |
+| `semantic`   | Main catalog                         | Default; user search hits this            |
 | `catalog_db` | Authoritative product/entity catalog | structured entity recognition (e.g., BLM) |
-| `taxonomy` | Authoritative product taxonomy | Category/department naming |
-| `synonyms` | Curated synonyms list | Hand-maintained equivalences |
+| `taxonomy`   | Authoritative product taxonomy       | Category/department naming                |
+| `synonyms`   | Curated synonyms list                | Hand-maintained equivalences              |
 
 At query time, the tagger filters by `source=` to scope which sources are considered. A user-facing search uses `source=semantic`; an admin tool might use `source=catalog_db` for catalog-only validation.
 
@@ -258,6 +266,7 @@ Some teams run concept indexing on a dedicated, lower-traffic Solr cluster, then
 ### Validation
 
 After every rebuild, sanity-check counts:
+
 - Each `field` has expected entry count (compare to historical)
 - No fields with 0 entries (broken source)
 - No fields with explosively too many entries (data corruption?)
@@ -270,23 +279,26 @@ A mismatch usually indicates source-side data corruption. Catch it before servin
 
 The handler takes parameters:
 
-| Param | Required | Purpose |
-|---|---|---|
-| `sourceCollection` | yes | which Solr collection to harvest from |
-| `sourceType` | no (default "semantic") | label for the source entries |
-| `clearCollection` | no (default false) | delete existing entries first |
+| Param              | Required                | Purpose                               |
+| ------------------ | ----------------------- | ------------------------------------- |
+| `sourceCollection` | yes                     | which Solr collection to harvest from |
+| `sourceType`       | no (default "semantic") | label for the source entries          |
+| `clearCollection`  | no (default false)      | delete existing entries first         |
 
 Trigger:
+
 ```
 POST /solr/concepts/indexConcepts?sourceCollection=catalog&sourceType=semantic&clearCollection=true
 ```
 
 For incremental on top of existing (e.g., adding new source without deleting):
+
 ```
 POST /solr/concepts/indexConcepts?sourceCollection=products&sourceType=catalog_db&clearCollection=false
 ```
 
 Register in solrconfig.xml of the concept collection:
+
 ```xml
 <requestHandler name="/indexConcepts" class="com.example.semantic.IndexConceptsHandler">
   <lst name="defaults">

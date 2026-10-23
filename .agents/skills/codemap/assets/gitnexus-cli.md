@@ -11,6 +11,7 @@ Use when a GitNexus CLI command should be run directly, need to know which flags
 <commands>
 
 **analyze — Build or refresh the index**
+
 ```bash
 npx -y gitnexus@latest analyze
 ```
@@ -25,6 +26,7 @@ Run from the project root. This parses all source files, builds the knowledge gr
 **When to run:** First time in a project, after major code changes, or when `gitnexus://repo/{name}/context` reports the index is stale.
 
 **status — Check index freshness**
+
 ```bash
 npx -y gitnexus@latest status
 ```
@@ -32,6 +34,7 @@ npx -y gitnexus@latest status
 Shows whether the current repo has a GitNexus index, when it was last updated, and symbol/relationship counts. Use this to check if re-indexing is needed.
 
 **clean — Delete the index**
+
 ```bash
 npx -y gitnexus@latest clean
 ```
@@ -44,6 +47,7 @@ Deletes the `.gitnexus/` directory and unregisters the repo from the global regi
 | `--all`   | Clean all indexed repos, not just the current one |
 
 **wiki — Generate documentation from the graph**
+
 ```bash
 npx -y gitnexus@latest wiki
 ```
@@ -60,6 +64,7 @@ Generates repository documentation from the knowledge graph using an LLM. Requir
 | `--gist`            | Publish wiki as a public GitHub Gist      |
 
 **list — Show all indexed repos**
+
 ```bash
 npx -y gitnexus@latest list
 ```

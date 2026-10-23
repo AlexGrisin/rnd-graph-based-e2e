@@ -1,6 +1,6 @@
 ---
 name: planning
-description: "To build execution-ready plans from approved intent/specs with EARS, sequenced WBS, and HITL checkpoints."
+description: 'To build execution-ready plans from approved intent/specs with EARS, sequenced WBS, and HITL checkpoints.'
 license: Apache-2.0
 disable-model-invocation: false
 user-invocable: true
@@ -10,8 +10,8 @@ model_reasoning_effort: high
 context: default
 agent: planner, architect
 metadata:
-  version: "1.1"
-  category: "planning"
+  version: '1.1'
+  category: 'planning'
 tags:
   - planning
   - planning-wbs
@@ -35,14 +35,14 @@ Output: EARS requirements, sequenced WBS, prerequisites, unknowns, stop points f
 
 <request_size_scaling>
 
-| | SMALL | MEDIUM | LARGE |
-|---|---|---|---|
-| Reasoning | brief | 8D full | 8D full |
-| Requirements | inline AC | inline AC | formal EARS FRs |
-| Plan artifact | todo tasks | flat task list (title, files, AC, risk) | full WBS (all fields) |
-| Persistence | todo tasks only | `plans/` if >5 tasks, else todo | `plans/` always + `wbs.md` |
-| HITL gates | one before execution | one before execution | per major decision |
-| Templates | none | none | template files |
+|               | SMALL                | MEDIUM                                  | LARGE                      |
+| ------------- | -------------------- | --------------------------------------- | -------------------------- |
+| Reasoning     | brief                | 8D full                                 | 8D full                    |
+| Requirements  | inline AC            | inline AC                               | formal EARS FRs            |
+| Plan artifact | todo tasks           | flat task list (title, files, AC, risk) | full WBS (all fields)      |
+| Persistence   | todo tasks only      | `plans/` if >5 tasks, else todo         | `plans/` always + `wbs.md` |
+| HITL gates    | one before execution | one before execution                    | per major decision         |
+| Templates     | none                 | none                                    | template files             |
 
 </request_size_scaling>
 

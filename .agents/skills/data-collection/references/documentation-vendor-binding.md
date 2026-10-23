@@ -10,11 +10,11 @@
 
 The phase supplies one input form; validate shape BEFORE any integration call (malformed input → failure path "input-unresolvable"; host mismatch → "cross-domain URL"). Never retrieve against malformed input (it produces silent zero-result branches that look like "no pages found").
 
-| Input form | Example shape (Confluence) | Validation |
-|---|---|---|
-| Page ID | numeric (Cloud) or alphanumeric (some Server) | non-empty + matches host ID format |
+| Input form          | Example shape (Confluence)                                                                           | Validation                                                                                 |
+| ------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Page ID             | numeric (Cloud) or alphanumeric (some Server)                                                        | non-empty + matches host ID format                                                         |
 | Page URL (any form) | display `…/wiki/spaces/<SPACE>/pages/<ID>/<slug>`, direct `…?pageId=<ID>`, or short `…/x/<short-id>` | extract the provider's stable page handle; host MUST match the configured integration site |
-| Search terms | keywords / labels / components / project key | ≥1 keyword OR ≥1 label/component/project key |
+| Search terms        | keywords / labels / components / project key                                                         | ≥1 keyword OR ≥1 label/component/project key                                               |
 
 The example-shape column illustrates the canonical vendor; a different backend uses its own URL forms -- match by capability (a page reference vs. search terms), not by these literal shapes.
 
@@ -23,10 +23,12 @@ Store each page under a **stable canonical reference** the backend guarantees (f
 ## Retrieval & harvesting discipline (`extract + normalize` step)
 
 **Direct-URL path (preferred when URLs/IDs supplied):**
+
 1. **Get page** for each supplied page -- convert the body to markdown and include metadata.
 2. **List child pages** -- fetch up to 5 relevant child pages per parent, recursing to leaves or the phase's depth cap. Ask once for child links (or approval to continue parent-only) and record the decision (`Children fetched: yes | no (reason)`) when the API does not expose child relationships and children are still plausible.
 
 **Search path (when no URLs supplied):**
+
 1. Build a **scoped search query** -- combine a space/scope filter AND a label/term predicate. **Always scope to the project space when its key is known** (dominant noise reducer; unscoped search breaks deterministic ranking). Express it in the backend's query language; for Confluence that is CQL:
    - Worked (CQL): `space = PROJ AND (label = "feature-x" OR text ~ "checkout refund")`
    - Fallback (labels unknown): `space = PROJ AND text ~ "<key-term>"`
@@ -37,6 +39,7 @@ Store each page under a **stable canonical reference** the backend guarantees (f
 **Cross-system:** when this binding runs beside an Issue Tracker or TMS, derive search terms from upstream labels, components, titles, and summary keywords already present in context.
 
 **Normalization discipline:**
+
 - **Truncate** pages over the phase's word budget (default ~5000 words); insert a banner naming the budget, the section where truncation happened, and the omitted section headings, e.g. `<!-- truncated: 5000-word budget reached at section 'Deployment Steps'; remaining 3 sections omitted: 'Monitoring', 'Rollback', 'Appendix' -->`. Keep headings + first sections intact.
 - **Deduplicate** by canonical URL; merge parents before children unless the phase overrides.
 
@@ -49,11 +52,16 @@ Store each page under a **stable canonical reference** the backend guarantees (f
 **Rendered example** (one normalized page entry in the phase's output artifact):
 
 ```markdown
-#### Checkout Refund Flow  (/spaces/PROJ/pages/12345)
+#### Checkout Refund Flow (/spaces/PROJ/pages/12345)
+
 - **Space / Labels / Updated / Type / Status:** PROJ / `refund`, `checkout` / 2026-04-18 / page / current
+
 #### Content
+
 Refunds are issued via POST /api/v1/orders/{id}/refund; a paid order transitions PAID → REFUNDED…
+
 #### Child Pages
+
 - Refund Edge Cases (/spaces/PROJ/pages/12346)
 ```
 

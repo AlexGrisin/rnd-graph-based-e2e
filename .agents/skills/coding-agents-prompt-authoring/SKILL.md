@@ -1,6 +1,6 @@
 ---
 name: coding-agents-prompt-authoring
-description: "To author, adapt, review, and validate prompts (skills, agents, workflows, rules, etc.) with brief, contracts, and a validation pack."
+description: 'To author, adapt, review, and validate prompts (skills, agents, workflows, rules, etc.) with brief, contracts, and a validation pack.'
 license: Apache-2.0
 disable-model-invocation: false
 user-invocable: true
@@ -10,8 +10,8 @@ model_reasoning_effort: high
 context: default
 agent: prompt-engineer, reviewer, validator
 metadata:
-  version: "1.0"
-  category: "prompt-engineering"
+  version: '1.0'
+  category: 'prompt-engineering'
 tags:
   - coding-agents-prompt-authoring
   - coding-agents-prompt-validation
@@ -53,7 +53,7 @@ Also for porting prompts between agents/IDEs, or migrating rules between formats
 Prompt classification:
 
 - **Skill** — reusable knowledge/instructions/action/activity dynamically loaded into agents on demand; skill is a folder with SKILL.md file plus references and assets loaded from SKILL.md
-- **Rule** — persistent constraints added to LLM context across all agents either globally (always apply) or by description (not reliable) or by path glob (ex: *.md, *.ts), do not duplicate skill, skill is preferred, rules are actually rarely needed
+- **Rule** — persistent constraints added to LLM context across all agents either globally (always apply) or by description (not reliable) or by path glob (ex: _.md, _.ts), do not duplicate skill, skill is preferred, rules are actually rarely needed
 - **Agent / Subagent** — delegated specialist with fresh context, own system prompt, dynamically loaded on demand
 - **Workflow / Command** — user-triggered action or multi-phase pipeline coordinating multiple prompts/agents, large workflows come with phases in separate files
 - **Template** — parameterized template prompt with variables, instructions in placeholders, validated before rendering
@@ -85,7 +85,6 @@ Maintain this boundaries:
 - Exception: frontmatters (coding agent contract) and keywords (example: "validation report", "specification")
 - When using, do not expose internals of what you use (negative example: describing how skill works in subagent)
 - Use keywords as semantic contract cues (for example: `validation report`, `specification`) that may guide execution quality without adding sibling awareness.
-
 
 Based on the task, load (READ/APPLY SKILL FILE) and apply:
 
@@ -139,7 +138,7 @@ Read Rosetta's canonical lists when the target IS Rosetta (repos `rosetta`, `cto
 - `docs/definitions/agents.md`
 - `docs/definitions/skills.md`
 - `docs/definitions/rules.md`
-</rosetta_canonical_lists>
+  </rosetta_canonical_lists>
 
 <resources>
 

@@ -1,7 +1,7 @@
 ---
 name: init-workspace-flow-shells
-description: "Phase 2 Shells of init-workspace-flow"
-tags: ["init", "workspace", "shells", "phase"]
+description: 'Phase 2 Shells of init-workspace-flow'
+tags: ['init', 'workspace', 'shells', 'phase']
 disable-model-invocation: true
 user-invocable: false
 baseSchema: docs/schemas/phase.md
@@ -14,24 +14,27 @@ Generates shell config files so subsequent sessions can load context and invoke 
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 2 of 9 in init-workspace-flow
 - Input: state.mode, state.plugin_active, IDEs
 - Output: shell configs, bootstrap rule, load-project-context shell
 - Prerequisite: Phase 1 complete, state.mode set
 - This is simple mechanical AND systematic phase (do not overthink)
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Check mode, skip if plugin
 2. Execute shell generation
 3. Update state with shell status
-</phase_steps>
+   </phase_steps>
 
 <check_mode step="2.1">
+
 1. Read `agents/init-workspace-flow-state.md`
 2. If `state.plugin_active == true`: mark Phase 2 skipped, proceed to Phase 3
 3. If upgrade mode: check which shells already exist
-</check_mode>
+   </check_mode>
 
 <execute_shells step="2.2">
 
@@ -103,18 +106,20 @@ Step 6: Verify Shell Integrity
 </execute_shells>
 
 <update_state step="2.3">
+
 1. Write to `agents/init-workspace-flow-state.md`:
    - Shell configs status (created | updated | skipped)
    - Bootstrap rule status
    - Phase 2 completion timestamp
 2. Log gaps for Phase 8
-</update_state>
+   </update_state>
 
 <validation_checklist>
+
 - Plugin mode: phase marked skipped, no shell files modified
 - Install mode: all expected shell files exist on disk
 - Upgrade mode: only missing shells created, existing preserved
 - Bootstrap rule file exists with a typed load instruction for load-project-context
-</validation_checklist>
+  </validation_checklist>
 
 </init_workspace_flow_shells>

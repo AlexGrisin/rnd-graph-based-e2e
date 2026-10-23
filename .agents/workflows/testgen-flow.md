@@ -1,8 +1,8 @@
 ---
 name: testgen-flow
-description: "Workflow for generating test cases from requirements (Issue Tracker / Wiki sources), exporting to a Test Management System, etc."
+description: 'Workflow for generating test cases from requirements (Issue Tracker / Wiki sources), exporting to a Test Management System, etc.'
 alwaysApply: false
-tags: ["workflow"]
+tags: ['workflow']
 user-invocable: true
 baseSchema: docs/schemas/workflow.md
 ---
@@ -34,12 +34,12 @@ Prerequisite: Rosetta Prep Steps.
 - MUST create output directory `plans/testgen-{TICKET-KEY}/` at start.
 - **Trigger prompt example:** `Analyze requirements for PROJ-123` (also: bare key `PROJ-123`, full ticket URL). Ticket-only and ticket+Wiki input formats are enumerated in `testgen-flow-project-config-loading.md` step 0.1.
 - **Per-phase failure cases — owned by phase files:**
-  - *Ticket not found* → `testgen-flow-data-collection.md` + the `data-collection` skill's Issue Tracker failure handling.
-  - *No Wiki results* → `testgen-flow-data-collection.md` + the `data-collection` skill's Wiki failure handling.
-  - *User declines / does not answer questions* → `testgen-flow-question-generation.md` `<failure_handling>` "User explicitly declines to answer".
-  - *Incomplete / missing requirements inputs* → `testgen-flow-requirements-document-generation.md` `<failure_handling>` "Missing or empty inputs".
-  - *Documentation search query example + ranking rule* → the `data-collection` skill's documentation-binding search/ranking behavior.
-  - *Initial-prompt format examples* → `testgen-flow-project-config-loading.md`.
+  - _Ticket not found_ → `testgen-flow-data-collection.md` + the `data-collection` skill's Issue Tracker failure handling.
+  - _No Wiki results_ → `testgen-flow-data-collection.md` + the `data-collection` skill's Wiki failure handling.
+  - _User declines / does not answer questions_ → `testgen-flow-question-generation.md` `<failure_handling>` "User explicitly declines to answer".
+  - _Incomplete / missing requirements inputs_ → `testgen-flow-requirements-document-generation.md` `<failure_handling>` "Missing or empty inputs".
+  - _Documentation search query example + ranking rule_ → the `data-collection` skill's documentation-binding search/ranking behavior.
+  - _Initial-prompt format examples_ → `testgen-flow-project-config-loading.md`.
   - **Phase 6 80%-export-success threshold** → `testgen-flow-test-case-export.md` (`Threshold (80%) met` field + `PARTIAL — N/M exported` state).
   - **Phase 5 test-case-count guidance** → `testgen-flow-test-case-generation.md` `<validation_checklist>`.
 - **Model tiers** (phase `subagent_required_model`): `tier: complex` = heavy reasoning / multi-source synthesis / requirements engineering (Opus-class / GPT high-tier); `tier: workhorse` = structured execution / extraction / generation + export (Sonnet-class / GPT mid-tier).
@@ -127,9 +127,10 @@ Prerequisite: Rosetta Prep Steps.
 </orchestration_and_escalation>
 
 <phase_5_6_standards_gate>
+
 - Phases 5-6: apply `coding` whenever the phase writes any file outside `plans/testgen-{TICKET-KEY}/` — including "mixed outputs" (writes both inside and outside) or when repository edit scope was not explicitly confirmed in chat. When in doubt, apply.
 - Examples: apply for `cypress/e2e/login.spec.ts`; skip when writing only `plans/testgen-{TICKET-KEY}/test-scenarios.md`.
-</phase_5_6_standards_gate>
+  </phase_5_6_standards_gate>
 
 <state_and_outputs>
 

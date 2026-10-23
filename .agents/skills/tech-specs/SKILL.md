@@ -1,6 +1,6 @@
 ---
 name: tech-specs
-description: "To define clear, testable tech specs from requirements — target-state architecture, contracts, interfaces."
+description: 'To define clear, testable tech specs from requirements — target-state architecture, contracts, interfaces.'
 license: Apache-2.0
 disable-model-invocation: false
 user-invocable: true
@@ -60,14 +60,14 @@ Spec sections (adapt per request):
 
 Scale per request size classification:
 
-| | SMALL | MEDIUM | LARGE |
-|---|---|---|---|
-| Output | message, no files | concise specs file, light and short | full specs document |
-| Sections | overview + affected areas | core sections | all sections |
-| Detail | concise, signatures only | signatures + contracts | full specs |
-| Length | up to 100 lines | 100-200 lines | 200-500 lines |
-| Diagrams | none | key interfaces | sequence + component |
-| Security | skip unless critical | threat summary | full STRIDE |
+|          | SMALL                     | MEDIUM                              | LARGE                |
+| -------- | ------------------------- | ----------------------------------- | -------------------- |
+| Output   | message, no files         | concise specs file, light and short | full specs document  |
+| Sections | overview + affected areas | core sections                       | all sections         |
+| Detail   | concise, signatures only  | signatures + contracts              | full specs           |
+| Length   | up to 100 lines           | 100-200 lines                       | 200-500 lines        |
+| Diagrams | none                      | key interfaces                      | sequence + component |
+| Security | skip unless critical      | threat summary                      | full STRIDE          |
 
 </request_size_scaling>
 

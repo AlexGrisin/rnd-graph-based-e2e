@@ -107,13 +107,13 @@ tv => tv, television
 
 ### Attributes
 
-| Attribute | Meaning |
-|---|---|
-| `synonyms` | Path to the file (`synonyms.txt`) relative to the config set, or a managed resource name. |
-| `expand` | `true`: comma rules expand each term to all terms. `false`: comma rules collapse all terms to the **first** term only. Ignored by `=>` rules. |
-| `ignoreCase` | `true`: match rule terms case-insensitively. Pair with a `LowerCaseFilter` placed after, or lowercase consistently. |
+| Attribute          | Meaning                                                                                                                                                                 |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `synonyms`         | Path to the file (`synonyms.txt`) relative to the config set, or a managed resource name.                                                                               |
+| `expand`           | `true`: comma rules expand each term to all terms. `false`: comma rules collapse all terms to the **first** term only. Ignored by `=>` rules.                           |
+| `ignoreCase`       | `true`: match rule terms case-insensitively. Pair with a `LowerCaseFilter` placed after, or lowercase consistently.                                                     |
 | `tokenizerFactory` | Tokenizer used to **parse the rule terms in the file** (not the field). Set it to match your field's tokenizer so multi-word entries split the same way the field does. |
-| `format` | Defaults to `solr`; `wordnet` for WordNet-format files (rare). |
+| `format`           | Defaults to `solr`; `wordnet` for WordNet-format files (rare).                                                                                                          |
 
 `tokenizerFactory` matters when synonym entries contain punctuation or non-default splitting — if the file is parsed with `StandardTokenizer` but your field uses `WhitespaceTokenizer`, a multi-word entry can tokenize inconsistently and never match.
 
@@ -157,7 +157,7 @@ Notes:
 
 - Use `ManagedSynonymGraphFilterFactory` (graph-aware), not the older `ManagedSynonymFilterFactory`.
 - After a PUT, **reload the collection** for the change to take effect on analysis; the managed resource is persisted in ZooKeeper (SolrCloud) or on disk (standalone).
-- The index-vs-query and reindex caveats above still apply — managed only changes *how you edit* the rules, not *when expansion happens*.
+- The index-vs-query and reindex caveats above still apply — managed only changes _how you edit_ the rules, not _when expansion happens_.
 
 ---
 

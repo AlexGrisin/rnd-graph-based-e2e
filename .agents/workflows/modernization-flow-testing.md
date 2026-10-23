@@ -1,6 +1,6 @@
 ---
 name: modernization-flow-testing
-description: "Phase 3 Testing (optional) of modernization-flow"
+description: 'Phase 3 Testing (optional) of modernization-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -12,6 +12,7 @@ baseSchema: docs/schemas/phase.md
 ## Phase Flow
 
 **Phase 3: Test Coverage (OPTIONAL - Execute only when explicitly requested)**
+
 1. Complete Phase 2 first
 2. Analyze existing test coverage
 3. Identify gaps in test coverage
@@ -27,6 +28,7 @@ baseSchema: docs/schemas/phase.md
 **THIS PHASE IS OPTIONAL** - Only execute when explicitly requested in the modernization context or by user.
 
 **OBJECTIVES:**
+
 - Establish baseline test coverage for original code before modernization
 - Ensure original behavior is captured in tests for validation during migration
 - Achieve 80% code coverage on original codebase
@@ -50,6 +52,7 @@ baseSchema: docs/schemas/phase.md
 ### Test Priorities
 
 Focus on testing in this order:
+
 1. **Public APIs** - All public methods and interfaces
 2. **Critical Business Logic** - Core functionality and calculations
 3. **Edge Cases** - Boundary conditions, null handling, error conditions
@@ -68,6 +71,7 @@ Focus on testing in this order:
 ### Coverage Analysis
 
 For each project:
+
 1. Run coverage tools to establish baseline
 2. Identify files/classes with <80% coverage
 3. Analyze which code paths are missing tests
@@ -113,6 +117,7 @@ Create `docs/original-test-coverage-<lib/project>.md` for each project including
 MUST spawn separate subagent to validate grounding, truthfulness, gaps, consistency, reasoning, and overall completion of the phase.
 
 Before proceeding to Phase 4:
+
 - [ ] All projects have ≥80% code coverage
 - [ ] Coverage reports generated and documented
 - [ ] Tests are stable and passing
@@ -128,4 +133,3 @@ Before proceeding to Phase 4:
 - If original code has bugs, tests should capture that buggy behavior (document as assumption/unknown)
 
 **DEPENDENTS:** Phase 4 (Class Group Analysis) depends on completion of this phase (if executed)
-

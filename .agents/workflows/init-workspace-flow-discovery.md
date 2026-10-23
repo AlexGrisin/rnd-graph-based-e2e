@@ -1,7 +1,7 @@
 ---
 name: init-workspace-flow-discovery
-description: "Phase 3 Discovery of init-workspace-flow"
-tags: ["init", "workspace", "discovery", "phase"]
+description: 'Phase 3 Discovery of init-workspace-flow'
+tags: ['init', 'workspace', 'discovery', 'phase']
 disable-model-invocation: true
 user-invocable: false
 baseSchema: docs/schemas/phase.md
@@ -14,24 +14,27 @@ Produces foundational technical documentation (TECHSTACK, CODEMAP, DEPENDENCIES)
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 3 of 9 in init-workspace-flow
 - Input: filesystem, state.mode, state.composite
 - Output: TECHSTACK, CODEMAP, DEPENDENCIES on disk, source code file count
 - Count only source code files
 - Prerequisite: Phase 1 complete (mode known), Phase 2 complete or skipped
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Read state and confirm mode
 2. Acquire and execute discovery
 3. Update state
-</phase_steps>
+   </phase_steps>
 
 <check_mode step="3.1">
+
 1. Read `agents/init-workspace-flow-state.md`
 2. Confirm Phase 1 complete and mode is set
 3. If upgrade mode: note which discovery files already exist
-</check_mode>
+   </check_mode>
 
 <execute_discovery step="3.2">
 
@@ -99,23 +102,26 @@ USE SKILL `codemap` to generate the project codemap and incorporate it into the 
 </references>
 
 Finally:
+
 - If state.composite: create registry-style top-level docs referencing sub-repo versions
-</execute_discovery>
+  </execute_discovery>
 
 <update_state step="3.3">
+
 1. Write to `agents/init-workspace-flow-state.md`:
    - TECHSTACK status (created | updated | skipped)
    - CODEMAP status (created | updated | skipped)
    - DEPENDENCIES status (created | updated | skipped)
    - Phase 3 completion timestamp
 2. Log gaps for Phase 8
-</update_state>
+   </update_state>
 
 <validation_checklist>
+
 - TECHSTACK exists with language/framework entries
 - CODEMAP exists with shell-output-style tree
 - DEPENDENCIES exists
 - If composite: registry-style top-level docs reference sub-repos; each sub-repo has its own set of docs
-</validation_checklist>
+  </validation_checklist>
 
 </init_workspace_flow_discovery>

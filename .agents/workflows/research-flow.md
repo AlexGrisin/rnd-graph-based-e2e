@@ -1,7 +1,7 @@
 ---
 name: research-flow
-description: "Workflow for deep project research with grounded references, parallel exploration, etc."
-tags: ["workflow"]
+description: 'Workflow for deep project research with grounded references, parallel exploration, etc.'
+tags: ['workflow']
 user-invocable: true
 baseSchema: docs/schemas/workflow.md
 ---

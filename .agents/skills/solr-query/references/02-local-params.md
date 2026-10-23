@@ -9,6 +9,7 @@ Local params (`{!parser key=value ...}`) are how you select a query parser and p
 ```
 
 Anatomy:
+
 - `{!` `}` — local params delimiters (Solr-specific, not Lucene)
 - `parserName` — short name registered in Solr (`lucene`, `edismax`, `term`, `terms`, `field`, `parent`, `child`, `bool`, `frange`, `func`, `geofilt`, `bbox`, `join`, `knn`, `complexphrase`)
 - `key=value` — parameter pairs; values without spaces don't need quoting
@@ -16,16 +17,20 @@ Anatomy:
 - `query body` — everything after `}` is parser-specific input
 
 You can omit `parserName` to inherit the default (or use `type=`):
+
 ```
 {!cache=false v=$qq}                    # parser inherited (lucene by default)
 {!type=edismax qf=$qf}red shoes         # equivalent to {!edismax qf=$qf}red shoes
 ```
 
 The `v` parameter is a special way to put the query body inside the local params instead of after `}`:
+
 ```
 {!parent which=type:product v="color_s:red"}
 ```
+
 is equivalent to:
+
 ```
 {!parent which=type:product}color_s:red
 ```
@@ -35,11 +40,13 @@ is equivalent to:
 ## Quoting and escaping
 
 When a value contains spaces, quote it:
+
 ```
 {!edismax qf="title_t^5 brand_s^2" pf="title_t^10"}
 ```
 
 To include a literal `"` inside a quoted value, escape with backslash:
+
 ```
 {!term f="weird field name with \"quotes\""}foo
 ```
@@ -49,6 +56,7 @@ To include `}` inside a value (rare), quote it. Inside an HTTP URL, also URL-enc
 ## Parameter dereferencing
 
 `$paramName` references another HTTP request parameter:
+
 ```
 q={!parent which=$pq v=$cq}
 &pq=type_s:product
@@ -56,10 +64,12 @@ q={!parent which=$pq v=$cq}
 ```
 
 This is essential for two reasons:
+
 1. **Reusing complex sub-queries** without escaping nightmares
 2. **Caching** — request params hash differently than inlined values; dereferencing lets you parameterize without breaking filterCache hits
 
 You can chain dereferences:
+
 ```
 &q={!parent which=$pq v=$cq}
 &pq=$ptype
@@ -112,6 +122,7 @@ fq={!terms f=sku_id}100,101,102,103,104,105,106,107,108,109,110
 ```
 
 Default separator is comma. To use another:
+
 ```
 fq={!terms f=sku_id separator=|}100|101|102
 fq={!terms f=tag_s separator=" "}red green blue
@@ -124,6 +135,7 @@ Performance: for >10 values, `{!terms}` beats `OR`-chains. For <5 values, simila
 ### `{!bool}` — explicit boolean construction
 
 Useful when constructing complex filters from parameters:
+
 ```
 {!bool must=type_s:sku must=color_s:red filter=brand_s:Nike must_not=discontinued_b:true}
 ```
@@ -141,6 +153,7 @@ Each `filter=` is independently cached — three distinct filterCache entries. T
 ### `{!frange}` — function range
 
 Filters on the result of a function:
+
 ```
 fq={!frange l=0 u=100}price_f
 fq={!frange l=10 incl=false}div(sales_i,views_i)        # ratio > 10, exclusive
@@ -196,6 +209,7 @@ If you're not sure if a parser exists: it must appear in `solr/server/solr/confi
 ## Caching behavior
 
 For `fq=` clauses:
+
 - `{!cache=false}` — skip filterCache lookup and storage. Use for filters that change every request (e.g., user-specific).
 - `{!cost=N}` — control evaluation order. Lower-cost filters run first. Spatial and frange should have higher cost (e.g., `cost=100`) so cheap filters narrow the set first.
 - `{!cache=false cost=100}` — common combination for expensive non-cacheable filters.
@@ -209,6 +223,7 @@ Without `cache=false`, every distinct frange parameter would create a new filter
 ## Implicit vs explicit parser
 
 When you write:
+
 ```
 q=red shoes
 defType=edismax
@@ -218,6 +233,7 @@ qf=title_t^5
 The query is parsed by `edismax` because `defType=edismax`. The `qf` parameter is a **request parameter**, not a local param.
 
 When you write:
+
 ```
 q={!edismax qf="title_t^5"}red shoes
 ```
@@ -237,10 +253,7 @@ When mixing: local params win over request params for the same key.
     "qq": "red shoes",
     "qf": "title_t^5 brand_s^2"
   },
-  "filter": [
-    "{!terms f=sku_id}100,101,102",
-    "in_stock_b:true"
-  ]
+  "filter": ["{!terms f=sku_id}100,101,102", "in_stock_b:true"]
 }
 ```
 
@@ -249,11 +262,13 @@ Note `query` (not `q`), `filter` (not `fq`). `params` is the JSON way to define 
 ## Debugging parser dispatch
 
 When unsure which parser ran, set `debug=query` and inspect:
+
 - `parsedquery` — the Java toString of the resulting query
 - `parsedquery_toString` — same, more readable
 - `QParser` — name of the parser that produced it
 
 Example:
+
 ```
 "debug": {
   "rawquerystring": "{!parent which=type_s:product}color_s:red",

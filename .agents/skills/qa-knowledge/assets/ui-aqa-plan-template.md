@@ -25,40 +25,50 @@ Output template for `plans/ui-aqa-<test-name>/test-plan.md`. Populate `## Access
 ## Test Case Information
 
 ### Source
+
 - TMS: [Provider + case handle/URL, or N/A]
 - Wiki: [Provider + page handles/URLs, or N/A]
 - Direct input: [User request reference, or N/A]
 
 ### Test Goal
+
 [What is being tested and why]
 
 ### Preconditions
+
 [List preconditions from the cited source]
 
 ### Test Steps
+
 1. [Step 1]
    - Expected: [Result]
 2. [Step 2]
    - Expected: [Result]
 
 ### Expected Overall Result
+
 [Final expected outcome]
 
 ## Feature Context
 
 ### Business Purpose
+
 [From the cited Wiki/direct source -- e.g. "Allows customers to track order delivery status in real-time."]
 
 ### Technical Details
+
 [From the cited Wiki/direct source]
 
 ### User Flow
+
 [From the cited Wiki/direct source]
 
 ## Access / Truncation Notes
+
 - [Per source: full read / unavailable / truncated / permission denied / fallback used -- cite the canonical handle/URL; if none: `None -- all cited Wiki pages read in full`.]
 
 ## Cross-Reference Notes
+
 - [Gaps, contradictions, or observations across sources -- e.g. `TMS step 3 expects 200; Wiki page <URL> references 204 -- [CONFLICT -- await clarification]`]
 ```
 

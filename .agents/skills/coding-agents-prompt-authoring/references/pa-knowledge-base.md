@@ -108,6 +108,7 @@ Priority order (enforced top-down):
 - **Prompt decay** — every AI system decays unless entropy is actively suppressed.
 
 Decay root causes:
+
 - Surface area expands (responsibilities, exceptions, disclaimers accumulate)
 - Cognitive branching grows exponentially
 - Instruction weight shifts after model updates
@@ -224,6 +225,7 @@ Can the architecture flip between agent and skill-with-fork?
 ### 6.11 Anti-Patterns
 
 Avoid:
+
 - 1:1 skill-to-agent mappings
 - Agents wrapping single skills
 - Skills containing full workflows
@@ -232,6 +234,7 @@ Avoid:
 - Skills that modify other skills
 
 Correct:
+
 - N skills into 1 agent
 - One-sentence boundaries
 - Skills as composable knowledge
@@ -241,6 +244,7 @@ Correct:
 ### 6.12 Architecture Health Check
 
 Correct when:
+
 - Each boundary explainable in one sentence
 - No 1:1 relationships
 - Related capabilities cluster naturally
@@ -249,6 +253,7 @@ Correct when:
 - Failures are isolated
 
 Needs revision when:
+
 - Wrappers around wrappers
 - Boundaries are arbitrary
 - New capability fits in 3+ places
@@ -319,6 +324,7 @@ Output: clear answer, confidence level, key caveats.
 ### When to Use Chain-of-Thought
 
 Use CoT:
+
 - Math/arithmetic
 - Logical reasoning
 - Multi-step planning
@@ -326,6 +332,7 @@ Use CoT:
 - Complex decisions
 
 Skip CoT:
+
 - Simple factual queries
 - Direct lookups
 - Creative writing
@@ -337,6 +344,7 @@ Skip CoT:
 ## 11. Best Practices
 
 Reasoning structure:
+
 - Clear step markers (numbered)
 - Show all work, don't skip steps
 - Explicit verification steps
@@ -344,6 +352,7 @@ Reasoning structure:
 - Check edge cases
 
 Examples (few-shot):
+
 - Format consistently across all examples
 - Align input-output to exact task
 - Span expected difficulty range
@@ -351,6 +360,7 @@ Examples (few-shot):
 - Dynamically adjust count by task difficulty
 
 Experimentation:
+
 - Establish baseline first
 - Change one variable at a time
 - Use diverse test cases, track metrics
@@ -358,6 +368,7 @@ Experimentation:
 - Version everything, monitor production
 
 Templates:
+
 - Keep DRY
 - Validate variables before rendering
 - Version like code
@@ -369,6 +380,7 @@ Templates:
 ## 12. Common Pitfalls
 
 Reasoning failures:
+
 - Premature conclusions
 - Circular logic
 - Missing intermediate steps
@@ -376,6 +388,7 @@ Reasoning failures:
 - Inconsistent format mid-reasoning
 
 Few-shot failures:
+
 - Too many examples (dilutes focus)
 - Irrelevant examples
 - Inconsistent formatting
@@ -421,6 +434,7 @@ Goal: not prettier — more reliable, stable, deterministic, cheaper, resilient 
 ## 14. References
 
 ### Specifications
+
 - https://agentskills.io/specification
 - https://github.com/agentskills/agentskills/blob/main/docs/what-are-skills.mdx
 - https://github.com/agentskills/agentskills/blob/main/docs/specification.mdx
@@ -430,10 +444,12 @@ Goal: not prettier — more reliable, stable, deterministic, cheaper, resilient 
 - https://code.claude.com/docs/en/sub-agents
 
 ### Guides
+
 - https://www.productmanagement.ai/p/prompt-engineering
 - https://www.productmanagement.ai/p/prompt-optimization-guide
 
 ### Examples
+
 - https://github.com/maitrix-org/PromptAgent
 - https://github.com/ckelsoe/claude-skill-prompt-architect
 - https://github.com/Piebald-AI/claude-code-system-prompts/blob/main/system-prompts/agent-prompt-agent-creation-architect.md

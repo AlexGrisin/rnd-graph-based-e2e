@@ -1,7 +1,7 @@
 ---
 name: pl-functional-requirements
 description: Template for planning-oriented functional requirements in EARS form.
-tags: ["planning", "templates"]
+tags: ['planning', 'templates']
 ---
 
 <pl-functional-requirements>

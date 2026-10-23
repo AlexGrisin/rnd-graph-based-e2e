@@ -13,6 +13,7 @@ JetBrains IDEs (IntelliJ IDEA, PyCharm, WebStorm, Rider, Goland, etc.) offer two
 2. **Junie** - Autonomous AI coding agent for complex task delegation
 
 **Configuration locations:**
+
 - AI Assistant: `.aiassistant/rules/*.md` (Markdown with YAML frontmatter)
 - Junie: `.junie/guidelines.md` (Plain Markdown, no frontmatter)
 
@@ -34,6 +35,7 @@ When using both tools, maintain **TWO core files** that serve as root agent rule
 **CRITICAL:** Core files **MUST NOT** duplicate rules. Instead, they **MUST** contain **chaining references** to other rule files using **MoSCoW prioritization**.
 
 **Example reference in `.junie/guidelines.md`:**
+
 ```markdown
 - **MUST** use `.aiassistant/rules/[rule-file-name].md` for [specific context]
 ```
@@ -51,6 +53,7 @@ This is an example. You **MUST** use MoSCoW (MUST/SHOULD/COULD/WON'T) in all ref
 ### Format Requirements
 
 **CRITICAL:** Follow the format **EXACTLY**. Do NOT convert to:
+
 - YAML arrays
 - Square brackets syntax
 - Different line breaks or indentation
@@ -69,24 +72,29 @@ Must include coding rules AND implementation flow in the core set of rules in th
 This project uses both Junie and AI Assistant. Follow rules in `.aiassistant/rules/` with priorities:
 
 ### MUST (Required - Always Enforce)
+
 - **MUST** follow all rules in `.aiassistant/rules/agents.md`
 - **MUST** use `.aiassistant/rules/[rule-file-1].md` for [context-1]
 - **MUST** use `.aiassistant/rules/[rule-file-2].md` for [context-2]
 
 ### SHOULD (Important - Strongly Recommended)
+
 - **SHOULD** use `.aiassistant/rules/[rule-file-3].md` for [context-3]
 - **SHOULD** use `.aiassistant/rules/[rule-file-4].md` for [context-4]
 
 ### COULD (Optional - Apply When Appropriate)
+
 - **COULD** use `.aiassistant/rules/[rule-file-5].md` for [context-5]
 
 ### WON'T (Explicitly Excluded)
+
 - **WON'T** apply `.aiassistant/rules/[rule-file-6].md` (reason)
 
 [The rest of the core rules content]
 ```
 
 **Replace:**
+
 - `[rule-file-N]` with actual rule file names
 - `[context-N]` with when/where to apply the rule
 
@@ -110,12 +118,14 @@ Each custom command is a separate Markdown file with YAML front matter.
 ---
 description: Explains code in a given file
 ---
+
 Explain the code in $file and suggest improvements.
 ```
 
 ### Variables
 
 Commands support variables in prompts:
+
 - `$file` - File path argument
 - `$selection` - Selected code
 - Other custom variables as needed
@@ -145,6 +155,7 @@ Commands support variables in prompts:
 **File:** `.aiassistant/rules/agents.md`
 
 **Required frontmatter:**
+
 ```markdown
 ---
 apply: always
@@ -161,12 +172,15 @@ apply: always
 # Project Agents Rule
 
 ## Bootstrap Instructions
+
 [Bootstrap content]
 
 ## KnowledgeBase Sync
+
 [Sync instructions]
 
 ## Core Project Guidelines
+
 [Core guidelines]
 
 ## Rule File References (MoSCoW Prioritization)
@@ -189,6 +203,7 @@ This project also uses Junie AI agent. The Junie configuration is in `.junie/gui
 **Apply Types:**
 
 **Always:**
+
 ```markdown
 ---
 apply: always
@@ -198,6 +213,7 @@ apply: always
 ```
 
 **By File Patterns:**
+
 ```markdown
 ---
 apply: by file patterns
@@ -208,6 +224,7 @@ patterns: **/*.ts, **/*.tsx
 ```
 
 **By Model Decision:**
+
 ```markdown
 ---
 apply: by model decision
@@ -218,6 +235,7 @@ instructions: [Instruction for when to apply]
 ```
 
 **Manual:**
+
 ```markdown
 ---
 apply: manually
@@ -227,6 +245,7 @@ apply: manually
 ```
 
 **Format rules:**
+
 - Patterns: comma-separated, use glob syntax
 - Do NOT use YAML arrays `[...]` for patterns
 - Use exact format: `patterns: **/*.ts, **/*.tsx`

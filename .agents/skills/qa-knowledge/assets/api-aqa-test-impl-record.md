@@ -22,9 +22,11 @@ Summary fields in order:
 
 ```markdown
 ### Gaps surfaced
+
 - ATC-007 (rate-limit 429 path): Uncovered: backend has no rate-limit config in the test env; needs infra setup. Recorded, not dropped.
 
 ### Validation scope & waivers
+
 - Ran locally: lint + the 12 new ATC tests (all pass). Waived: full-suite regression (user-approved -- residual risk: a cross-module side-effect would surface only in CI).
 ```
 

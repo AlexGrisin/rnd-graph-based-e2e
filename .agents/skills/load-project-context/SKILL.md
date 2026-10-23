@@ -6,6 +6,7 @@ disable-model-invocation: false
 user-invocable: false
 baseSchema: docs/schemas/skill.md
 ---
+
 <load-project-context compact="NEVER" summarize="AS-IS">
 
 Prerequisite: USE SKILL `hitl`. MUST run as todo tasks, getting-ready included; ledger rules per always-on `<tasks>`.
@@ -14,7 +15,7 @@ Prerequisite: USE SKILL `hitl`. MUST run as todo tasks, getting-ready included; 
 
 1. `grep -nE "^#{1,3} " docs/CONTEXT.md docs/ARCHITECTURE.md agents/IMPLEMENTATION.md agents/MEMORY.md docs/PATTERNS/INDEX.md docs/REQUIREMENTS/INDEX.md refsrc/INDEX.md $(find docs -maxdepth 1 \( -name '*-CONTEXT.md' -o -name '*-ARCHITECTURE.md' \) 2>/dev/null)`
 2. MUST then read relevant sections to the request by line-ranges. There is no ToC in docs above. grep/rg is Auto-ToC.
-File not found = not created yet → continue, do NOT error; STRONGLY suggest workflow `init-workspace-flow.md`.
+   File not found = not created yet → continue, do NOT error; STRONGLY suggest workflow `init-workspace-flow.md`.
 
 </project-files>
 

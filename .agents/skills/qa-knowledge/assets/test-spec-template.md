@@ -6,7 +6,7 @@ QA test-specs.md skeleton -- Summary, Given-When-Then ATC scenarios, file mappin
 
 Skeleton for `plans/api-aqa-{IDENTIFIER}/test-specs.md`. The shape already in context; the skill emits Given-When-Then ATC entries into this shape. (Outer fence = 4 backticks so the inner 3-backtick example doesn't terminate it.)
 
-````markdown
+```markdown
 # QA Test Specifications - [IDENTIFIER]
 
 **Created**: [DateTime]
@@ -38,16 +38,20 @@ Each `ATC-NNN` entry follows the Given-When-Then ATC template + scenario taxonom
 ---
 
 ## Test File Mapping
+
 One row per ATC-NNN: target test file (e.g. `tests/api/orders.test.js`), test name (function/describe block), reusable fixtures.
 
 ## Shared Utilities
+
 List each auth helper, request builder, response validator, data factory, teardown utility to create/reuse -- with purpose + target file path.
 
 ## Execution Order
+
 Ordered list of test groups with dependencies (e.g. create-then-read runs sequentially). Mark each independent / sequential / setup-required.
 
 ## Assumptions
+
 List Phase-3 assumptions affecting these specs **plus new ones introduced during specification** (guessed boundary values, default headers, fixture sizes). Cite source for each.
-````
+```
 
 </test-spec-template>

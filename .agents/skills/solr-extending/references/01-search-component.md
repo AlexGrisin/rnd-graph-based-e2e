@@ -15,6 +15,7 @@ SearchHandler invokes for each registered component, in order:
 ```
 
 The standard built-in components (in default order):
+
 - `query` — runs the main Q
 - `facet` — JSON facets and legacy facets
 - `mlt` — MoreLikeThis
@@ -102,6 +103,7 @@ For one-off use, override on a per-request basis: `&components=query,myComp,face
 ## Distributed mode (SolrCloud)
 
 In SolrCloud, a request typically:
+
 1. Hits a coordinator node
 2. Coordinator creates a `ResponseBuilder` and calls `prepare()` on each component
 3. For each stage, calls `distributedProcess()` to determine if more shard requests are needed
@@ -110,6 +112,7 @@ In SolrCloud, a request typically:
 6. Final response merged and returned
 
 A SearchComponent that doesn't override `distributedProcess()` and `handleResponses()` works at standalone but in distributed mode:
+
 - `prepare()` runs on coordinator
 - `process()` runs on each shard (during the `STAGE_GET_FIELDS` typically)
 - Custom response additions only appear in shard responses, not aggregated
@@ -150,6 +153,7 @@ public void handleResponses(ResponseBuilder rb, ShardRequest sreq) {
 ```
 
 The full `ResponseBuilder.STAGE_*` constants in order:
+
 - `STAGE_START` (0)
 - `STAGE_PARSE_QUERY` (1000)
 - `STAGE_TOP_GROUPS` (1500)
@@ -166,6 +170,7 @@ You can insert work at any stage by returning the appropriate next stage from `d
 Register as `first-components`. Override `prepare()`. Mutate `rb.req` params.
 
 Example use cases:
+
 - Inject a security filter based on user context
 - Auto-add a default `fq=tenant_id_s:$user_tenant`
 - Translate user-friendly query syntax to Solr syntax
@@ -175,6 +180,7 @@ Example use cases:
 Register as `last-components`. Override `process()`. Read `rb.getResults().docList`, add to `rb.rsp`.
 
 Example use cases:
+
 - Add custom aggregations across all results
 - Compute query-time analytics
 - Inject related-search suggestions
@@ -233,6 +239,7 @@ The `<arr name="first-components">` / `last-components` declarations are additiv
 Adds `myComp` after the default pipeline (query, facet, mlt, highlight, stats, debug, expand, terms).
 
 To reorder built-ins, use `<arr name="components">` to specify the entire pipeline:
+
 ```xml
 <arr name="components">
   <str>query</str>

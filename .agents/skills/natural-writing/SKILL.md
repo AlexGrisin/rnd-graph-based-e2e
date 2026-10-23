@@ -1,9 +1,9 @@
 ---
 name: natural-writing
-description: "To rewrite text in a clear, natural, honest human tone — no AI slop, hype, or robotic phrasing."
+description: 'To rewrite text in a clear, natural, honest human tone — no AI slop, hype, or robotic phrasing.'
 license: Apache-2.0
 
-tags: ["natural-writing", "writing", "style", "rewrite"]
+tags: ['natural-writing', 'writing', 'style', 'rewrite']
 disable-model-invocation: false
 user-invocable: true
 baseSchema: docs/schemas/skill.md

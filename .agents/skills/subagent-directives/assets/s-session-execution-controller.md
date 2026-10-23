@@ -35,9 +35,9 @@ Your prompt says `Use EXECUTION_CONTROLLER` with a plan_file (absolute) + target
    a. `npx -y rosettify@latest plan update_status <plan_file> <step_id> in_progress`.
    b. Split the step's prompt into todo tasks (your own isolated list — invisible to other agents); order by dependencies; output `Tasks Created: [task ids]`; execute; close each on verifiable evidence.
    c. `npx -y rosettify@latest plan update_status <plan_file> <step_id> <status>`:
-      - `complete` — done with verifiable evidence → back to step 2 for the next step.
-      - `blocked` — cannot proceed → step 4, report reason.
-      - `failed` — execution failed → step 4, report error + root cause.
+   - `complete` — done with verifiable evidence → back to step 2 for the next step.
+   - `blocked` — cannot proceed → step 4, report reason.
+   - `failed` — execution failed → step 4, report error + root cause.
 4. At target end (or on `blocked`/`failed`), report to the orchestrator per your prompt's Output specs — `blocked` carries the reason, `failed` carries the error + root cause.
 
 </process>

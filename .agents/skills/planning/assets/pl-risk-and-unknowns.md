@@ -1,7 +1,7 @@
 ---
 name: pl-risk-and-unknowns
 description: Template to capture planning assumptions, unknowns, blockers, and clarification questions.
-tags: ["planning", "templates"]
+tags: ['planning', 'templates']
 ---
 
 <pl-risk-and-unknowns>

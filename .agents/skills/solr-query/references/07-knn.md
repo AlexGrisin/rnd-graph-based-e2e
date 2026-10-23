@@ -5,12 +5,14 @@ Solr 9.0+ ships with native dense-vector indexing and querying via Lucene's HNSW
 ## Field setup
 
 In schema:
+
 ```xml
 <fieldType name="knn_vector_768" class="solr.DenseVectorField" vectorDimension="768" similarityFunction="cosine"/>
 <field name="embedding" type="knn_vector_768" indexed="true" stored="true"/>
 ```
 
 `similarityFunction` options:
+
 - `cosine` — most common for sentence embeddings (BERT, sentence-transformers)
 - `dot_product` — assumes pre-normalized vectors; faster, equivalent to cosine if normalized
 - `euclidean` — for raw distance models
@@ -20,6 +22,7 @@ In schema:
 `indexed=true` is required for kNN search. `stored=true` is optional (uses disk; only needed if you return the vector to the client).
 
 HNSW tuning at index time:
+
 ```xml
 <fieldType name="knn_vector_768" class="solr.DenseVectorField"
            vectorDimension="768"
@@ -33,6 +36,7 @@ HNSW tuning at index time:
 ## Indexing vectors
 
 JSON:
+
 ```json
 {
   "id": "p1",
@@ -54,6 +58,7 @@ q={!knn f=embedding topK=100}[0.012, -0.345, 0.678, ...]
 Returns top 100 docs by similarity, ranked by similarity score (cosine in `[0, 1]` post-normalization).
 
 Parameters:
+
 - `f=` — vector field name (required)
 - `topK=` — number of results to retrieve from HNSW graph (default 10)
 
@@ -71,6 +76,7 @@ fq=in_stock_b:true
 Solr first retrieves topK=100 from HNSW (without considering `fq`), then filters those 100 by `in_stock_b:true`. If only 5 of the top 100 vectors happen to be in stock, you get 5 results.
 
 This is a recall disaster when filters are selective. Symptoms:
+
 - "kNN works in dev but returns 2 results in prod"
 - "Increasing topK helps but I still don't get enough results"
 
@@ -81,6 +87,7 @@ q={!knn f=embedding topK=100 preFilter=in_stock_b:true}[...]
 ```
 
 Or pull from request:
+
 ```
 q={!knn f=embedding topK=100 preFilter=$kf}[...]
 &kf=in_stock_b:true AND brand_s:Nike
@@ -99,6 +106,7 @@ q={!knn f=embedding topK=100 preFilter='in_stock_b:true,brand_s:Nike'}[...]
 Comma-separated for multiple. Each becomes a pre-filter clause (intersected).
 
 Or via param refs:
+
 ```
 q={!knn f=embedding topK=100 preFilter=$pf1 preFilter=$pf2}[...]
 ```
@@ -106,6 +114,7 @@ q={!knn f=embedding topK=100 preFilter=$pf1 preFilter=$pf2}[...]
 ### Choosing topK and pre-filter combination
 
 Rules of thumb:
+
 - If filters are very selective (`in_stock_b:true` matches 5% of corpus): use `preFilter`, topK=number-of-results-needed × 2
 - If filters are loose (matches 80%): post-filter is fine, topK=number-of-results-needed × 1.5
 - If you need exact top-N regardless: use `preFilter` + topK=larger margin
@@ -168,14 +177,17 @@ fl=id,name_t,score
 `fq` after pre-filtered kNN: an additional cache-able filter applied to the topK result set. Doesn't affect kNN traversal but does post-filter.
 
 `sort=score desc` is the default for `{!knn}` since the query produces relevance scores. You can override:
+
 ```
 sort=price_f asc
 ```
+
 to override semantic ordering with a price sort (still showing only the kNN top results).
 
 ## Inspecting kNN behavior
 
 `debug=true` shows:
+
 ```
 "parsedquery": "DocAndScoreQuery[100,...]",
 "explain": {
@@ -186,6 +198,7 @@ to override semantic ordering with a price sort (still showing only the kNN top 
 The explain is less informative than for BM25 — vector queries don't decompose into per-term contributions.
 
 If results look wrong, sanity-check:
+
 1. Vector dimension matches field config (server log will show `IllegalArgumentException` on mismatch)
 2. Query vector is L2-normalized if using `cosine` (some libraries don't normalize by default)
 3. `topK` is large enough relative to filtering selectivity
@@ -194,27 +207,35 @@ If results look wrong, sanity-check:
 ## Common mistakes
 
 ### Mismatched vector dimension
+
 Indexing with 768-dim vectors but querying with 384-dim → `IllegalArgumentException` at query time. Sometimes caught at indexing, sometimes only at query. Pin model versions.
 
 ### Forgetting to normalize for cosine
+
 Many embedding libraries return raw vectors; `cosine` similarity assumes unit length. If unnormalized, Solr still computes cosine correctly (it normalizes internally for cosine), but `dot_product` similarity will give wildly wrong results on unnormalized vectors.
 
 ### Using post-filter on selective filters
+
 Already covered. Symptom: empty result sets. Switch to `preFilter`.
 
 ### topK too small
+
 With post-filter and selective fq, topK=10 returns 0-2 results. Either raise topK or use preFilter.
 
 ### Reusing vector across model versions
+
 Embedding model upgraded from v1 to v2. Old documents have v1 vectors; new query uses v2 vector. Distance is meaningless. Re-index ALL documents on model change.
 
 ### Storing vectors unnecessarily
+
 `stored=true` doubles disk usage. Only set when you need to retrieve vectors via `fl=embedding` (rare).
 
 ### Vector field with no indexed flag
+
 `indexed=true` is required. Without it, the field stores values but kNN queries fail to find candidates.
 
 ### Mixing similarity functions across fields
+
 Per-field, but if you have two vector fields with different `similarityFunction`, hybrid queries combining them are not directly comparable. Use re-rank or RRF, not boolean OR with boosts.
 
 ## Performance characteristics

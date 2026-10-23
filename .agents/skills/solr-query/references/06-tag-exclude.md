@@ -5,6 +5,7 @@ The tag/exclude pattern lets a faceted search show "options that would be availa
 ## The problem
 
 User search:
+
 ```
 fq=brand_s:Nike
 fq=color_s:red
@@ -25,15 +26,18 @@ fq={!tag=COLOR}color_s:red
 ```
 
 JSON Facets:
+
 ```json
 {
   "facet": {
     "by_brand": {
-      "type": "terms", "field": "brand_s",
+      "type": "terms",
+      "field": "brand_s",
       "domain": { "excludeTags": ["BRAND"] }
     },
     "by_color": {
-      "type": "terms", "field": "color_s",
+      "type": "terms",
+      "field": "color_s",
       "domain": { "excludeTags": ["COLOR"] }
     }
   }
@@ -69,6 +73,7 @@ A facet excluding `PRICE` will see neither filter.
 ```
 
 Or comma-separated string:
+
 ```json
 "domain": { "excludeTags": "BRAND,COLOR" }
 ```
@@ -78,6 +83,7 @@ Both forms are accepted. Use the array form for consistency.
 ## Excluding in legacy facet API
 
 In the legacy URL-style facet API:
+
 ```
 fq={!tag=BRAND}brand_s:Nike
 &facet=true
@@ -86,10 +92,10 @@ fq={!tag=BRAND}brand_s:Nike
 
 `{!ex=NAME}` is the exclusion syntax for legacy faceting. **JSON Facets does NOT use `{!ex=}`** — it uses `domain.excludeTags`. Mixing the syntaxes is a common mistake.
 
-| Style | Tag | Exclude |
-|---|---|---|
-| Legacy URL facets | `fq={!tag=X}field:val` | `facet.field={!ex=X}field` |
-| JSON Facets | `fq={!tag=X}field:val` (same) | `domain.excludeTags: ["X"]` |
+| Style             | Tag                           | Exclude                     |
+| ----------------- | ----------------------------- | --------------------------- |
+| Legacy URL facets | `fq={!tag=X}field:val`        | `facet.field={!ex=X}field`  |
+| JSON Facets       | `fq={!tag=X}field:val` (same) | `domain.excludeTags: ["X"]` |
 
 The tagging is the same; the exclusion mechanism differs.
 
@@ -106,6 +112,7 @@ This facet runs as if both `BRAND` and `COLOR` filters were absent.
 Tag/exclude only works for **filter queries** (`fq=`). It does not work for the main query (`q=`).
 
 If you have:
+
 ```
 q=red shoes
 defType=edismax
@@ -122,7 +129,8 @@ If you need to exclude `q`, restructure: move the user query into an `fq` (loses
   "filter": ["{!tag=BRAND}brand_s:Nike"],
   "facet": {
     "by_brand": {
-      "type": "terms", "field": "brand_s",
+      "type": "terms",
+      "field": "brand_s",
       "domain": {
         "excludeTags": ["BRAND"],
         "query": "type_s:product"
@@ -168,6 +176,7 @@ If you tag a filter at child level (e.g., a SKU-level color filter applied via p
 ## Common mistakes
 
 ### Tag name typo
+
 ```
 fq={!tag=BRND}brand_s:Nike
 "domain": { "excludeTags": ["BRAND"] }   // doesn't match BRND
@@ -176,6 +185,7 @@ fq={!tag=BRND}brand_s:Nike
 Tags are silently unmatched — the facet just doesn't get the exclusion. Always test by removing the filter to confirm the facet count rises.
 
 ### Wrong key name
+
 ```json
 "domain": { "exclude": ["BRAND"] }       // WRONG
 "domain": { "excludeFilters": ["BRAND"] } // WRONG
@@ -185,6 +195,7 @@ Tags are silently unmatched — the facet just doesn't get the exclusion. Always
 Solr ignores unknown `domain` keys silently.
 
 ### Tagging the main query
+
 ```
 q={!tag=Q}red shoes        // tag has no effect on q
 ```
@@ -192,6 +203,7 @@ q={!tag=Q}red shoes        // tag has no effect on q
 Tags only apply to filters. The above is silently ignored for facet exclusion.
 
 ### Tag inside `{!edismax}` body
+
 ```
 q={!edismax tag=Q}red shoes    // tag here doesn't tag for facet exclusion
 ```
@@ -199,9 +211,11 @@ q={!edismax tag=Q}red shoes    // tag here doesn't tag for facet exclusion
 Tag must be on `fq`, not on `q`. Refactor to put the constrainable parts in `fq`.
 
 ### Excluding a tag that's also `cache=false`
+
 This works fine, but be aware: the un-cached filter still runs at facet time (no cache benefit), and the exclusion just removes its constraint. Both behaviors apply.
 
 ### Excluding parent filter at child scope
+
 ```json
 "available_colors": {
   "type": "terms", "field": "color_s",
@@ -215,6 +229,7 @@ This works fine, but be aware: the un-cached filter still runs at facet time (no
 This is correct. `blockChildren` transitions scope, and `excludeTags` removes parent-tagged filters before that scope evaluates.
 
 But:
+
 ```json
 "available_brands": {
   "type": "terms", "field": "brand_s",

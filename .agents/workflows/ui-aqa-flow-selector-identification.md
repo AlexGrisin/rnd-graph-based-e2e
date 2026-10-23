@@ -1,6 +1,6 @@
 ---
 name: ui-aqa-flow-selector-identification
-description: "Phase 4 Selector Identification of ui-aqa-flow"
+description: 'Phase 4 Selector Identification of ui-aqa-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -14,6 +14,7 @@ Identify missing UI selectors from frontend source code or page-source HTML and 
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 4 of 8 in `ui-aqa-flow`
 - Input: test plan `plans/ui-aqa-<test-name>/test-plan.md` with assertions; Phase 3 code analysis at `plans/ui-aqa-<test-name>/code-analysis.md`
 - Output: the `## Selector Management` section (Part A subsections) written into the test plan
@@ -24,31 +25,35 @@ Identify missing UI selectors from frontend source code or page-source HTML and 
 - Paths + `<test-name>` slug resolution + the page-sources capture path/naming contract are owned by `qa-structure`'s UI layout reference.
 - Required skills: `qa-knowledge` (`implementation_modes` — selector mode Part A, read-only identification; page-source capture message), `qa-structure` (`<test-name>` + page-sources path), `sensitive-data` (page-source redaction)
 - Recommended skills: `testing`
-</workflow_context>
+  </workflow_context>
 
 <failure_handling>
 If the code-analysis file is missing, the slug stays ambiguous in `agents/TEMP/<FEATURE>/ui-aqa-state.md`, or more than one plausible `plans/ui-aqa-*/code-analysis.md` exists: stop Phase 4, record the gap in `agents/TEMP/<FEATURE>/ui-aqa-state.md`, ask the user once for the canonical `<test-name>` or to re-run Phase 3 — do not guess (slug rules per `qa-structure`).
 </failure_handling>
 
 <phase_steps>
+
 1. Resolve `<test-name>` and verify the Phase 3 code-analysis file (step 4.0)
 2. Execute selector identification (step 4.1)
 3. Handle page source request if needed (step 4.2)
 4. Update state (step 4.3)
-</phase_steps>
+   </phase_steps>
 
 <resolve_inputs step="4.0">
+
 1. USE SKILL `qa-structure` and resolve `<test-name>` per its UI layout slug rules (the slug matches the Phase 1 run folder; use `ui-aqa-state.md` if unclear).
 2. Verify `plans/ui-aqa-<test-name>/code-analysis.md` exists and is the single canonical input for this run.
 3. If verification fails: apply `<failure_handling>`.
-</resolve_inputs>
+   </resolve_inputs>
 
 <execute_identification step="4.1" subagent="engineer" role="Selector identification specialist">
+
 1. USE SKILL `testing` and USE SKILL `qa-knowledge` (`implementation_modes` — selector mode, Part A: read-only identify) with the parent-supplied bindings: test plan path; code-analysis path; page-sources directory + capture contract = `qa-structure`'s UI layout; output = the `## Selector Management` section's Part A subsections in the test plan.
 2. Execute Part A only (Interaction Map → Selector Availability → frontend-source search → page-source analysis for still-missing selectors). If all selectors are found in frontend code, skip step 4.2.
 3. Honor the read-only scope (`<workflow_context>`).
 
 **Part A deliverables** (written into the test plan's `## Selector Management` — the contract Phase 5 reads):
+
 - **Interaction Map** — test step → required UI interactions.
 - **Selector Availability** — ✅ EXISTS / ❌ MISSING / ❌ UNRESOLVABLE per interaction.
 - **Identified Selectors** — Selector / Type / Source (file:line or page-source file) / Usage / Stability per selector, using the 4-tier strategy (`data-testid` > `id` > stable class/ARIA > XPath).
@@ -72,6 +77,7 @@ If the code-analysis file is missing, the slug stays ambiguous in `agents/TEMP/<
 </handle_page_source>
 
 <update_state step="4.3">
+
 1. **GATE — do NOT mark Phase 4 complete or advance to Phase 5 until** the test plan's `## Selector Management` section carries the Part A deliverables (Interaction Map · Selector Availability · Identified Selectors · Fragile Selectors Flagged). If absent, return to the identification step and write them — Phase 5 reads this section as its contract; completing Phase 4 without it leaves Phase 5 with no selectors to implement.
 2. Update `agents/TEMP/<FEATURE>/ui-aqa-state.md`:
    - Total Selectors Needed: [count]
@@ -81,9 +87,10 @@ If the code-analysis file is missing, the slug stays ambiguous in `agents/TEMP/<
    - Selector Strategy: [preferred method]
    - Phase 4 completion timestamp
 3. Mark Phase 4 complete, Phase 5 current.
-</update_state>
+   </update_state>
 
 <validation_checklist>
+
 - All required UI interactions mapped
 - Existing selectors checked in page objects (✅ / ❌ / UNRESOLVABLE per interaction)
 - Frontend source code searched first (if available)
@@ -91,6 +98,6 @@ If the code-analysis file is missing, the slug stays ambiguous in `agents/TEMP/<
 - Selector strategy documented; fragile selectors flagged with reason + recommendation
 - No page objects, test files, or frontend source modified (read-only scope)
 - Redaction pre-read gate ran on captured page sources — `sensitive-data` scan executed (fail-closed) before any page-source content was read or referenced; no literal tokens/PII remain
-</validation_checklist>
+  </validation_checklist>
 
 </ui_aqa_flow_selector_identification>

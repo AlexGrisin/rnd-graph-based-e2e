@@ -26,6 +26,7 @@ DirectedWeightedMultigraph<Integer, StagedTag>
 Position 0 is "before the first token". Position N is "after the last token". An edge from start to end represents "this StagedTag covers tokens from position start to position end".
 
 For "sony wh-1000xm5 earpads":
+
 ```
 positions: 0      1          2        3
             ┌──>───┴────>─────┴───>────┘
@@ -88,6 +89,7 @@ private static DirectedWeightedMultigraph<Integer, StagedTag> toGraph(
 ```
 
 JGraphT's `DirectedWeightedMultigraph<V, E>`:
+
 - "Multigraph" — allows multiple edges between same vertex pair (we need this; "sony" can have multiple tags from different concept fields)
 - "Directed" — edges go start→end, not bidirectional
 - "Weighted" — each edge has a weight (here, the StagedTag's combined boost)
@@ -155,6 +157,7 @@ positions:   0             1
 The vertex `-1` is virtual; the edges `[ear]@(0→-1)` and `[cushions]@(-1→1)` together cover position 0 to position 1, just like the direct edge `[cushions]@(0→1)`.
 
 K-shortest finds both as valid paths:
+
 - Path 1: `[cushions]` directly
 - Path 2: `[ear] → [cushions]` via quasi
 
@@ -165,6 +168,7 @@ TagEdge.calculateQuasiPosition(start, offset, synonymNum, totalNodesToAdd, curre
 ```
 
 Where:
+
 - `start, offset` — original phrase position info
 - `synonymNum` — which synonym (if multiple multi-word synonyms exist for this shingle)
 - `totalNodesToAdd` — how many intermediate nodes needed for THIS synonym
@@ -201,6 +205,7 @@ for (String multiwordSyn : multiwordSynonymsList) {
 ```
 
 The result for `"cushions" → "ear cushions"` (2-word synonym, 1 node to add):
+
 ```
 edge 0: from start to quasi(-1):  token="ear"  (substring of synonym)
 edge 1: from quasi(-1) to end:     token="cushions" (substring of synonym)
@@ -233,6 +238,7 @@ Configurable per-stage. Common limit: keep top-N synonym edges by weight, drop t
 A "complete" path covers every token position from start (0) to end (N). An incomplete path skips positions. Most stages reject incomplete paths — the user's full phrase should be accounted for. Some lenient stages allow partial coverage (with corresponding mm relaxation).
 
 `StagedTagUtils.hasFullCompleteCoverage(path)` checks coverage:
+
 ```java
 public static boolean hasFullCompleteCoverage(GraphPath<Integer, StagedTag> path) {
     return path.getEdgeList().stream()
@@ -256,6 +262,7 @@ public static String toDot(DirectedWeightedMultigraph<Integer, StagedTag> graph,
 ```
 
 Returns a string like:
+
 ```
 digraph G {
   rankdir=LR;
@@ -270,11 +277,13 @@ digraph G {
 ```
 
 Pipe to graphviz:
+
 ```bash
 dot -Tpng input.dot > graph.png
 ```
 
 Color coding from `toDot`:
+
 - Green: CONCEPT (exact match, the strongest)
 - Red: SYN, MULTI_SYN (synonym match)
 - Blue: SPELL (spell-corrected match)
@@ -282,6 +291,7 @@ Color coding from `toDot`:
 - Black: unrecognized / fallback
 
 Style:
+
 - Solid: mandatory field tag
 - Dashed: optional field tag
 
@@ -292,6 +302,7 @@ For debugging multi-stage processing, generate the DOT at each stage and watch h
 ### Empty graph
 
 If `buildGraph` returns null, it means **no token was recognized at all**. Either:
+
 - Concepts don't exist for these terms in this language/source
 - Filters (lang/source) excluded all matches
 - Phrase is gibberish
@@ -303,6 +314,7 @@ Check with `debug=true` on the tagger — does the response have any `tags`?
 If a token at position K has no edges, paths can't traverse through K. This breaks full-phrase paths.
 
 Mitigations:
+
 - Stage allows incomplete coverage (relaxed mm)
 - Add a fallback `unrecognized` edge spanning the gap (some stages do this automatically)
 - Raise tagger `maxTag` to surface more candidates
@@ -310,6 +322,7 @@ Mitigations:
 ### Too many paths
 
 If K-shortest returns 25 paths and they're all different orderings of the same tags, the graph has too much ambiguity. Reduce by:
+
 - Stricter ambiguity resolver (drop weak alternatives more aggressively)
 - Lower `MAX_NUMBER_OF_PATHS`
 - Filter excessive synonym edges
@@ -321,6 +334,7 @@ Encoding bug: two synonyms get same quasi id. Symptoms: paths through quasi merg
 ### K-shortest performance
 
 For graphs with 100+ edges, K-shortest is O(K × V × E) at worst. If you hit performance issues here, options:
+
 - Reduce K (fewer paths)
 - Reduce edges (more aggressive ambiguity resolution before this step)
 - Use `AllDirectedPaths` only when you need every path; usually K-shortest with k=25 is fine

@@ -1,7 +1,7 @@
 ---
 name: init-workspace-flow-patterns
-description: "Phase 5 Patterns of init-workspace-flow"
-tags: ["init", "workspace", "patterns", "phase"]
+description: 'Phase 5 Patterns of init-workspace-flow'
+tags: ['init', 'workspace', 'patterns', 'phase']
 disable-model-invocation: true
 user-invocable: false
 baseSchema: docs/schemas/phase.md
@@ -14,23 +14,26 @@ Extract recurring code structures into explicit reusable pattern templates. With
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 5 of 9 in init-workspace-flow
 - Input: CODEMAP, source code
 - Output: docs/PATTERNS/ (INDEX.md, per-module files, CHANGES.md)
 - Prerequisite: Phase 3 complete (CODEMAP exists)
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Read state and CODEMAP
 2. Execute multi-agent pattern extraction
 3. Update state, log gaps
-</phase_steps>
+   </phase_steps>
 
 <read_state step="5.1">
+
 1. Read `agents/init-workspace-flow-state.md`
 2. Confirm Phase 3 complete and CODEMAP exists
 3. Read state.mode for dual-mode behavior
-</read_state>
+   </read_state>
 
 <execute_extraction step="5.2" subagent="built-in" role="Senior pattern analyst extracting reusable conventions" subagent_recommended_model="claude-sonnet-5, gpt-5.4-medium, gemini-3.1-pro-preview">
 
@@ -60,7 +63,7 @@ Orchestration: Read CODEMAP, identify distinct modules; spawn built-in subagent 
    - CREATE-OR-UPDATE: install = create all; upgrade = add missing only
    - PRESERVE-HUMAN: never overwrite human-curated content
    - REPORT-CHANGES: log to CHANGES.md
-3. Per pattern file (docs/PATTERNS/*.md):
+3. Per pattern file (docs/PATTERNS/\*.md):
    - **Name**: short identifier (e.g., "REST Controller Endpoint")
    - **Description**: what it solves, when to use
    - **Template/Example**: generalizable code skeleton with extension-point comments
@@ -71,25 +74,28 @@ Orchestration: Read CODEMAP, identify distinct modules; spawn built-in subagent 
 </extraction_process>
 
 <extraction_validation_checklist>
+
 - INDEX.md lists all pattern files
 - CHANGES.md tracks all actions taken
 - No human-curated content overwritten in upgrade mode
-</extraction_validation_checklist>
+  </extraction_validation_checklist>
 
 </execute_extraction>
 
 <update_state step="5.3">
+
 1. Write Phase 5 completion to `agents/init-workspace-flow-state.md`
 2. Update PATTERNS row in file inventory
 3. Log gaps for Phase 8
-</update_state>
+   </update_state>
 
 <validation_checklist>
+
 - docs/PATTERNS/INDEX.md exists and lists all extracted pattern files
 - Every CODEMAP module has pattern coverage or explicit skip reason
 - State file shows Phase 5 complete
 - Upgrade mode: no human-curated patterns overwritten
-</validation_checklist>
+  </validation_checklist>
 
 <pitfalls>
 - Do not extract implementation details as patterns — only recurring structures

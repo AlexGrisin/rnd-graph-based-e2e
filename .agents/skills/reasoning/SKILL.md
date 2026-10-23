@@ -1,6 +1,6 @@
 ---
 name: reasoning
-description: "To apply structured 8D meta-cognitive reasoning thinking to complex problems, then answer clearly with caveats. Must use when asked to think or reason."
+description: 'To apply structured 8D meta-cognitive reasoning thinking to complex problems, then answer clearly with caveats. Must use when asked to think or reason.'
 license: Apache-2.0
 disable-model-invocation: true
 user-invocable: true
@@ -29,12 +29,14 @@ Multi-dependency/tradeoff problems needing explicit confidence; skip simple, low
 Must apply fully canonical 8-point reasoning flow:
 
 1. DISCOVERY
+
 - Search relevant information
 - Affected areas
 - Existing patterns, standards, best practices, files, knowledge, packages, etc
 - Output terse, only then proceed next
 
 2. DECONSTRUCT
+
 - Extract core intent, key entities, and context
 - Identify output requirements and constraints
 - Break into sub-problems
@@ -42,6 +44,7 @@ Must apply fully canonical 8-point reasoning flow:
 - Output terse, only then proceed next
 
 3. DIAGNOSE
+
 - Audit for clarity gaps and ambiguity
 - Check specificity and completeness
 - Assess structure and complexity needs
@@ -50,6 +53,7 @@ Must apply fully canonical 8-point reasoning flow:
 - Output concise, only then proceed next
 
 4. DEVELOP
+
 - Use techniques: Multi-perspective, Constraint-based + precision focus, Few-shot examples + clear structure, Chain-of-thought + systematic frameworks
 - Extract systems, actors, roles, actions, events, data, models, and entities
 - Identify dependencies, edge cases, and constraints
@@ -62,6 +66,7 @@ Must apply fully canonical 8-point reasoning flow:
 - Output concise, only then proceed next
 
 5. DESIGN
+
 - Define target artifact structure
 - Define constraints and technical approach options
 - Include NFR and quality attributes where relevant
@@ -72,6 +77,7 @@ Must apply fully canonical 8-point reasoning flow:
 - Output concise, only then proceed next
 
 6. DELIVER
+
 - Construct resulting output artifact suited to task complexity
 - Provide implementation guidance with what and why
 - Generate scenarios, verification approach, and test data when relevant
@@ -82,22 +88,24 @@ Must apply fully canonical 8-point reasoning flow:
 - Output concise, only then proceed next
 
 7. DEBRIEF
+
 - Reflect: challenge the first answer for blind spots and conflicting signals.
 - If honest confidence < 0.8: name the weakest link, output a terse decision, and loop 1–7 again.
 - If confidence ≥ 0.8: proceed to DECIDE.
 
 8. DECIDE
-After DEBRIEF passes, **do not stop at the single surviving answer.** Branch the solution space using Tree-of-Thoughts and
-think each branch through to the end before committing.
+   After DEBRIEF passes, **do not stop at the single surviving answer.** Branch the solution space using Tree-of-Thoughts and
+   think each branch through to the end before committing.
 
 MUST use the following algorithm:
-  1. Branch. Enumerate the candidate answers or paths still in play — including the strongest alternatives to your leading answer, not only confirmations of it. Ask few targeted questions. If question can be answered from artifacts - read/search them.
-  2. Expand relentlessly. Take each branch to its conclusion: its consequences, its second-order effects, its failure modes, and the strongest case both *for* and *against* it. Do not abandon a branch because it looks weak early — follow it until it actually fails or actually holds.
-  3. Score. Rate each branch against the criteria and confidence established in steps 1–7.
-  4. Prune. Eliminate dominated branches and state, for each, the explicit reason it was killed.
-  5. Commit. Choose the surviving branch and give its rationale. If no branch dominates, surface the live tradeoff to the user as a decision rather than forcing a pick.
-  6. Output state.
-  7. Loop 1-7 into depth with more branches until crystal clear.
+
+1. Branch. Enumerate the candidate answers or paths still in play — including the strongest alternatives to your leading answer, not only confirmations of it. Ask few targeted questions. If question can be answered from artifacts - read/search them.
+2. Expand relentlessly. Take each branch to its conclusion: its consequences, its second-order effects, its failure modes, and the strongest case both _for_ and _against_ it. Do not abandon a branch because it looks weak early — follow it until it actually fails or actually holds.
+3. Score. Rate each branch against the criteria and confidence established in steps 1–7.
+4. Prune. Eliminate dominated branches and state, for each, the explicit reason it was killed.
+5. Commit. Choose the surviving branch and give its rationale. If no branch dominates, surface the live tradeoff to the user as a decision rather than forcing a pick.
+6. Output state.
+7. Loop 1-7 into depth with more branches until crystal clear.
 
 Once loop completed: output answer fully.
 

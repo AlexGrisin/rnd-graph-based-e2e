@@ -1,6 +1,6 @@
 ---
 name: api-aqa-flow-project-config-loading
-description: "Phase 0 Project Config Loading of api-aqa-flow (USER INTERACTION CONDITIONALLY REQUIRED)"
+description: 'Phase 0 Project Config Loading of api-aqa-flow (USER INTERACTION CONDITIONALLY REQUIRED)'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -14,6 +14,7 @@ Initialize the AQA session directory, load the existing project config or collec
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 0 of 8 in `api-aqa-flow`
 - Input (REQUIRED): user request with test case reference (TMS case ID, Issue Tracker ticket, or direct description — e.g. TestRail `C1234`, Jira `PROJ-123`)
 - Input (OPTIONAL, when provided by user): repository-root `gain.json` `sdlc.*` providers, Swagger/OpenAPI spec URL or path, Wiki/docs page URLs, backend source code locations
@@ -22,13 +23,14 @@ Initialize the AQA session directory, load the existing project config or collec
 - HITL: conditional — user is questioned ONLY if the project config does not already exist
 - Required skills: `qa-structure` (paths / `{IDENTIFIER}` / config schema / state shape), `sensitive-data` (redaction at intake)
 - Recommended skills: `questioning` (config-missing interview)
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Parse user input, resolve providers from `gain.json` + evidence, derive `{IDENTIFIER}`, and create the session directory + state-file stub.
 2. Load this session's config if present, or collect the still-missing project info from the user and create it.
 3. Create the initial-data file and mark Phase 0 complete.
-</phase_steps>
+   </phase_steps>
 
 <execute_config step="0.1" subagent="discoverer" role="AQA project config loader">
 
@@ -63,22 +65,25 @@ USE SKILL `qa-structure` for the session layout, `{IDENTIFIER}` derivation, and 
    - [ ] Phase 6: Execution & Report Analysis
    - [ ] Phase 7: Test Corrections
    ```
+
 5. **Load or create the project config** at `plans/api-aqa-{IDENTIFIER}/api-aqa-project-config.md` (per-session, inside the feature plan folder): if the file exists AND is non-empty → `<config_exists>`; if it is missing OR empty → `<config_missing>`.
 6. **Verify** the feature plan folder `plans/api-aqa-{IDENTIFIER}/` exists and the config is non-empty before proceeding.
 
 </execute_config>
 
 <config_exists step="0.1.5a">
+
 1. Reuse the existing config as-is; skip to step 0.2 — nothing to collect, no user interaction.
 2. Still confirm every required key from `qa-structure`'s config-key schema is present; a malformed / incomplete existing config is handled per `<failure_handling>` (the config-incomplete branch).
-</config_exists>
+   </config_exists>
 
 <config_missing step="0.1.5b">
+
 1. Pre-fill every key already resolved by step 0.1.2 provider evidence (`gain.json` + user input); then collect ONLY the still-unresolved project info from the user — USE SKILL `questioning` asking the config-missing interview prompt owned by `qa-structure`, trimmed to the missing keys.
 2. Validate the answers + prefill cover at minimum: Wiki/document storage, Swagger/OpenAPI availability, and the test-case source (TMS). If a required field is missing, ask ONE follow-up naming exactly the missing fields — cap 2 rounds total.
 3. Write the populated config using `qa-structure`'s config template, applying `<safety_boundaries>` redaction at intake.
 4. Required keys + accepted `N/A` forms are in `qa-structure`'s config-key schema.
-</config_missing>
+   </config_missing>
 
 <create_initial_data step="0.2">
 Write `plans/api-aqa-{IDENTIFIER}/initial-data.md` using the template below; all four fields populated from the parsed input (`None` only for additional-links):
@@ -91,9 +96,11 @@ Write `plans/api-aqa-{IDENTIFIER}/initial-data.md` using the template below; all
 **Test case reference:** [TMS case ID / Issue Tracker key / direct description summary]
 **Additional links provided:** [list URLs verbatim, or `None`]
 ```
+
 </create_initial_data>
 
 <update_state step="0.3">
+
 1. Update `agents/TEMP/<FEATURE>/api-aqa-state.md`:
    - Test Case Source: [TMS case ID / Issue Tracker key / Manual]
    - Providers: [resolved TMS / Wiki / Issue Tracker, with evidence source: gain.json / user / URL]
@@ -101,7 +108,7 @@ Write `plans/api-aqa-{IDENTIFIER}/initial-data.md` using the template below; all
    - Files Created: initial-data.md, api-aqa-state.md
    - Phase 0 completion timestamp
 2. Mark Phase 0 complete, Phase 1 current.
-</update_state>
+   </update_state>
 
 <safety_boundaries>
 
@@ -124,6 +131,7 @@ Write `plans/api-aqa-{IDENTIFIER}/initial-data.md` using the template below; all
 </failure_handling>
 
 <validation_checklist>
+
 - `plans/api-aqa-{IDENTIFIER}/` directory exists
 - `api-aqa-project-config.md` exists in the feature plan folder (per `qa-structure`) with non-empty content — either pre-existing or freshly written
 - **Every required key from `qa-structure`'s config-key schema is present** — populated with a real value OR explicitly marked `N/A — <reason>`; no key absent / blank / `TBD` without a documented next-step
@@ -132,6 +140,6 @@ Write `plans/api-aqa-{IDENTIFIER}/initial-data.md` using the template below; all
 - `{IDENTIFIER}` value identical across (a) directory name, (b) api-aqa-state.md IDENTIFIER field, (c) initial-data.md path; no fabricated `{IDENTIFIER}`
 - Redaction pre-write gate ran — `sensitive-data` scan executed against the config before write; no literal credential persisted; any redaction noted in `## Additional Notes`
 - No failure-handling condition from `<failure_handling>` is currently active — every listed scenario has either not been triggered or has been remediated
-</validation_checklist>
+  </validation_checklist>
 
 </api_aqa_flow_project_config_loading>

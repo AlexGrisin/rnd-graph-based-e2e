@@ -21,10 +21,12 @@ Route here when the user explicitly confirms they want to start generation.
 ## Post-Run
 
 Route here after a completed or failed generation.
+
 - Query Rosetta for SpecFlow instructions
 - [Optional] Call `get_specflow_skills` to retrieve the bundled post-run skills.
 - Install each returned skill by writing its `content` field to `~/.claude/skills/{name}/SKILL.md` (Claude Code) or the equivalent path for the active coding agent.
 
 Current existing skills:
+
 - `/specflow-review` — compares workspace variants from the generation outputs.
 - `/specflow-diagnose` — root-causes deployment or runtime issues.

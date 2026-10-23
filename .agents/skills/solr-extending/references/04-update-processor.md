@@ -86,6 +86,7 @@ class MyUpdateProcessor extends UpdateRequestProcessor {
 ```
 
 Register:
+
 ```xml
 <updateRequestProcessorChain name="myChain">
   <processor class="com.example.MyUpdateProcessorFactory">
@@ -112,6 +113,7 @@ URP-Pre  → DistributedUpdateProcessor → URP-Post → RunUpdate
 ```
 
 **Before Distributed (most common):**
+
 - Field validation, derivation, normalization
 - Document-level decisions that should be consistent across all replicas
 - Anything that affects routing (e.g., generating the doc ID)
@@ -119,6 +121,7 @@ URP-Pre  → DistributedUpdateProcessor → URP-Post → RunUpdate
 Runs once on the receiving node. Distributed copies the (mutated) doc to leader and replicas.
 
 **After Distributed:**
+
 - Replica-side bookkeeping (rare)
 - Things that depend on shard-local state
 - Logging that needs to happen per-replica
@@ -127,19 +130,19 @@ Runs on each leader and replica. Easy to introduce inconsistency — use only wh
 
 ## Built-in URPs you should know
 
-| URP | Purpose |
-|---|---|
-| `LogUpdateProcessorFactory` | Logs each add/delete; useful in dev, often skipped in prod |
-| `DistributedUpdateProcessorFactory` | SolrCloud routing — required in cloud mode |
-| `RunUpdateProcessorFactory` | Actually writes to Lucene — required, must be last |
-| `IgnoreCommitOptimizeUpdateProcessorFactory` | Drops user-issued commits; force scheduled commits only |
-| `TimestampUpdateProcessorFactory` | Adds a timestamp field |
-| `UUIDUpdateProcessorFactory` | Generates UUIDs for unset id field |
-| `RegexpBoostProcessorFactory` | Boosts docs matching regex patterns |
-| `LangDetectLanguageIdentifierUpdateProcessor` | Detects language from text fields |
-| `AddSchemaFieldsUpdateProcessorFactory` | Adds new fields to managed schema based on doc content |
-| `SignatureUpdateProcessorFactory` | Computes content signature for dedup |
-| `ScriptUpdateProcessorFactory` | Runs a JavaScript snippet per doc (deprecated; consider Java URP) |
+| URP                                           | Purpose                                                           |
+| --------------------------------------------- | ----------------------------------------------------------------- |
+| `LogUpdateProcessorFactory`                   | Logs each add/delete; useful in dev, often skipped in prod        |
+| `DistributedUpdateProcessorFactory`           | SolrCloud routing — required in cloud mode                        |
+| `RunUpdateProcessorFactory`                   | Actually writes to Lucene — required, must be last                |
+| `IgnoreCommitOptimizeUpdateProcessorFactory`  | Drops user-issued commits; force scheduled commits only           |
+| `TimestampUpdateProcessorFactory`             | Adds a timestamp field                                            |
+| `UUIDUpdateProcessorFactory`                  | Generates UUIDs for unset id field                                |
+| `RegexpBoostProcessorFactory`                 | Boosts docs matching regex patterns                               |
+| `LangDetectLanguageIdentifierUpdateProcessor` | Detects language from text fields                                 |
+| `AddSchemaFieldsUpdateProcessorFactory`       | Adds new fields to managed schema based on doc content            |
+| `SignatureUpdateProcessorFactory`             | Computes content signature for dedup                              |
+| `ScriptUpdateProcessorFactory`                | Runs a JavaScript snippet per doc (deprecated; consider Java URP) |
 
 ## Common patterns
 
@@ -272,6 +275,7 @@ The marker field prevents re-normalization on replay. Pick a field that only you
 ## Distributed mode behavior
 
 In SolrCloud:
+
 1. Doc arrives at any node
 2. URPs **before** `DistributedUpdateProcessor` run on the receiving node
 3. `DistributedUpdateProcessor` routes to the leader of the appropriate shard
@@ -373,6 +377,7 @@ public class MyURPTest extends SolrTestCaseJ4 {
 ```
 
 For factory-init testing:
+
 ```java
 @Test public void testFactoryInit() {
     NamedList<String> args = new NamedList<>();

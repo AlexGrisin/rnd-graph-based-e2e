@@ -1,6 +1,6 @@
 ---
 name: api-aqa-flow-api-spec-analysis
-description: "Phase 2 API Spec Analysis of api-aqa-flow"
+description: 'Phase 2 API Spec Analysis of api-aqa-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -14,26 +14,29 @@ Analyze Swagger/OpenAPI specification or codebase API definitions to extract end
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 2 of 8 in `api-aqa-flow`
 - Input: raw data from Phase 1 + project config (Swagger URL if available)
 - Output artifact path (single SSoT — referenced by other sections): `plans/api-aqa-{IDENTIFIER}/api-analysis.md` (resolve `{IDENTIFIER}` from `agents/TEMP/<FEATURE>/api-aqa-state.md`)
 - Prerequisite: Phase 1 complete, `raw-data.md` exists with identified endpoints
 - Read-only scope: locate spec/source, extract contracts, reconcile, write the analysis artifact. NO edits to backend source or product code.
 - Required skills: `qa-knowledge` (`code_analysis` mode — API-contract extraction; supplies the api-analysis skeleton), `reverse-engineering` (extraction engine of that mode), `sensitive-data` (redaction), `qa-structure` (`{IDENTIFIER}` + artifact path)
-</workflow_context>
+  </workflow_context>
 
 <input_contract>
 The phase supplies the skill two required inputs; the skill GATEs on both before any spec-location logic:
+
 - **Target-endpoint list** — non-empty, derived from Phase 1 test cases (or explicit user list). The skill never fabricates the target set. Empty/absent → stop, report back, ask the user.
 - **Spec/source path** — Swagger/OpenAPI URL OR file path OR backend source path with route definitions (determined in step 2.1). Neither supplied → stop; do NOT scan the whole codebase as a silent fallback unless the user explicitly requested it.
-</input_contract>
+  </input_contract>
 
 <phase_steps>
+
 1. Determine API specification source
 2. Execute API spec analysis using skill
 3. Produce API analysis document
 4. Validate and update state
-</phase_steps>
+   </phase_steps>
 
 <determine_spec_source step="2.1">
 
@@ -82,13 +85,15 @@ Create `plans/api-aqa-{IDENTIFIER}/api-analysis.md`. The phase owns the document
 </redaction_contract>
 
 <validate_findings step="2.4">
+
 1. Confirm all endpoints from test cases analyzed
 2. Confirm request/response schemas documented
 3. Confirm auth requirements identified
 4. Confirm data dependencies mapped
-</validate_findings>
+   </validate_findings>
 
 <update_state step="2.5">
+
 1. Update `agents/TEMP/<FEATURE>/api-aqa-state.md`:
    - Endpoints Analyzed: [count]
    - HTTP Methods: [GET/POST/PUT/DELETE/PATCH counts]
@@ -97,9 +102,10 @@ Create `plans/api-aqa-{IDENTIFIER}/api-analysis.md`. The phase owns the document
    - Backend Source Path: [path or N/A]
    - Phase 2 completion timestamp
 2. Mark Phase 2 complete, Phase 3 current
-</update_state>
+   </update_state>
 
 <validation_checklist>
+
 - **Coverage:** every target endpoint has a contract entry OR is flagged back as a gap with reason — no silent drops
 - **Source Citations:** every entry has ≥1 citation (Swagger JSONPath OR code `file:line`); citation-less entries are gaps, not entries
 - **No fabricated content:** every field traces to spec, to code, or is `N/A — <reason>` / `Gap: <reason>` — no invented schema fields, status codes, or auth
@@ -110,6 +116,6 @@ Create `plans/api-aqa-{IDENTIFIER}/api-analysis.md`. The phase owns the document
 - Request/response schemas, auth requirements, and data dependencies documented (from spec or code)
 - Backend source analyzed for route definitions (if path configured)
 - `api-analysis.md` created with all `<produce_output>` sections, each endpoint per the api-analysis template, plus the Analysis Summary metrics
-</validation_checklist>
+  </validation_checklist>
 
 </api_aqa_flow_api_spec_analysis>

@@ -1,6 +1,6 @@
 ---
 name: ui-aqa-flow-selector-implementation
-description: "Phase 5 Selector Implementation of ui-aqa-flow"
+description: 'Phase 5 Selector Implementation of ui-aqa-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -14,6 +14,7 @@ Add the selectors identified in Phase 4 to page objects, following project conve
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 5 of 8 in `ui-aqa-flow`
 - Input: the `## Selector Management` Part A inventory from Phase 4 (in the test plan); page-object inventory from Phase 3
 - Output: page objects extended/created with all required selectors; the Part B Implementation subsection recorded
@@ -21,7 +22,7 @@ Add the selectors identified in Phase 4 to page objects, following project conve
 - Write boundary (single SSoT): writes ONLY page-object files (and the test plan's `## Selector Management` → Implementation subsection). No test files, fixtures, or frontend source.
 - Required skills: `qa-knowledge` (`implementation_modes` — selector mode Part B), `qa-structure` (`<test-name>` paths + state shape)
 - Recommended skills: `coding` (general repo hygiene), `testing`
-</workflow_context>
+  </workflow_context>
 
 <skill_precedence>
 If repository general hygiene and the selector-mode page-object rules disagree: follow the selector mode (per `qa-knowledge` `implementation_modes`) for selector locators, page-object accessor/getter/method conventions, and UI-specific patterns; follow `coding` for general repo hygiene (formatting, shared helpers, import order) where it does not override those selector decisions. Repo docs win on general-hygiene conflicts.
@@ -40,12 +41,14 @@ If `qa-structure`, `qa-knowledge`, `testing`, or `coding` cannot be loaded: retr
 </load_failure>
 
 <phase_steps>
+
 1. Execute selector implementation (step 5.1)
 2. Validate implementation (step 5.2)
 3. Update state (step 5.3)
-</phase_steps>
+   </phase_steps>
 
 <execute_implementation step="5.1" subagent="engineer" role="Selector implementation specialist">
+
 1. USE SKILL `qa-structure` to resolve run paths/state. Apply `<part_a_inventory_gate>` — stop if the Part A inventory is missing.
 2. USE SKILL `coding` to read the repository standards as authority for general hygiene before touching page objects; repo docs beat model defaults.
 3. USE SKILL `qa-knowledge` (`implementation_modes` — selector mode, Part B: implement) and USE SKILL `testing` with the parent-supplied bindings: Part A inventory source = the test plan's `## Selector Management` section; write boundary = page-object files only (`<workflow_context>`); output = the Implementation subsection.
@@ -53,7 +56,7 @@ If `qa-structure`, `qa-knowledge`, `testing`, or `coding` cannot be loaded: retr
 5. **Fragile-selector gate:** any selector Phase 4 flagged as fragile is NOT committed silently — replace it with a stable alternative agreed with the user, or surface it for explicit approval first. Record approval evidence in the Implementation subsection.
 6. **Implementation report:** Part B writes the `### Implementation (Part B only)` subsection in the test plan's `## Selector Management` section (Page Objects Modified, Page Objects Created, Selectors Added, Methods Added, Fragile selectors implemented after approval). Step 5.3 echoes these into `agents/TEMP/<FEATURE>/ui-aqa-state.md`.
 7. **Conditional doc-style match:** add JSDoc/TSDoc on new selectors/methods ONLY if existing page objects in the same file/module already use it. Match the existing style; do not introduce doc comments to a module that lacks them.
-</execute_implementation>
+   </execute_implementation>
 
 <validate step="5.2">
 1. Check linting/format on all modified/created files; fix errors.
@@ -62,6 +65,7 @@ If `qa-structure`, `qa-knowledge`, `testing`, or `coding` cannot be loaded: retr
 </validate>
 
 <update_state step="5.3">
+
 1. Update `agents/TEMP/<FEATURE>/ui-aqa-state.md` (mirrors the Implementation subsection — canonical shape in the test plan; this is the state-file echo):
    - Page Objects Modified: [list with paths]
    - Page Objects Created: [list with paths]
@@ -71,9 +75,10 @@ If `qa-structure`, `qa-knowledge`, `testing`, or `coding` cannot be loaded: retr
    - Linting: [clean/resolved]
    - Phase 5 completion timestamp
 2. Mark Phase 5 complete, Phase 6 current
-</update_state>
+   </update_state>
 
 <validation_checklist>
+
 - All missing selectors from the Phase 4 map implemented (or flagged-and-handled per the fragile-selector gate)
 - New page objects created if needed, using existing page objects as templates
 - General repo hygiene applied (formatting, shared helpers) and selector-mode rules applied for selector/page-object conventions — no conflicting shortcuts (see Resolved example / Anti-pattern in `<skill_precedence>`)
@@ -82,6 +87,6 @@ If `qa-structure`, `qa-knowledge`, `testing`, or `coding` cannot be loaded: retr
 - No fragile selector committed without recorded approval
 - No files outside the page-object layer modified (write boundary)
 - Linting/format checked and fixed; Implementation subsection recorded
-</validation_checklist>
+  </validation_checklist>
 
 </ui_aqa_flow_selector_implementation>

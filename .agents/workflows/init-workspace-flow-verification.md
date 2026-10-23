@@ -1,7 +1,7 @@
 ---
 name: init-workspace-flow-verification
-description: "Phase 9 Verification of init-workspace-flow"
-tags: ["init", "workspace", "verification", "phase"]
+description: 'Phase 9 Verification of init-workspace-flow'
+tags: ['init', 'workspace', 'verification', 'phase']
 disable-model-invocation: true
 user-invocable: false
 baseSchema: docs/schemas/phase.md
@@ -14,23 +14,26 @@ Without a final verification pass, incomplete or inconsistent documentation ship
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 9 of 9 in init-workspace-flow (final phase)
 - Prerequisite: Phases 1-8 complete
 - Output: verification report, next steps, new-chat enforcement
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Read state file and confirm prerequisites
 2. Execute verification checklist
 3. Suggest next steps
 4. Enforce new chat and mark COMPLETE
-</phase_steps>
+   </phase_steps>
 
 <read_state step="9.1">
+
 1. Read `agents/init-workspace-flow-state.md`
 2. Confirm Phases 1-8 all marked complete
 3. Collect unresolved gaps from Phase 8
-</read_state>
+   </read_state>
 
 <execute_verification step="9.2" subagent="built-in" role="Workspace initialization auditor" subagent_recommended_model="claude-sonnet-5,gpt-5.4-medium">
 
@@ -105,23 +108,26 @@ ASSUMPTIONS REVALIDATION:
 </execute_verification>
 
 <next_steps step="9.3">
+
 1. If verification found failed checkpoints: list specific remediation actions
 2. Suggest next steps based on workspace state:
    - Run coding workflow for first feature
    - Review and customize generated docs
    - Add project-specific patterns
-</next_steps>
+     </next_steps>
 
 <enforce_new_chat step="9.4">
+
 1. EMPHASIZE: MUST start a new chat session after init completes
 2. Current session context is polluted with init-specific state
 3. Mark state as COMPLETE in `agents/init-workspace-flow-state.md`
-</enforce_new_chat>
+   </enforce_new_chat>
 
 <validation_checklist>
+
 - Verification skill ran and reported pass/fail per checkpoint
 - Failed checkpoints have documented remediation
 - State file shows COMPLETE status
-</validation_checklist>
+  </validation_checklist>
 
 </init_workspace_flow_verification>

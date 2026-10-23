@@ -1,7 +1,7 @@
 ## What is Rosetta
 
 Rosetta is an instructions and processes enforcement for AI coding agents (like you).
-It is public OSS and central repository of rules/skills/agents/subagents/commands/workflows stored as markdown files. 
+It is public OSS and central repository of rules/skills/agents/subagents/commands/workflows stored as markdown files.
 These artifacts are deployed via plugins (preferred) or MCP into a target real software project repository, which has its own files and folder structure.
 
 Top-agent sessions receive `bootstrap-alwayson.md` plus exactly one mode file: `mcp-files-mode.md` (MCP), `plugin-files-mode.md` (plugin/standalone), or `local-files-mode.md` (developing Rosetta). Spawned subagents receive only `bootstrap-alwayson.md` + their dispatch prompt, which requires `subagent-directives` and any task-needed skills. Heavy process loads on demand through skills and workflows; the plugin mode file carries no alias mapping because typed aliases operate natively on plugin files.
@@ -15,7 +15,7 @@ Remember that Rosetta (rosetta, cto-ims-kb) and target repositories ARE DIFFEREN
 ## How to think about Rosetta
 
 `instructions` folder has folders for releases (r1, r2, r3).
-One agent works with only one release (no cross refs), upgrades switch releases to latest. 
+One agent works with only one release (no cross refs), upgrades switch releases to latest.
 R3 is the final numbered release and receives incremental updates; R2 (previous) receives backported fixes only.
 Instructions are uploaded to RAGFlow (all releases as separate datasets), where MCP reads it from latest stable dataset only.
 Instructions are also copied and adapted by plugin generator to generate coding agent plugins (to avoid MCP altogether).
@@ -25,7 +25,7 @@ Other engineers install Rosetta plugins (preferred) or MCP to their TARGET repos
 AI coding agents support subagents feature: the top agent assumes orchestrator role and executes subagents sequentially or in parallel, basically managing its own team. Very small tasks do not need subagent overhead, but medium to large require use of subagents to reduce cost and prevent context compaction. Subagent run physically in he same process and environment (only LLM context is fresh).
 If conversation history runs for long or loads too many files/calls it overflows. AI coding agents perform context compaction.
 Context compaction destroys majority of knowledge (bootstraps, reasoning, original code) and renders coding agent fully unreliable.
-You review original instructions so that they work properly within coding agents on the target repository. 
+You review original instructions so that they work properly within coding agents on the target repository.
 Must distinguish repos, actors, prompts, etc as defined above.
 Use references `rosetta`, `cto-ims-kb`, `RulesOfPower` (all must be).
 
@@ -41,4 +41,4 @@ MUST USE SKILL `orchestration` for all subagent dispatches.
 MUST USE SKILL `coding-agents-prompt-authoring` to review and to harden the changes and at least must include pa-rosetta.md, pa-patterns, pa-hardening.md, pa-schemas.md.
 Subagents MUST USE SKILL `coding-agents-prompt-authoring` with references listed above (and more if they determine additional references are needed).
 
-Each orchestrator/subagent instance can handle at most 7 prompt files (hard cap). Apply the small/large split thresholds defined in the Workflow section; when splitting, group prompts by release (instructions/r*), then by their prompt families or usage patterns.
+Each orchestrator/subagent instance can handle at most 7 prompt files (hard cap). Apply the small/large split thresholds defined in the Workflow section; when splitting, group prompts by release (instructions/r\*), then by their prompt families or usage patterns.

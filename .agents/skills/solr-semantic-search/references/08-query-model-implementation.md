@@ -1,4 +1,4 @@
-# Sm* Query Model — Reference Implementation
+# Sm\* Query Model — Reference Implementation
 
 This file gives you the **complete code** for the abstract Sm query model that's mentioned throughout this skill (in `01-architecture.md` and `06-query-building.md`). If you're implementing semantic search for a new domain, drop these classes into your project as a starting point.
 
@@ -101,6 +101,7 @@ public class SmClause {
 ```
 
 `Occur` mirrors Lucene's `BooleanClause.Occur`. Use:
+
 - `MUST` — must match, contributes to score
 - `FILTER` — must match, no score contribution (cheaper)
 - `SHOULD` — optional, contributes to score, counts toward mm
@@ -156,7 +157,7 @@ public interface QueryParserFabric<T extends ParsedQuery> {
 }
 ```
 
-## Concrete Sm* query classes
+## Concrete Sm\* query classes
 
 Each implements `SmQuery`, holds whatever data the type needs, and forwards `parse()` to the fabric's specific parser.
 
@@ -630,11 +631,13 @@ Look at how `SolrParsedQuery` accumulates state. When a `SmTermQuery` is parsed,
 3. Calls `queryBuilder.setQuery(queryString)` — also makes it the "current" query
 
 Now when `SmBooleanQuery` is parsed, it doesn't have to inline the term query string — it just references its ID:
+
 ```
 {!bool must=$term_id_1 should=$term_id_2 mm=2}
 ```
 
 The final HTTP request to Solr looks like:
+
 ```
 ?q={!bool must=$term_id_1 should=$term_id_2 mm=2}
 &term_id_1={!term f=color_s v='red'}
@@ -1091,6 +1094,7 @@ solr.getParams().getParameters().forEach((k, v) ->
 ```
 
 Output (formatted):
+
 ```
 Main: {!boost b=1.5}$top_level
 
@@ -1103,6 +1107,7 @@ Main: {!boost b=1.5}$top_level
 ```
 
 Send to Solr:
+
 ```
 GET /solr/catalog/select
   ?q={!boost b=1.5}$top_level
@@ -1146,6 +1151,7 @@ This is the payoff for the indirection — production deployments that run Solr 
 Most translators reference sub-queries via `$queryId`. If a sub-query has `queryId == null`, you'll get `$null` in the output, which Solr can't resolve.
 
 Always assign `queryId` either:
+
 - In the constructor
 - Before adding to a boolean query (`q.setQueryId("path_3_term_5")`)
 - Use a counter/sequencer in your `SemanticQueryBuilder`

@@ -49,11 +49,13 @@ class MyTransformer extends DocTransformer {
 ```
 
 Register in solrconfig.xml:
+
 ```xml
 <transformer name="myTransform" class="com.example.MyTransformerFactory"/>
 ```
 
 Use in fl:
+
 ```
 fl=*,result:[myTransform arg=foo]
 ```
@@ -166,6 +168,7 @@ public void transform(SolrDocument doc, int docid) throws IOException {
 ```
 
 Why `ParentChildrenBlockJoinQuery` instead of `{!terms f=parent_id_s}$row.id`:
+
 - No filter cache pollution (no per-parent fq)
 - Block-join already knows the children's docids without a join lookup
 - Faster on large indexes; same per-instance configuration as `[subquery]`
@@ -257,6 +260,7 @@ private void checkNoDupe(String field, Map<Object, Object> context) {
 DocTransformers run on the node assembling the final response — typically the coordinator in SolrCloud. They see the merged result, not per-shard.
 
 Implications:
+
 - Transformer `transform()` is called only for the `rows`-bounded final result (not all shard candidates).
 - If transformer needs data only available on the doc's home shard (e.g., per-shard cached state), you have a problem. Most transformers don't need this — `getSearcher()` returns the coordinator's view, which can read from any shard via the standard mechanisms.
 - For transformers that fetch per-doc, network cost from coordinator can be significant in cloud mode. Co-locate caches.
@@ -313,6 +317,7 @@ double price = ((Number) doc.getFieldValue("price_f")).doubleValue();  // NPE if
 ```
 
 Always check `getFieldValue` for null:
+
 ```java
 Object v = doc.getFieldValue("price_f");
 if (v instanceof Number) {
@@ -338,6 +343,7 @@ For pure computation (no IO): negligible even at rows=1000.
 For fetches: keep rows × per-doc-fetch-latency under your latency budget. A request with rows=20 and 2ms-per-doc fetch = 40ms transformer overhead. With rows=200, 400ms — too much.
 
 Mitigations:
+
 - Use a SearchComponent partner to bulk-prefetch (see `01-search-component.md`)
 - Cache aggressively in `req.getContext()` shared between multiple transformer invocations
 - Avoid IO on the doc being transformed — pre-compute at indexing time when possible

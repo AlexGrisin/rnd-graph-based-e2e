@@ -1,7 +1,7 @@
 ---
 name: init-workspace-flow
-description: "Workflow for initializing or upgrading a workspace: context, discovery, documentation, etc."
-tags: ["workflow"]
+description: 'Workflow for initializing or upgrading a workspace: context, discovery, documentation, etc.'
+tags: ['workflow']
 user-invocable: true
 baseSchema: docs/schemas/workflow.md
 ---
@@ -30,8 +30,10 @@ Validation: State file tracks every phase with file inventory; verification conf
 9. IF state.file_count >= 100 (set by Phase 3): pass "USE SKILL `large-workspace-handling`" to Phase 5, 7, 8 subagents.
 10. Create `agents/init-workspace-flow-state.md`.
 11. Conditional phases:
-  - If you have already in context "RUNNING AS A PLUGIN": MUST NOT EXECUTE "shells" phase 2
-  - Else MUST EXECUTE "shells" phase 2
+
+- If you have already in context "RUNNING AS A PLUGIN": MUST NOT EXECUTE "shells" phase 2
+- Else MUST EXECUTE "shells" phase 2
+
 12. Note: `rosetta@rosetta` is an MCP connector, not a plugin — it follows the normal path (shells phase 2 executes)
 13. If user says to initialize rules, subagents, agents, workflows, commands it ONLY means to execute "shells" phase 2.
 14. Upgrade from R2 to R3 is exactly the same process as define here, but you already have some files available, which you can reuse.
@@ -120,10 +122,11 @@ DISABLED
 </workflow_phases>
 
 <next_steps>
+
 1. DEMAND user as MUST to start new chat session (highly visible message, red icon, bold, ASCII art, it must standout).
 2. DEMAND user to study (USAGE GUIDE)[https://griddynamics.github.io/rosetta/docs/usage-guide/]
 3. DEMAND user to review examples for the next steps for user and EMPHASIS on "/slash-commands":
-   
+
    ```md
    # Coding Workflow
 
@@ -149,13 +152,14 @@ DISABLED
 
    **NOTE**: All phases are must. All phases to be implemented one-by-one with proper review. Phase 3: Pre-Modernization Test Coverage is a must (and must include both unit and integration/e2e tests).
 
-   "/modernization-flow Perform modernization phase 1 to reuse library refsrc/... using subagents." 
+   "/modernization-flow Perform modernization phase 1 to reuse library refsrc/... using subagents."
 
    "/modernization-flow Perform modernization phase 2 to analyze service module ... using subagents. Target microservice name is ... ."
 
    "/modernization-flow Perform modernization phase 8 for target service to analyze service module ... using subagents. Must USE FLOW `coding-flow.md` to actually implement and as the main flow. Once done spawn subagent to validate and repeat an entire loop until there are no issues detected."
    ```
-</next_steps>
+
+   </next_steps>
 
 <pitfalls>
 

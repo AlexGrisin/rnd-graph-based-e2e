@@ -1,6 +1,6 @@
 ---
 name: coding-agents-farm
-description: "To orchestrate parallel coding-agent farms (Claude, Codex, Copilot, Gemini, etc.) on isolated git worktrees."
+description: 'To orchestrate parallel coding-agent farms (Claude, Codex, Copilot, Gemini, etc.) on isolated git worktrees.'
 license: Apache-2.0
 disable-model-invocation: false
 user-invocable: true
@@ -9,8 +9,8 @@ model: gpt-5.5
 model_reasoning_effort: high
 context: default
 metadata:
-  version: "1.0"
-  category: "orchestration"
+  version: '1.0'
+  category: 'orchestration'
 tags:
   - coding-agents-farm
   - multi-agent
@@ -37,27 +37,28 @@ USER MUST TYPE EXACTLY `Yes, I take responsibility`, IF NOT PROVIDED EXACTLY - A
 
 Provider-model constraints (enforced, not optional):
 
-| CLI | Provider | Headless cmd | Model flag |
-|-----|----------|-------------|-----------|
-| `claude` | Anthropic only | `claude -p "PROMPT"` | `--model MODEL` |
-| `codex` | OpenAI only | `codex exec "PROMPT"` | `-m MODEL` |
-| `copilot` | GitHub-hosted (multi) | `copilot -p "PROMPT"` | `--model MODEL` |
-| `gemini` | Google only | `gemini -p "PROMPT"` | `-m MODEL` |
-| `opencode` | Multi-provider | `opencode run "PROMPT"` | `-m provider/model` |
-| `goose` | Multi-provider (config) | `goose run --text "PROMPT"` | Config-based |
+| CLI        | Provider                | Headless cmd                | Model flag          |
+| ---------- | ----------------------- | --------------------------- | ------------------- |
+| `claude`   | Anthropic only          | `claude -p "PROMPT"`        | `--model MODEL`     |
+| `codex`    | OpenAI only             | `codex exec "PROMPT"`       | `-m MODEL`          |
+| `copilot`  | GitHub-hosted (multi)   | `copilot -p "PROMPT"`       | `--model MODEL`     |
+| `gemini`   | Google only             | `gemini -p "PROMPT"`        | `-m MODEL`          |
+| `opencode` | Multi-provider          | `opencode run "PROMPT"`     | `-m provider/model` |
+| `goose`    | Multi-provider (config) | `goose run --text "PROMPT"` | Config-based        |
 
 Auto-approve flags (use ALL applicable flags, not just one):
 
-| CLI | CLI flags | Env vars / Config (set before launch) |
-|-----|-----------|--------------------------------------|
-| `claude` | `--dangerously-skip-permissions` (= `--permission-mode bypassPermissions`) | Settings: `"defaultMode": "bypassPermissions"` in `.claude/settings.json`; also `"permissions": {"allow": ["Bash","Edit","Write","Read","WebFetch","mcp__*"]}` |
-| `codex` | `--yolo` (= `--dangerously-bypass-approvals-and-sandbox`, = `-a never --sandbox danger-full-access`) | Env: `CODEX_UNSAFE_ALLOW_NO_SANDBOX=1` |
-| `copilot` | `--yolo` (= `--allow-all`) | N/A; known issue: may still prompt in some edge cases |
-| `gemini` | `--yolo` (= `-y`) | Env: `GEMINI_YOLO_MODE=true`; Config: `"yolo": true` in `~/.gemini/settings.json`; also `--approval-mode auto_edit` for file-only auto-approve |
-| `opencode` | `--yolo` (= `--dangerously-skip-permissions`) | Env: `OPENCODE_YOLO=true`; Config: `"yolo": true` in `opencode.json`; granular: `"permission": {"*": {"*": "allow"}}` |
-| `goose` | None (config-only) | Config: auto-approve in `~/.config/goose/profiles.yaml` |
+| CLI        | CLI flags                                                                                            | Env vars / Config (set before launch)                                                                                                                          |
+| ---------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `claude`   | `--dangerously-skip-permissions` (= `--permission-mode bypassPermissions`)                           | Settings: `"defaultMode": "bypassPermissions"` in `.claude/settings.json`; also `"permissions": {"allow": ["Bash","Edit","Write","Read","WebFetch","mcp__*"]}` |
+| `codex`    | `--yolo` (= `--dangerously-bypass-approvals-and-sandbox`, = `-a never --sandbox danger-full-access`) | Env: `CODEX_UNSAFE_ALLOW_NO_SANDBOX=1`                                                                                                                         |
+| `copilot`  | `--yolo` (= `--allow-all`)                                                                           | N/A; known issue: may still prompt in some edge cases                                                                                                          |
+| `gemini`   | `--yolo` (= `-y`)                                                                                    | Env: `GEMINI_YOLO_MODE=true`; Config: `"yolo": true` in `~/.gemini/settings.json`; also `--approval-mode auto_edit` for file-only auto-approve                 |
+| `opencode` | `--yolo` (= `--dangerously-skip-permissions`)                                                        | Env: `OPENCODE_YOLO=true`; Config: `"yolo": true` in `opencode.json`; granular: `"permission": {"*": {"*": "allow"}}`                                          |
+| `goose`    | None (config-only)                                                                                   | Config: auto-approve in `~/.config/goose/profiles.yaml`                                                                                                        |
 
 Known auto-approve issues:
+
 - Claude Code: bug where allowlist permissions silently denied even when configured (as of Feb 2026). Use `bypassPermissions` mode, not allowlists.
 - Codex: `--yolo` suppresses trust prompt but `.codex/skills` may still gate on per-project trust. Fixed in v0.88+.
 - Copilot: `--yolo` may still prompt for some operations in edge cases. No full workaround.
@@ -66,6 +67,7 @@ Known auto-approve issues:
 YOUR INTERNAL KNOWLEDGE ABOUT MODEL NAMES, CLI FLAGS, AND TOOL VERSIONS IS STALE. Use ONLY the names and flags listed in this skill. Do NOT substitute from memory. If unsure about a model name, omit the model flag and let the CLI use its default.
 
 Model selection guidance:
+
 - Anthropic: `claude-sonnet-5` (workhorse), `claude-opus-4-8` (complex), `claude-haiku-4-5` (fast)
 - OpenAI: `gpt-5.4` (workhorse), `gpt-5.5-high` (complex)
 - Google: `gemini-3.1-pro-preview` (workhorse), `gemini-3.5-flash` (fast)
@@ -102,6 +104,7 @@ Size of features for coding agents: 1h+ of AI work (10+ phases, 20+ subagent cal
 ### 3. Prompt Construction
 
 Construct a self-contained prompt per orchestrator:
+
 - Specific subtask with clear scope boundaries and file list.
 - "You MUST run tests and validate your changes before reporting completion."
 - "Do NOT modify files outside your assigned scope."
@@ -113,31 +116,37 @@ Construct a self-contained prompt per orchestrator:
 Launch each CLI in background using the Shell tool with `block_until_ms: 0` and `working_directory` set to the worktree path.
 
 Claude Code:
+
 ```
 claude -p "PROMPT" --dangerously-skip-permissions --model claude-sonnet-5 --max-turns 30 --output-format json --no-session-persistence
 ```
 
 Codex:
+
 ```
 codex exec "PROMPT" --yolo -m gpt-5.4-medium --ephemeral -o result.txt
 ```
 
 Copilot:
+
 ```
 copilot -p "PROMPT" --yolo --model MODEL --silent
 ```
 
 Gemini (set `GEMINI_YOLO_MODE=true` in env before launch):
+
 ```
 gemini -p "PROMPT" --yolo -m gemini-3.1-pro-preview --output-format json
 ```
 
 OpenCode (set `OPENCODE_YOLO=true` in env before launch):
+
 ```
 opencode run "PROMPT" --yolo -m provider/model --format json
 ```
 
 Goose (ensure `profiles.yaml` has auto-approve and provider configured before launch):
+
 ```
 goose run --text "PROMPT"
 ```
@@ -149,6 +158,7 @@ Pre-flight: before launching any CLI, verify auto-approve is effective by runnin
 ### 5. Monitor
 
 Poll each terminal output file periodically. Detect:
+
 - **Completion**: exit code appears in terminal footer.
 - **Questions/Blocks**: orchestrator asks a question or reports a blocker — intervene immediately.
 - **Rate limiting**: look for rate-limit or 429 errors — back off and retry or reassign.

@@ -18,6 +18,7 @@ Each gap is recorded as one entry; if all five dimensions are satisfied, emit th
 
 ```markdown
 ### G-N: [Brief gap title]
+
 - **Dimension:** D1 | D2 | D3 | D4 | D5
 - **Priority:** Critical (blocks test design) | Should (impairs quality) | Optional
 - **Confidence:** High (clearly a gap) | Low (borderline -- flag for prioritization)
@@ -25,7 +26,7 @@ Each gap is recorded as one entry; if all five dimensions are satisfied, emit th
 - **Derived assertion (if applicable):** [Concrete measurable form, e.g. `response.statusCode == 200` or `page.title == "Order Confirmed"`. Blank if none derivable from the plan as written.]
 ```
 
-Specificity expectation for the downstream question (exact-text-vs-contains, timing budget, single-decision-per-question) is owned by the questioning step -- e.g. *"After Logout, assert exact text `'Success!'` OR that the message **contains** `'Success'` (case-insensitive)? Acceptable wait window -- 2s, 5s, or match existing similar tests?"* Vague *"is the user logged out?"* questions are forbidden.
+Specificity expectation for the downstream question (exact-text-vs-contains, timing budget, single-decision-per-question) is owned by the questioning step -- e.g. _"After Logout, assert exact text `'Success!'` OR that the message **contains** `'Success'` (case-insensitive)? Acceptable wait window -- 2s, 5s, or match existing similar tests?"_ Vague _"is the user logged out?"_ questions are forbidden.
 
 ## Clarification questions message
 
@@ -58,22 +59,27 @@ Please provide answers so I can proceed with test implementation.
 ## Phase 2: Requirements Clarification
 
 ### Questions Asked
+
 [List of questions]
 
 ### User Responses
+
 [Documented answers]
 
 ### Edge Cases to Cover
+
 - [Edge case 1]
 - [Edge case 2]
-...
+  ...
 
 ### Test Data Requirements
+
 - [Data requirement 1]
 - [Data requirement 2]
-...
+  ...
 
 ### Open Questions
+
 - [Each declined or unanswered question -- `declined by user -- <reason>` or `unanswered (Edge/Optional)` -- citing the question. If none: `None -- all questions answered.`]
 
 ### Explicit Assertions (mandatory -- transcribed from step 2.1 gap analysis)

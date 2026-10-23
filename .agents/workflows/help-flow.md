@@ -1,7 +1,7 @@
 ---
 name: help-flow
-description: "Help about Rosetta: explains capabilities and usage."
-tags: ["workflow"]
+description: 'Help about Rosetta: explains capabilities and usage.'
+tags: ['workflow']
 user-invocable: true
 baseSchema: docs/schemas/workflow.md
 ---
@@ -22,6 +22,7 @@ When presenting capabilities to users, always show concrete slash command exampl
 `/[command-name] [request in natural language]`
 
 QUICKSTART REFERENCE PATTERN — use this exact style for all examples shown to users:
+
 ```
 /coding-flow Implement side bar on the home page, ...
 /coding-flow Identify and implement fix, ...
@@ -41,6 +42,7 @@ Skills can be invoked directly. Slash command = folder name of the skill.
 Naming rule: `skills/[folder-name]/SKILL.md` → `/[folder-name] [request]`
 
 WHAT MAKES A VALID DIRECT SKILL EXAMPLE — a valid request must have all three:
+
 1. Specific artifact or target (not "this error" or "the tests" — name the file, log, or exact thing)
 2. Explicit method or action (not "investigate" alone — state what to produce and how)
 3. Explicit scope constraint (state what NOT to do, or what the boundary is)
@@ -49,11 +51,13 @@ WORKFLOWS ARE SELF-CONTAINED — they invoke skills internally:
 `coding-flow` handles all coding tasks and invokes debugging, testing, and other skills itself as needed. Similarly, every other workflow invokes its own skills internally. Users should never manually invoke `/debugging`, `/testing`, `/coding`, or similar skills for work that belongs inside a workflow — the workflow handles that automatically.
 
 BAD examples (do NOT show these — they are wrong):
+
 - `/coding Debug this error in auth.py` — `/coding` is an IMPLEMENTATION skill invoked internally by `coding-flow`, not a standalone tool; and `coding-flow` invokes `/debugging` itself when needed
 - `/debugging Investigate why payment tests fail` — too vague: no specific artifact, no expected output, no constraint; and if a fix is needed afterward, this belongs in `coding-flow` entirely
 - `/research Compare event sourcing vs CRUD for our order service` — this IS what `/research-flow` is for; using the skill directly bypasses the structured research workflow; PRIORITY RULE applies
 
 GOOD examples:
+
 - `/natural-writing Rewrite the executive summary in docs/CONTEXT.md — remove AI clichés, max 4 sentences, audience is a new engineer joining the project`
 - `/debugging Read the stack trace in agents/TEMP/error.log — identify root cause only, do NOT propose fixes, report findings`
 
@@ -64,6 +68,7 @@ Naming rule: `agents/[name].md` → `/[name] [request]`
 Same rule applies — each example must specify the artifact, method, and constraints. Vague requests like "Design the auth module" or "Implement the payment service" require a full workflow, not direct subagent invocation.
 
 GOOD examples:
+
 - `/architect Question me and initialize as a loop a project-brief.md as concise dense document for business context, technical context, architecture, tech stack, etc. No coding.`
 - `/reviewer Check current git changes, understand what was changed and why, validate against AC, find gaps or possible issues according to DoD`
 - `/reviewer Validate implemented changes by actually running the code and using manual QA by AI`

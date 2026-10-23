@@ -1,8 +1,8 @@
 ---
 name: api-aqa-flow
-description: "Workflow for backend API test automation: TMS / Issue Tracker test cases → automated API tests, HITL-gated."
+description: 'Workflow for backend API test automation: TMS / Issue Tracker test cases → automated API tests, HITL-gated.'
 alwaysApply: false
-tags: ["workflow"]
+tags: ['workflow']
 user-invocable: true
 baseSchema: docs/schemas/workflow.md
 ---
@@ -41,15 +41,16 @@ This block owns ONLY the api-aqa-flow-specific skip rules below: a set of **alwa
 
 - **Verification-failure unilateral-start override** — subordinate to the `hitl` skill + the carve-outs above; the only no-ask deviation, applies only at this skip-verification gate.
 
-  | Precondition (ALL true, independently verified) | Action |
-  |---|---|
+  | Precondition (ALL true, independently verified)                                                                                                                                                         | Action                                                                                                                                                                                                                                                            |
+  | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
   | (a) user asserts Phases 0-2 complete this turn AND (b) `agents/TEMP/<FEATURE>/api-aqa-state.md` marks them complete AND (c) `raw-data.md` + `api-analysis.md` exist under `plans/api-aqa-{IDENTIFIER}/` | **Print (a)/(b)/(c) each with its concrete evidence** (user-assertion quote · the api-aqa-state rows · the two artifact paths), then skip Phases 0-2 and resume at Phase 3. Any precondition not showable with concrete evidence → treat as uncertain (last row). |
-  | Any of (a)/(b)/(c) false AND user instruction unambiguous | Print failing conditions; begin Phase 0 same turn. |
-  | Any precondition uncertain | Fall back to normal HITL ask. **Ambiguity defaults to ASK.** |
+  | Any of (a)/(b)/(c) false AND user instruction unambiguous                                                                                                                                               | Print failing conditions; begin Phase 0 same turn.                                                                                                                                                                                                                |
+  | Any precondition uncertain                                                                                                                                                                              | Fall back to normal HITL ask. **Ambiguity defaults to ASK.**                                                                                                                                                                                                      |
 
 </skip_rules>
 
 <execution_policy>
+
 - If user did not specify preferences, perform all steps except optional.
 - MUST follow JIT phase-by-phase: do not load/act IN ADVANCE.
 - User CAN customize: specific phases, already-done phases, specific goals, specific cases — LISTEN and ADOPT.
@@ -57,74 +58,82 @@ This block owns ONLY the api-aqa-flow-specific skip rules below: a set of **alwa
 - **Repository coding standards:** follow `<coding_standards_precedence>`.
 - Prefer extending existing test files and utilities over creating new ones.
 - **Overall workflow done when:** every phase required for this run is marked complete in `agents/TEMP/<FEATURE>/api-aqa-state.md`, expected artifacts for those phases exist under `plans/api-aqa-{IDENTIFIER}/` (and related paths named in phase docs), and the user accepts the last test outcome or explicitly stops the run.
-</execution_policy>
+  </execution_policy>
 
 <project_config_loading phase="0" applies="ALL" subagent="discoverer" role="AQA project config loader" subagent_required_model="claude-sonnet-5, gpt-5.4-medium, gemini-3.1-pro, grok-4.5, gpt-5.6-terra" type="HITL-CONDITIONAL">
+
 - APPLY PHASE `api-aqa-flow-project-config-loading.md`
 - Input: user request. Output: project config file, initial data file, session directory at `plans/api-aqa-{IDENTIFIER}/`.
 - HITL gate: **ASK USER FOR PROJECT INFO** if config does not already exist.
 - Required skills: `qa-structure`, `sensitive-data` (redaction at intake)
 - Recommended skills: `questioning` (config-missing interview)
 - Update `agents/TEMP/<FEATURE>/api-aqa-state.md`; Phase 0 is not complete until its output spot-check passes.
-</project_config_loading>
+  </project_config_loading>
 
 <data_collection phase="1" applies="ALL" subagent="discoverer" role="AQA data collector" subagent_required_model="claude-sonnet-5, gpt-5.4-medium, gemini-3.1-pro, grok-4.5, gpt-5.6-terra">
+
 - APPLY PHASE `api-aqa-flow-data-collection.md`
 - Input: project config + initial data. Output: `plans/api-aqa-{IDENTIFIER}/raw-data.md` (test cases, documentation, existing test patterns).
 - Required skills: `data-collection` (TMS + Wiki collector), `qa-knowledge` (`code_analysis` mode — existing-test + backend-source scan), `reverse-engineering`, `qa-structure`
 - Update `agents/TEMP/<FEATURE>/api-aqa-state.md`; Phase 1 is not complete until its output spot-check passes.
-</data_collection>
+  </data_collection>
 
 <api_spec_analysis phase="2" applies="ALL" subagent="discoverer" role="API spec analyst" subagent_required_model="claude-sonnet-5, gpt-5.4-medium, gemini-3.1-pro, grok-4.5, gpt-5.6-terra">
+
 - APPLY PHASE `api-aqa-flow-api-spec-analysis.md`
 - Input: raw data + project config. Output: `plans/api-aqa-{IDENTIFIER}/api-analysis.md` (endpoint contracts, auth, data dependencies).
 - Required skills: `qa-knowledge` (`code_analysis` mode — API-contract extraction), `reverse-engineering`, `sensitive-data`, `qa-structure`
 - Update `agents/TEMP/<FEATURE>/api-aqa-state.md`; Phase 2 is not complete until its output spot-check passes.
-</api_spec_analysis>
+  </api_spec_analysis>
 
 <gap_and_requirements_clarification phase="3" applies="ALL" subagent="architect" role="Test requirements analyst" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high, gpt-5.6-sol" type="HITL">
+
 - APPLY PHASE `api-aqa-flow-gap-and-requirements-clarification.md`
 - Input: raw data + API analysis. Output: `plans/api-aqa-{IDENTIFIER}/analysis.md` (gaps, contradictions, ambiguities resolved).
 - HITL gate: **WAIT FOR USER ANSWERS** before Phase 4.
 - Required skills: `qa-knowledge` (`gap_analysis` mode), `qa-structure`
 - Recommended skills: `questioning`
 - Update `agents/TEMP/<FEATURE>/api-aqa-state.md`; Phase 3 is not complete until its output spot-check passes.
-</gap_and_requirements_clarification>
+  </gap_and_requirements_clarification>
 
 <test_case_specification phase="4" applies="ALL" subagent="architect" role="Test specification author" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high, gpt-5.6-sol" type="HITL">
+
 - APPLY PHASE `api-aqa-flow-test-case-specification.md`
 - Input: all phase 1-3 outputs. Output: `plans/api-aqa-{IDENTIFIER}/test-specs.md` (Given-When-Then scenarios).
 - HITL gate: **WAIT FOR EXPLICIT USER APPROVAL** before Phase 5; comments, questions, suggestions, and review feedback are not approval.
 - Required skills: `qa-knowledge` (`scenario_design` mode), `sensitive-data`, `qa-structure`
 - Recommended skills: `hitl`
 - Update `agents/TEMP/<FEATURE>/api-aqa-state.md`; Phase 4 is not complete until its output spot-check passes.
-</test_case_specification>
+  </test_case_specification>
 
 <test_implementation phase="5" applies="ALL" subagent="engineer" role="Test automation engineer" subagent_required_model="claude-sonnet-5, gpt-5.4-medium, gemini-3-flash, grok-4.5, gpt-5.6-terra" type="HITL">
+
 - APPLY PHASE `api-aqa-flow-test-implementation.md`
 - Input: approved test specs + existing patterns + API analysis. Output: implemented test files.
 - HITL gate: **STOP AND WAIT** — user must provide actual execution results (output, report path, or pass/fail); confirmation alone does not satisfy this gate.
 - Required skills: `qa-knowledge` (`implementation_modes` — API impl), `qa-structure`
 - Recommended skills: `testing`, `coding` (repo conventions)
 - Update `agents/TEMP/<FEATURE>/api-aqa-state.md`; Phase 5 is not complete until its output spot-check passes.
-</test_implementation>
+  </test_implementation>
 
 <execution_and_report_analysis phase="6" applies="ALL" subagent="engineer" role="Test failure analyst" subagent_required_model="claude-sonnet-5, gpt-5.4-medium, gemini-3-flash, grok-4.5, gpt-5.6-terra" type="HITL">
+
 - APPLY PHASE `api-aqa-flow-execution-and-report-analysis.md`
 - Input: test execution report (user-provided or from `agents/user-instructions/`). Output: `plans/api-aqa-{IDENTIFIER}/execution-report.md` (failure analysis).
 - HITL gate: **WAIT FOR USER TO PROVIDE TEST EXECUTION RESULTS**.
 - Required skills: `qa-knowledge` (`test_execution_triage` mode), `sensitive-data`, `qa-structure`
 - Update `agents/TEMP/<FEATURE>/api-aqa-state.md`; Phase 6 is not complete until its output spot-check passes.
-</execution_and_report_analysis>
+  </execution_and_report_analysis>
 
 <test_corrections phase="7" applies="ALL" subagent="engineer" role="Test correction engineer" subagent_required_model="claude-sonnet-5, gpt-5.4-medium, gemini-3-flash, grok-4.5, gpt-5.6-terra" type="HITL">
+
 - APPLY PHASE `api-aqa-flow-test-correction.md`
 - Input: execution report + test files + test specs. Output: corrected test files.
 - HITL gate: **WAIT FOR EXPLICIT USER APPROVAL** before applying changes; comments, questions, suggestions, and review feedback are not approval.
 - Required skills: `qa-knowledge` (`correction` mode), `qa-structure`
 - Recommended skills: `coding` (authors the proposed/applied edits), `debugging` (root-cause alignment), `hitl`
 - Update `agents/TEMP/<FEATURE>/api-aqa-state.md`; Phase 7 is not complete until its output spot-check passes.
-</test_corrections>
+  </test_corrections>
 
 </workflow_phases>
 
@@ -134,11 +143,12 @@ Example: if a skill suggests `/tests/api/` but `docs/ARCHITECTURE.md` requires `
 </coding_standards_precedence>
 
 <failure_handling>
+
 - **Phase-file load failure** (APPLY PHASE for a required phase returns nothing): retry once, then stop, record in `agents/TEMP/<FEATURE>/api-aqa-state.md`, ask the user — never improvise an undocumented phase.
 - **Missing prior artifact:** do not fabricate; with user agreement re-run the producing phase, or stop and ask the user to restore it.
 - **Unreadable `agents/TEMP/<FEATURE>/api-aqa-state.md`:** pause, rebuild minimal phase pointers from `plans/api-aqa-{IDENTIFIER}/` when possible, then ask the user to confirm.
 - **State-note example (phase-file load failure):** `Phase 5 blocked: APPLY PHASE api-aqa-flow-test-implementation.md returned nothing at 2026-05-25T15:00Z; awaiting user action.`
-</failure_handling>
+  </failure_handling>
 
 <state_file>
 

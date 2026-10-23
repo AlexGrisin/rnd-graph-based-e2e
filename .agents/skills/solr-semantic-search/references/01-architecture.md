@@ -56,6 +56,7 @@ The concept collection is **read-only at query time**. It's rebuilt offline from
 The tagger is a `RequestHandlerBase` exposed at `/semanticTagGraph` on the concept collection. It implements `SolrCoreAware` to load `StagesConfig` (per-collection config: which fields to consider, what shingle length, etc.).
 
 Pseudocode:
+
 ```java
 public class TagHandler extends RequestHandlerBase implements SolrCoreAware {
     @Override
@@ -76,12 +77,12 @@ The `phraseTagging` method does steps 1-6. `TagHandlerResponse` carries the tags
 
 Match types are scored differently to bias toward exact matches:
 
-| Match type | Boost factor |
-|---|---|
-| Exact (token equals shingle) | 100 × `pow` |
-| Word break (broken into multiple matching tokens) | 75 × `pow` |
-| Prefix (token starts with shingle) | 50 × `pow` |
-| Fuzzy (within edit distance) | 25 × `pow` |
+| Match type                                        | Boost factor |
+| ------------------------------------------------- | ------------ |
+| Exact (token equals shingle)                      | 100 × `pow`  |
+| Word break (broken into multiple matching tokens) | 75 × `pow`   |
+| Prefix (token starts with shingle)                | 50 × `pow`   |
+| Fuzzy (within edit distance)                      | 25 × `pow`   |
 
 Where `pow = 2 ^ (originalTokenOffset - 1)`. So 2-token shingles weigh 2× single-token; 3-token weighs 4×; etc. This biases the tagger toward longer matches even when shorter ones exist.
 
@@ -97,12 +98,14 @@ The `SchemaSimilarity` score from this query is what's used to rank lookup candi
 ### Why a graph
 
 Different shingles can cover overlapping positions. "sony wh-1000xm5" can be:
+
 - `[sony]` (brand) + `[wh-1000xm5]` (model) — two tags
 - `[sony wh-1000xm5]` (model line, if known multi-word concept) — one tag
 
 These are **alternative interpretations**. Some are stronger (specific = weight 100), some weaker (generic = weight 10). You can't keep them all — they conflict on positions. You can't drop arbitrarily — you need to compare.
 
 A directed weighted multigraph models this:
+
 - **Vertices**: token positions (0, 1, 2, ..., N) plus negative "quasi-positions" for multi-word synonym intermediate nodes
 - **Edges**: each `StagedTag` is one edge, going from `start` to `end` position
 - A "path" through the graph from position 0 to position N is a way to cover the entire phrase
@@ -159,9 +162,10 @@ For complete class-level code (every `Sm*Query` subtype, the parser fabric, all 
 
 Some fields aren't independently meaningful — they only make sense paired with other fields. Example: `attr_*` fields (product attributes that depend on a primary category being present) only apply when a `category_concept` is present. A query with `attr_position=front` alone is too vague.
 
-`DependencyGroupService` finds these groups. For each path, it identifies "root" tags (e.g., category) and "dependent" tags (attr_*). The query builder generates one clause requiring the root + dependents, and another clause without dependencies (allowing fallback).
+`DependencyGroupService` finds these groups. For each path, it identifies "root" tags (e.g., category) and "dependent" tags (attr\_\*). The query builder generates one clause requiring the root + dependents, and another clause without dependencies (allowing fallback).
 
 This produces queries like:
+
 ```
 (category:ear_pad AND attr_position:front)  # full match
 OR
@@ -173,6 +177,7 @@ Without dependency groups, you'd get false matches for "front" appearing in rand
 ### Min-should-match
 
 Calculated dynamically from path:
+
 ```
 mm = calculateMinShouldMatch(phraseTokensCount, configMinShouldMatch)
 ```
@@ -210,6 +215,7 @@ This staged approach lets you get high-precision results when the user's phrase 
 ## Where the architecture sits relative to standard Solr
 
 Standard Solr request:
+
 ```
 HTTP /select → SearchHandler → QueryComponent (parses q via QParser)
                                        ↓
@@ -217,6 +223,7 @@ HTTP /select → SearchHandler → QueryComponent (parses q via QParser)
 ```
 
 Semantic search request:
+
 ```
 HTTP /select → SearchHandler → SemanticSearchHandler (custom)
                                        ↓

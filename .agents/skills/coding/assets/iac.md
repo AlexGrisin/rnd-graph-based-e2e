@@ -6,7 +6,7 @@ MUST follow this for all IaC work (Terraform, Pulumi, CloudFormation, ARM, Bicep
 
 <role>
 
-Senior software infrastructure engineer and IaC implementation specialist. Writes clean, minimal, production-grade code. 
+Senior software infrastructure engineer and IaC implementation specialist. Writes clean, minimal, production-grade code.
 
 </role>
 
@@ -49,7 +49,7 @@ Use when implementing features, bug fixes, refactors, or any code changes includ
 - Identify resource types (S3, RDS, VPC, etc.)
 - Determine operation type (CREATE, DELETE, MODIFY)
 - Extract project name, environment, region if provided
-- Use 
+- Use
 
 ### Step 2: Check Knowledge Base and available MCPs for Company Policies
 
@@ -60,6 +60,7 @@ Use when implementing features, bug fixes, refactors, or any code changes includ
 **CRITICAL:** Always check for resource conflicts BEFORE creating the plan!
 
 Examples:
+
 - Check resource name availability
 - Check credentials availability (but do not read them!)
 - Check availability zones are valid for the region
@@ -76,7 +77,7 @@ If issues detected - document, resolve with user, HITL.
 
 <coding>
 
-1. **CRITICAL:** ALWAYS try module catalog and template-based generation first! 
+1. **CRITICAL:** ALWAYS try module catalog and template-based generation first!
 2. **CRITICAL:** MUST search approved modules/templates/catalogs.
 3. **CRITICAL:** ALWAYS fetch modules/templates from repository!
 4. **CRITICAL:** MUST check existing infrastructure for existing resources.
@@ -117,6 +118,7 @@ If issues detected - document, resolve with user, HITL.
 ## Your Capabilities
 
 You have access to:
+
 1. **Rosetta/Context7/Fetch/DeepWiki/WebSearch Tools/MCPs** - Security policies, compliance rules, best practices
 2. **IaC CLI** - For syntax validation, formatting, plan generation
 3. **Checkov** - Policy/controls security scanning
@@ -131,13 +133,15 @@ You have access to:
 12. Any other applicable or alternative or specific to the user request
 
 ### Rule
+
 - **PASSED** = Tool ran successfully, no issues found
 - **SKIPPED** = Tool not available, check not performed
-- **FAILED** = Tool ran, issues found 
+- **FAILED** = Tool ran, issues found
 
 If required tools are unavailable REQUEST USER PERMISSION TO INSTALL IT.
 
 **Enforce rules:**
+
 - Capture output with file/line hints
 - Check for missing variables, invalid references, deprecated syntax
 - Typed variables with descriptions
@@ -150,6 +154,7 @@ If required tools are unavailable REQUEST USER PERMISSION TO INSTALL IT.
 - **Flag any secrets found as CRITICAL**
 
 **Enforce organizational policies:**
+
 - Required tagging (Name, Environment, Owner, CostCenter)
 - Naming conventions
 - Region constraints
@@ -177,36 +182,43 @@ Create comprehensive README.md:
 <error-handling>
 
 ### Planner Errors
+
 - Invalid request → Return error, suggest alternatives
 - Unsupported resource → Explain limitations
 - Missing information → Ask clarifying questions
 
 ### Coder Errors
+
 - Template unavailable → Use LLM fallback
 - Generation failed → Return error, suggest manual approach
 - Invalid plan → Return to Planner for correction
 
 ### Syntax Errors
+
 - Return to Coder with specific error messages
 - Include file and line numbers
 - Suggest fixes
 
 ### Security Issues
+
 - Flag critical/high issues as BLOCKING
 - Provide Checkov/tfsec check IDs
 - Include remediation steps
 
 ### Validator Errors
+
 - Syntax errors → Return to Coder with feedback
 - Security issues → Return to Coder with specific fixes
 - Compliance violations → Return to Coder with policy references
 
 ### Cloud Errors
+
 - Credentials invalid → Return error, check configuration
 - Resource conflicts → Warn user, suggest alternatives
 - Quota exceeded → Return error, suggest cleanup
 
 ### Check Step Failures
+
 - **CRITICAL:** If ANY validation check step fails, mark it as FAILED and proceed to next step
 - Do NOT halt validation pipeline on individual step errors - we must see full picture
 - Continue executing all remaining validation steps
@@ -217,17 +229,20 @@ Create comprehensive README.md:
 <self-healing-logic>
 
 **Retry Conditions:**
+
 - Validation failed
 - Retry count < 3
 - Errors are fixable (not fundamental issues)
 
 **Retry Process:**
+
 1. Extract feedback from ValidationResult
 2. Call Coder Agent with feedback
 3. Re-validate
 4. Repeat until passed or max retries
 
 **Stop Conditions:**
+
 - Validation passed
 - Max retries reached (3)
 - Fundamental errors (can't be fixed automatically)

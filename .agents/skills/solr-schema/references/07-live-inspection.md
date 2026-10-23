@@ -11,11 +11,11 @@ Replace `<c>` with the core or collection name (e.g. `products`) and
 
 ## The three endpoint families
 
-| Family | Answers | Endpoint |
-|---|---|---|
-| **Schema REST API** | What fields/types/copyFields are declared? | `/solr/<c>/schema/*` |
-| **Analysis API** | How is one value tokenized at index vs query time? | `/solr/<c>/analysis/field` |
-| **Luke handler** | What flags does each *materialized* field actually carry? | `/solr/<c>/admin/luke` |
+| Family              | Answers                                                   | Endpoint                   |
+| ------------------- | --------------------------------------------------------- | -------------------------- |
+| **Schema REST API** | What fields/types/copyFields are declared?                | `/solr/<c>/schema/*`       |
+| **Analysis API**    | How is one value tokenized at index vs query time?        | `/solr/<c>/analysis/field` |
+| **Luke handler**    | What flags does each _materialized_ field actually carry? | `/solr/<c>/admin/luke`     |
 
 The Schema API reports the **declared** schema; Luke reports the **effective**
 per-field reality (including dynamic fields that matched real documents). Use
@@ -106,7 +106,7 @@ will silently miss** — exactly the failure described in
 stemmer on one side only, a synonym expansion at query time only, or an
 asymmetric `WordDelimiterGraphFilter`.
 
-Tip: run it with the *same* string in both `fieldvalue` and `query` first to
+Tip: run it with the _same_ string in both `fieldvalue` and `query` first to
 confirm symmetric chains agree, then with a realistic user query to expose
 divergence.
 
@@ -133,20 +133,20 @@ Each field carries a compact `flags` string (and a `schema` string under
 `show=schema`). It is a fixed-position mask — a letter means the capability is
 present, a `-` means absent. The order is stable; the key positions to know:
 
-| Letter | Meaning |
-|---|---|
-| `I` | **Indexed** (searchable/filterable) |
-| `T` | **Tokenized** (analyzed into multiple terms) |
-| `S` | **Stored** (original value returned) |
-| `D` | **DocValues** (column store: facet/sort/function) |
-| `M` | Multivalued |
-| `V` | TermVector stored |
-| `o` | stOred term vector Offsets (lowercase `o`) |
-| `p` | OmitNorms (letter per the printed legend) |
-| `L` | Lazy |
-| `B` | Binary |
-| `f` | sorted (uses doc values for sort) |
-| `F` | Omit term freq & positions (letter per the printed legend) |
+| Letter | Meaning                                                    |
+| ------ | ---------------------------------------------------------- |
+| `I`    | **Indexed** (searchable/filterable)                        |
+| `T`    | **Tokenized** (analyzed into multiple terms)               |
+| `S`    | **Stored** (original value returned)                       |
+| `D`    | **DocValues** (column store: facet/sort/function)          |
+| `M`    | Multivalued                                                |
+| `V`    | TermVector stored                                          |
+| `o`    | stOred term vector Offsets (lowercase `o`)                 |
+| `p`    | OmitNorms (letter per the printed legend)                  |
+| `L`    | Lazy                                                       |
+| `B`    | Binary                                                     |
+| `f`    | sorted (uses doc values for sort)                          |
+| `F`    | Omit term freq & positions (letter per the printed legend) |
 
 So a `title_t` showing `ITS-----...` is **Indexed + Tokenized + Stored** but has
 **no DocValues** (the `D` slot is `-`) — faceting/sorting on it would fall back
@@ -166,7 +166,7 @@ the flags there are the ones that actually got applied.
    (standalone) or `.../admin/collections?action=LIST` (SolrCloud) to confirm
    `<c>`.
 2. **Dump the declared schema.** `GET /solr/<c>/schema` — note `uniqueKey` and
-   the declared field list. The default query field (`df`) is *not* returned
+   the declared field list. The default query field (`df`) is _not_ returned
    here: it lives in the request handler (solrconfig.xml / params), not the
    `/schema` endpoint (the old `defaultSearchField` schema element was removed
    well before 9.x).
@@ -185,6 +185,6 @@ the flags there are the ones that actually got applied.
 7. **Report.** Produce the same structured, severity-ordered review you would
    from XML — you now have every fact the files would have given you.
 
-> When files *are* available, prefer reading them (no live load, full comments);
+> When files _are_ available, prefer reading them (no live load, full comments);
 > use these endpoints to confirm what is actually deployed versus what the repo
 > claims. The deployed schema is the source of truth for a production incident.

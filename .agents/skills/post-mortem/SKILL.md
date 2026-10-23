@@ -1,10 +1,10 @@
 ---
 name: post-mortem
-description: "Diagnose instruction defects and optionally submit Rosetta GitHub issue"
+description: 'Diagnose instruction defects and optionally submit Rosetta GitHub issue'
 license: Apache-2.0
 disable-model-invocation: true
 user-invocable: true
-argument-hint: "optional: skill/agent/workflow name or concern"
+argument-hint: 'optional: skill/agent/workflow name or concern'
 baseSchema: docs/schemas/skill.md
 ---
 
@@ -82,11 +82,13 @@ Post-mortem report:
 
 ```md
 ## Post-Mortem
+
 **Component:** {skill|agent|workflow|prompt|file} · **Release:** {r2|r3} · **Delivery:** {MCP|plugin} · **IDE/agent:** {name} · **Model:** {id}
 **Task:** {one line} · **Outcome:** {completed | partial | blocked}
 
 **Issues** (repeat per issue)
 P{0-3} — {title}
+
 - Layer: {prompt | workspace files | local config | Rosetta instruction | tooling}
 - Trigger: {minimal repro — request paraphrase + preconditions}
 - Source: {prompt phrase / file section / instruction line — quoted}
@@ -96,6 +98,7 @@ P{0-3} — {title}
 - Frequency: {always | intermittent | once} · Workaround: {if any}
 
 **Recommended Changes**
+
 - Local (user applies): {exact file/section + proposed content + failure mode prevented}
 - Rosetta (issue candidate): {exact instruction file/section + proposed generalized rule + failure mode prevented}
 
@@ -108,24 +111,31 @@ GitHub issue draft (Rosetta-attributed findings only):
 Title: [post-mortem] {component}: {root-cause summary}
 
 ## Environment
+
 {release} · {MCP|plugin} · {IDE/agent} · {model}
 
 ## Repro / trigger
+
 {sanitized minimal repro}
 
 ## Expected vs actual
+
 {quoted instruction line/section} vs {observed agent behavior}
 
 ## Root cause
+
 {ambiguity | gap | contradiction | missing gate — why}
 
 ## Reasons
+
 {terse: why this is the root cause — verbatim proof quotes from instructions/output, sanitized}
 
 ## Suggested change
+
 {exact file/section + proposed generalized rule + failure mode prevented}
 
 ## Severity
+
 P{0-3} · Frequency {always|intermittent|once} · Confidence {High|Medium|Low}
 ```
 

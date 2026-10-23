@@ -2,7 +2,7 @@
 name: requirements-use-best-practices
 description: Rules for consuming requirements with strict traceability, explicit approvals, and no unapproved scope.
 alwaysApply: false
-tags: ["requirements", "rules", "best practices"]
+tags: ['requirements', 'rules', 'best practices']
 ---
 
 <requirements_use_best_practices>

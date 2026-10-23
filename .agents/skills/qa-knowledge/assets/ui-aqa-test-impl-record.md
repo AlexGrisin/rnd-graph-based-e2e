@@ -14,25 +14,30 @@ Template -- fill each subsection:
 
 ```markdown
 ### Test File
+
 - Location: <path>
 - New vs existing: <new | extended existing>
 - Test name: <name>
 
 ### Implementation Summary
+
 - Assertions implemented: <n> / <total>
 - Assertions uncovered: <n> (see Uncovered Assertions)
 - Page objects used: <list>
 - Utilities used: <list, or None>
 
 ### Uncovered Assertions
+
 - "<assertion>" -- reason: <…>
 - (or `None -- every plan assertion implemented`)
 
 ### Conflicts and Precedence
+
 - <user-instruction vs repo-doc conflict> → resolved in favor of repo docs: <what was applied>
 - (or `None -- sources consistent`)
 
 ### Validation
+
 - [ ] All plan assertions implemented or recorded as Uncovered
 - [ ] No assertion silently dropped
 - [ ] Page objects used (no raw-selector bypass)

@@ -1,6 +1,6 @@
 ---
 name: testgen-flow-data-collection
-description: "Phase 1 Data Collection of testgen-flow"
+description: 'Phase 1 Data Collection of testgen-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -14,6 +14,7 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 1 of 7 in `testgen-flow`
 - Input: initial user request + `initial-data.md`
 - Output: `raw-data.md` with extracted Issue Tracker and Wiki data
@@ -25,16 +26,18 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
   3. Evidence conflicting or ambiguous → ask only about the unresolved provider/input; never silently choose between conflicting systems.
   4. Wiki scope clearly absent → `SKIPPED_NO_CONFIG` (record the gap + skip that source, do not fabricate a provider). The Issue Tracker source is required.
 - Integrations: Issue Tracker + Wiki per the parent Terminology (Jira and Confluence are the canonical examples throughout this phase).
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Extract Issue Tracker ticket data
 2. Get Wiki documentation
 3. Create raw data document
 4. Update state file
-</phase_steps>
+   </phase_steps>
 
 <extract_ticket step="1.1">
+
 1. **Read `plans/testgen-{TICKET-KEY}/initial-data.md`** (contributes the original user prompt and a pointer to the project config) and the original user request.
 2. Resolve the **Issue Tracker provider** per `<workflow_context>`. If unresolvable with scope active, re-read config; still absent → record the gap and stop Phase 1.
 3. Extract ticket key from user input (parse from URL if needed). **Ticket-key extraction failure path:** if no key can be parsed (no URL, malformed input, ambiguous candidates): stop Phase 1, ask the user once for the exact ticket key (`PROJ-NNN` form), do not proceed until the user provides it. After 2 unsuccessful re-asks, record `Phase 1 blocked: ticket key unresolvable` in `testgen-state.md` and stop.
@@ -43,17 +46,21 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 </extract_ticket>
 
 <get_wiki step="1.2">
+
 1. Resolve the **Wiki provider** per `<workflow_context>`. If no Wiki is in scope, apply `SKIPPED_NO_CONFIG`: record `Wiki Source: Skipped — no Wiki configured` and proceed ticket-only.
 2. USE SKILL `data-collection` with role `Wiki`, the resolved provider, the Wiki input handle(s), and the Wiki section of `<create_raw_data>`'s contract. The skill's documentation binding owns URL parsing, direct-URL-vs-search precedence, child-page traversal, truncation, deduplication, permission fallbacks, AND the authenticated reads/searches in one binding — no second skill to reconcile against; its canonical Confluence examples adapt to the target system. Redaction runs inside `data-collection` via `sensitive-data` before write.
 3. **Search-term seed (passed to `data-collection` when no URLs supplied):** project key (from ticket key), labels, component names, key terms from summary/description.
 4. **Fallback**: when the binding reports zero pages after URL + search + its ask-once user fallback, record `Wiki Source: not available — proceeded ticket-only` in the data collection summary and continue. Do NOT fabricate documentation content.
-</get_wiki>
+   </get_wiki>
 
 <create_raw_data step="1.3">
 **Minimum-output contract (asserted by this phase independent of skill internals):** `raw-data.md` MUST capture, at minimum — ticket: summary, description, status, priority, labels, components, comments; Wiki (when not skipped): page title, URL, content. Missing any of these = phase incomplete, regardless of what the `data-collection` role bindings define internally. The template below shows Jira/Confluence field names as canonical examples — adapt labels to the resolved providers.
 
 1. Create `plans/testgen-{TICKET-KEY}/raw-data.md` with structure:
    ```markdown
+
+   ```
+
 # Raw Data - [TICKET-KEY]
 
 **Extracted**: [DateTime]
@@ -66,6 +73,7 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 ## Issue Tracker Ticket Data
 
 ### Ticket: [KEY]
+
 **URL**: [Ticket URL]
 **Summary**: [Summary]
 **Type**: [Issue Type]
@@ -75,30 +83,37 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 **Updated**: [Date]
 
 ### Description
+
 [Full description - rendered if HTML, otherwise raw]
 
 ### Labels
+
 - [Label1]
 - [Label2]
 
 ### Components
+
 - [Component1]
 - [Component2]
 
 ### Assignee
+
 **Name**: [Assignee Name]
 **Email**: [If available]
 
 ### Reporter
+
 **Name**: [Reporter Name]
 **Email**: [If available]
 
 ### Comments (Recent)
+
 1. **[Author]** ([Date]): [Comment text]
 2. **[Author]** ([Date]): [Comment text]
-[...]
+   [...]
 
 ### Custom Fields
+
 [List any custom fields found, e.g., Epic Link, Story Points, Sprint, etc.]
 
 ---
@@ -106,6 +121,7 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 ## Wiki Documentation
 
 ### Page 1: [Page Title]
+
 **URL**: [Wiki page URL]
 **Space**: [Space Key]
 **Labels**: [Labels]
@@ -113,15 +129,18 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 **Type**: Parent / Child of [Parent Title]
 
 #### Content
+
 [Full page content in markdown]
 
 #### Child Pages (if any)
+
 - [Child 1 Title] - [URL]
 - [Child 2 Title] - [URL]
 
 ---
 
 ### Page 2: [Child Page Title]
+
 **URL**: [Wiki page URL]
 **Space**: [Space Key]
 **Parent Page**: [Parent Title] - [URL]
@@ -130,6 +149,7 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 **Type**: Child
 
 #### Content
+
 [Full page content in markdown]
 
 ---
@@ -146,7 +166,9 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 - **Total Content Size**: [Approximate word count]
 - **Search Terms Used**: [List]
 - **Notes**: [Any issues during extraction]
-   ```
+  ```
+
+  ```
 
 </create_raw_data>
 
@@ -158,10 +180,13 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 
    ```markdown
    # In `## Phase Completion Status`:
+
    - [x] Phase 1: Data Collection - Completed [ISO datetime]
 
    # In `## Phase Details`, append:
+
    ### Phase 1
+
    - Completed: [ISO datetime]
    - Ticket: [TICKET-KEY]
    - Ticket Fields Captured: [count] (summary, description, status, priority, plus any extracted custom fields)
@@ -177,11 +202,12 @@ Extract all relevant data from the Issue Tracker ticket and related Wiki / docum
 </update_state>
 
 <validation_checklist>
+
 - `raw-data.md` created with the ticket section populated
 - Wiki section has at least 1 page OR user confirmed skip
 - All key ticket fields captured (summary, description, status, priority)
 - State file updated with Phase 1 complete
-</validation_checklist>
+  </validation_checklist>
 
 <pitfalls>
 - Wiki search may miss child pages — always perform child-page traversal per `data-collection`'s documentation binding for each found page

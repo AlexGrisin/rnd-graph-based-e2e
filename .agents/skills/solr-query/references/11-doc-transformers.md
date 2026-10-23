@@ -7,11 +7,13 @@ This file covers the built-in transformers most relevant to production e-commerc
 ## The big picture
 
 A request with `fl=*,foo:[transformerName arg1=val1 arg2=val2]` runs the transformer for every doc in the result page. So:
+
 - If `rows=10`, the transformer runs 10 times
 - If `rows=1000`, the transformer runs 1000 times
 - The cost per doc matters, a lot
 
 Transformer name conventions:
+
 - `fl=*,[transformerName]` — transformer adds field with default name
 - `fl=*,custom:[transformerName]` — transformer adds field named `custom`
 - `fl=*,a:[childquery],b:[childquery]` — same transformer twice with different result field names (only some transformers support this; `[child]` and `[child-subquery]` do)
@@ -29,9 +31,11 @@ fl=*,[child parentFilter="type_s:product" childFilter="color_s:red" limit=5]
 Returns each parent's matching children (or all children if no `childFilter`) under a `_childDocuments_` key on the parent doc.
 
 Required parameter:
+
 - `parentFilter=` — the Block Mask (parent filter that defines block boundaries — same rules as `which=`/`of=` in `{!parent}`/`{!child}` parsers)
 
 Optional:
+
 - `childFilter=` — restrict which children to include
 - `limit=` — max children per parent (default 10)
 - `fl=` — fields to include on children (default: all stored)
@@ -39,6 +43,7 @@ Optional:
 ### How `[child]` works under the hood
 
 For each parent doc:
+
 1. Find segment containing the parent
 2. Use `BitSetProducer` (built from `parentFilter`) to find the previous-parent boundary in this segment
 3. Walk doc IDs from previous-parent + 1 up to current parent (these are the children)
@@ -120,14 +125,14 @@ Three reasons:
 
 ## `[child]` vs `[subquery]` — quick decision
 
-| Situation | Use |
-|---|---|
-| Always-all-children, narrow blocks | `[child]` |
-| Top-N children sorted, wide blocks | `[subquery]` |
-| Children in separate core | `[subquery]` (mandatory; `[child]` only works with block-join) |
-| Multi-level, different children per level | `[subquery]` per level |
-| Need only when present (lazy) | `[subquery]` (it's per-parent; `[child]` is too) |
-| Children share filter that recurs | `[subquery]` (filterCache wins) |
+| Situation                                 | Use                                                            |
+| ----------------------------------------- | -------------------------------------------------------------- |
+| Always-all-children, narrow blocks        | `[child]`                                                      |
+| Top-N children sorted, wide blocks        | `[subquery]`                                                   |
+| Children in separate core                 | `[subquery]` (mandatory; `[child]` only works with block-join) |
+| Multi-level, different children per level | `[subquery]` per level                                         |
+| Need only when present (lazy)             | `[subquery]` (it's per-parent; `[child]` is too)               |
+| Children share filter that recurs         | `[subquery]` (filterCache wins)                                |
 
 For a typical e-commerce listing page (top 20 products, show 3 cheapest in-stock SKUs each):
 
@@ -190,6 +195,7 @@ When using QueryElevationComponent, marks docs that were elevated or excluded by
 ### `[geo]`
 
 For spatial fields, can format as GeoJSON, WKT, etc.:
+
 ```
 fl=*,location:[geo f=store_location format=GeoJSON]
 ```
@@ -236,6 +242,7 @@ total_transformer_cost_per_request ≈
 If a request fetches 50 rows and runs `[subquery]` (~1ms) + `[explain]` (~0.5ms) per doc, that's 50 × 1.5 = 75ms of transformer overhead alone — separate from the main query.
 
 Reduce by:
+
 - Lower `rows`
 - Bound `[subquery]` `rows` aggressively
 - Make sure `[subquery]` filters hit `filterCache`

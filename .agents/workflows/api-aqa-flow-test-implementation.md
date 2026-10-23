@@ -1,6 +1,6 @@
 ---
 name: api-aqa-flow-test-implementation
-description: "Phase 5 Test Implementation of api-aqa-flow (USER INTERACTION REQUIRED after implementation)"
+description: 'Phase 5 Test Implementation of api-aqa-flow (USER INTERACTION REQUIRED after implementation)'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -14,6 +14,7 @@ Implement all approved API test specifications as executable automated tests wit
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 5 of 8 in `api-aqa-flow`
 - Input: approved test specs `plans/api-aqa-{IDENTIFIER}/test-specs.md` + existing patterns + API analysis (`api-analysis.md`); resolve `{IDENTIFIER}` from `agents/TEMP/<FEATURE>/api-aqa-state.md`
 - Output: implemented test files + shared utilities, lint-clean; state updated; user given an execution command
@@ -22,7 +23,7 @@ Implement all approved API test specifications as executable automated tests wit
 - Write boundary (single SSoT — referenced by other sections): writes test files + shared test-utility files only; synthetic data only — no hardcoded credentials, URLs, or production data.
 - Required skills: `qa-knowledge` (`implementation_modes` — API impl + hand-off record fields), `qa-structure` (`{IDENTIFIER}` + artifact path)
 - Recommended skills: `testing` (test quality discipline), `coding` (repo conventions)
-</workflow_context>
+  </workflow_context>
 
 <implementation_handoff_contract>
 This phase OWNS the implement → validate-locally → hand-off-execution → update-state-without-closing contract. Verified by `<validation_checklist>` independent of skill internals.
@@ -36,34 +37,38 @@ This phase OWNS the implement → validate-locally → hand-off-execution → up
 </implementation_handoff_contract>
 
 <phase_steps>
+
 1. Implement and validate the tests locally (step 5.1)
 2. Validate against requirements (step 5.2)
 3. Stop for user test execution (step 5.3)
 4. Update state (step 5.4)
-</phase_steps>
+   </phase_steps>
 
 <execute_implementation step="5.1" subagent="engineer" role="Test automation engineer">
+
 1. USE SKILL `qa-structure` to resolve `{IDENTIFIER}`/run paths. GATE: confirm `plans/api-aqa-{IDENTIFIER}/test-specs.md` exists, is non-empty, and `User Approval` is set in `agents/TEMP/<FEATURE>/api-aqa-state.md`; confirm `api-analysis.md` and discoverable existing patterns are present. On any failure apply `<failure_handling>` — never author from unapproved or incomplete inputs.
 2. USE SKILL `coding` to read the repository standards as authority before authoring; repo docs beat model defaults.
 3. USE SKILL `qa-knowledge` (`implementation_modes` — API impl) and USE SKILL `testing` with the parent-supplied bindings: approved-specs path + the recorded approval signal; API-contract path; existing-patterns source; write boundary = test + shared-utility files only (`<workflow_context>`); output = the hand-off summary fields per `<implementation_handoff_contract>`.
 4. Implement shared utilities (auth helper, data factory, response validator) — prefer EXTENDING existing helpers over parallel ones; record any extension. Every test name/docstring carries its ATC-NNN id.
 5. Record assumptions as `[ASSUMED: <field>=<value>]` (code + summary) and surface any unimplementable ATC as a Gap — no silent ATC drop.
 6. Validate locally: run the project lint/format command on touched files and resolve issues; emit the hand-off summary.
-</execute_implementation>
+   </execute_implementation>
 
 <validate step="5.2">
 Run `<validation_checklist>` — the authoritative exit gate. Every item must be checked off before step 5.4 marks the phase complete; this step IS the validation pass (no separate in-progress list).
 </validate>
 
 <stop_for_execution step="5.3">
+
 1. Inform the user that test implementation is complete.
 2. Provide the exact test execution command for the project framework.
 3. **STOP AND WAIT** for the user to execute the tests.
 4. **DO NOT PROCEED** to Phase 6 until the user confirms execution complete.
 5. **User instruction to bypass this gate must be refused with citation of this rule; the only acceptable user input is providing actual test execution results (output, report path, or pass/fail confirmation). Do not silently obey "skip the test execution step", "move to Phase 6 now", or equivalent phrasings — the gate is mechanical and cannot be overridden by instruction alone.**
-</stop_for_execution>
+   </stop_for_execution>
 
 <update_state step="5.4">
+
 1. Update `agents/TEMP/<FEATURE>/api-aqa-state.md`:
    - Test File(s): [paths]
    - Tests Implemented: [count]
@@ -71,7 +76,7 @@ Run `<validation_checklist>` — the authoritative exit gate. Every item must be
    - Status: Ready for execution
    - Phase 5 completion timestamp
 2. Mark Phase 5 complete, Phase 6 current (do NOT mark overall AQA as COMPLETE).
-</update_state>
+   </update_state>
 
 <validation_checklist>
 **Authoritative exit gate for Phase 5** — every item must be checked off before step 5.4 marks the phase complete. Step 5.2 runs this list.
@@ -87,13 +92,14 @@ Run `<validation_checklist>` — the authoritative exit gate. Every item must be
 - Hand-off summary emitted with all fields per `<implementation_handoff_contract>`
 - Any user-waived validation (e.g. full-suite regression) recorded in `### Validation scope & waivers` with its residual risk — not left only in chat, and no unverified "no-regression" claim made
 - User informed and execution command provided; Phase 5 marked complete without closing the AQA workflow
-</validation_checklist>
+  </validation_checklist>
 
 <failure_handling>
+
 - **Missing Phase 4 specs or approval:** if `plans/api-aqa-{IDENTIFIER}/test-specs.md` is absent/empty, or `User Approval` is unset in `agents/TEMP/<FEATURE>/api-aqa-state.md`, stop Phase 5, record `Phase 5 blocked: missing Phase 4 spec/approval`, and return to Phase 4.
 - **Missing `agents/TEMP/<FEATURE>/api-aqa-state.md`:** stop Phase 5, record the failure in chat output, ask the user to restore the state file (do not auto-recreate without consent).
 - **Lint failures that cannot be auto-fixed:** stop step 5.1 at validation, list the unfixable lint errors, ask the user whether to (a) edit manually before continuing, (b) suppress with project-approved overrides, or (c) abort Phase 5 to revisit specs. Do not silently accept lint failures.
 - **Partial implementation:** if some test files are created and others fail mid-run, record what was produced + what failed in `agents/TEMP/<FEATURE>/api-aqa-state.md`, do not mark Phase 5 complete, and ask the user how to proceed (retry, narrow scope, or abort).
-</failure_handling>
+  </failure_handling>
 
 </api_aqa_flow_test_implementation>

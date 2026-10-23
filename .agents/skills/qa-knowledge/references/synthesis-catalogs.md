@@ -21,6 +21,7 @@ As-a / I-want / So-that; each story independently valuable.
 
 ```markdown
 ### US-[N]: [Title]
+
 **As a** [role/persona]
 **I want** [capability/goal]
 **So that** [business value/benefit]
@@ -29,6 +30,7 @@ As-a / I-want / So-that; each story independently valuable.
 **Source**: [Reference to source]
 
 **Acceptance Criteria**:
+
 - [ ] AC1: [Specific, testable criterion]
 - [ ] AC2: [Specific, testable criterion]
 
@@ -41,11 +43,13 @@ Synthesis guidelines: no implementation detail (user/business value only); AC us
 
 ```markdown
 ### FR-[N]: [Title]
+
 **Description**: [What the system must do]
 **Priority**: [P0 / P1 / P2 / P3]
 **Source**: [Reference]
 
 **Details**:
+
 - [Specific behavior 1]
 - [Specific behavior 2]
 
@@ -59,6 +63,7 @@ Coverage: include FRs only from capability classes the sources actually mention 
 
 ```markdown
 ### NFR-[N]: [Category] - [Title]
+
 **Category**: Performance / Security / Scalability / Usability / Reliability / Maintainability
 **Description**: [Specific requirement]
 **Measurement**: [How to verify — with threshold]
@@ -72,6 +77,7 @@ Threshold rule: every NFR MUST include a concrete numeric or categorical thresho
 
 ```markdown
 ### C-[N]: [Title]
+
 **Type**: Technical / Business / Legal / Resource / Time
 **Description**: [What cannot be changed]
 **Impact**: [How this affects implementation]
@@ -80,6 +86,7 @@ Threshold rule: every NFR MUST include a concrete numeric or categorical thresho
 
 ```markdown
 ### D-[N]: [Title]
+
 **Type**: System / Team / Data / Service / Infrastructure
 **Description**: [What is needed]
 **Owner**: [Who provides this]
@@ -91,6 +98,7 @@ Threshold rule: every NFR MUST include a concrete numeric or categorical thresho
 
 ```markdown
 ### A-[N]: [Assumption]
+
 **Based On**: [Unresolved question or missing info]
 **Assumption**: [What we're assuming]
 **Impact if Wrong**: [Consequences]
@@ -99,6 +107,7 @@ Threshold rule: every NFR MUST include a concrete numeric or categorical thresho
 
 ```markdown
 ### R-[N]: [Risk Title]
+
 **Probability**: High / Medium / Low
 **Impact**: High / Medium / Low
 **Description**: [What could go wrong]
@@ -108,10 +117,10 @@ Threshold rule: every NFR MUST include a concrete numeric or categorical thresho
 ### traceability-matrix
 
 ```markdown
-| Requirement ID | Source | User Story | Test Scenario |
-|----------------|--------|------------|---------------|
-| FR-1 | Jira DESC | US-1 | [placeholder for test phase] |
-| NFR-1 | User Answer Q5 | - | [placeholder for test phase] |
+| Requirement ID | Source         | User Story | Test Scenario                |
+| -------------- | -------------- | ---------- | ---------------------------- |
+| FR-1           | Jira DESC      | US-1       | [placeholder for test phase] |
+| NFR-1          | User Answer Q5 | -          | [placeholder for test phase] |
 ```
 
 ### out-of-scope
@@ -143,13 +152,15 @@ Front-matter (Document Control + Executive Summary) + 10 numbered sections in or
 ---
 
 ## Document Control
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | [Date] | [Author] | Initial generation |
+
+| Version | Date   | Author   | Changes            |
+| ------- | ------ | -------- | ------------------ |
+| 1.0     | [Date] | [Author] | Initial generation |
 
 ---
 
 ## Executive Summary
+
 **Description**: [2-3 sentence overview]
 **Scope Summary**: [Key capabilities]
 **Sources**: [List of sources used]
@@ -157,14 +168,23 @@ Front-matter (Document Control + Executive Summary) + 10 numbered sections in or
 ---
 
 ## 1. User Stories
+
 ## 2. Functional Requirements
+
 ## 3. Non-Functional Requirements
+
 ## 4. Constraints
+
 ## 5. Dependencies
+
 ## 6. Out of Scope
+
 ## 7. Assumptions
+
 ## 8. Risks
+
 ## 9. Traceability Matrix
+
 ## 10. Glossary
 ```
 
@@ -177,6 +197,6 @@ When sources conflict, resolve in order: (1) **User answers** (highest -- explic
 - **Section completeness** -- all ten numbered headers present (`## 1.` … `## 10.`) in order, plus front-matter (Document Control + Executive Summary). Empty sections stay present with an explicit `None.`
 - **Source provenance** -- every `### US-` / `FR-` / `NFR-` / `C-` / `D-` entry carries a non-blank `**Source**` line (absent Source = fabrication).
 - **NFR threshold** -- every `### NFR-` has a concrete numeric/categorical threshold in `**Measurement**`; any thresholdless NFR was moved to `assumptions-and-risks` and flagged.
-- **One behavior per req** -- no requirement statement joins two behaviors with ` AND `/`&` (split at synthesis).
+- **One behavior per req** -- no requirement statement joins two behaviors with `AND`/`&` (split at synthesis).
 - **Traceability** -- every FR/NFR appears in the Traceability Matrix with a real Source; no invented IDs.
 - **Redaction re-scan** -- per `sensitive-data`: scan quoted source text for `Bearer `, real-looking passwords, emails off `example.com`/`example.org`, phones outside `+1-555-0100`–`+1-555-0199`, card-number shapes, and `user:pass@` credentialed URLs.

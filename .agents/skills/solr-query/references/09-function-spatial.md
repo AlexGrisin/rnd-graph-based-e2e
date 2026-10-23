@@ -5,6 +5,7 @@ This file covers function queries (math expressions used in scoring or filtering
 ## Function queries: what they are
 
 A function query is a Lucene query that returns a numeric value per document, computed from field values or constants. Used as:
+
 - Scoring boost: `bf=log(popularity)` in eDisMax
 - Ranking by computed value: `sort=mul(price,0.9) asc`
 - Filter on computed value: `fq={!frange l=0 u=1.0}sub(rating,0.5)`
@@ -36,6 +37,7 @@ literal('hello')   # for string contexts
 ```
 
 `const(5)` is rarely needed explicitly — `5` is parsed as constant in most function contexts. But inside `sum(...)` you sometimes need explicit `const()`:
+
 ```
 sum(popularity_i, const(1))    # to ensure 1 is treated as numeric, not field name
 ```
@@ -60,6 +62,7 @@ ms(a, b)            # milliseconds: a - b (typically dates)
 ```
 
 Watch out: `log(0)` is `-Infinity`. Always guard:
+
 ```
 log(sum(popularity_i, 1))     # never log(0)
 ```
@@ -92,6 +95,7 @@ ms(a, b)              # difference in ms
 ```
 
 The classic decay function:
+
 ```
 recip(ms(NOW, created_dt), 3.16e-11, 1, 1)
 ```
@@ -113,6 +117,7 @@ scale(func, min, max)   # scale function output to [min, max]
 `ord`/`rord` are slow on high-cardinality fields — they require enumerating distinct values. Avoid in production.
 
 `scale` is useful for normalizing computed scores:
+
 ```
 scale(query($qq), 0, 1)     # normalize the query's scores to [0,1]
 ```
@@ -120,30 +125,38 @@ scale(query($qq), 0, 1)     # normalize the query's scores to [0,1]
 ## Common combinations
 
 ### Time-decay boost
+
 ```
 boost=recip(ms(NOW, created_dt), 3.16e-11, 1, 1)
 ```
+
 Multiplicative half-life decay.
 
 ### Inventory boost
+
 ```
 bq=stock_i:[1 TO *]^2          # binary boost via boost query
 boost=if(stock_i>0, 1.0, 0.3)  # multiplicative penalty for OOS
 ```
 
 ### Logarithmic popularity
+
 ```
 bf=log(sum(popularity_i, 1))
 ```
+
 Diminishing returns: doubling popularity adds a constant.
 
 ### Ratio
+
 ```
 fq={!frange l=0.5}div(positive_reviews_i, sum(reviews_i, 1))
 ```
+
 Documents with at least 50% positive review rate.
 
 ### Weighted sum of fields
+
 ```
 boost=sum(product(rating_f, 0.3), product(scale(price_f, 0, 1), -0.2))
 ```
@@ -166,6 +179,7 @@ fq={!frange l=0.5 cost=100}div(sales_i, views_i)
 ```
 
 For non-cacheable variants:
+
 ```
 fq={!frange l=$min cost=100 cache=false}div(sales_i, views_i)
 &min=0.5
@@ -198,6 +212,7 @@ Solr supports geo via `LatLonPointSpatialField` (or older `location` for legacy)
 ```
 
 Indexing:
+
 ```json
 { "id": "s1", "store_location": "37.7749,-122.4194" }
 ```
@@ -215,6 +230,7 @@ Returns docs where `store_location` is within 5 km of (37.7749, -122.4194).
 `d=` is in km always. Solr does not have a unit option; convert if you have miles input.
 
 For multiple centers OR'd:
+
 ```
 fq={!geofilt sfield=store_location pt=37.7749,-122.4194 d=5} OR {!geofilt sfield=store_location pt=40.7128,-74.0060 d=5}
 ```
@@ -243,6 +259,7 @@ For per-doc distance, `geodist()` runs in result-rendering — fine for small re
 ### Common patterns
 
 #### Stores near user, sorted by distance
+
 ```
 q=*:*
 fq={!bbox sfield=store_location pt=37.7749,-122.4194 d=10}
@@ -253,6 +270,7 @@ fl=id,name_s,distance:geodist(store_location,37.7749,-122.4194)
 `bbox` for cheap filtering, `geodist` sort for ordering. Don't double-evaluate — use bbox even if geofilt would be more accurate, because the filter is the dominant cost.
 
 #### Boost results by proximity
+
 ```
 defType=edismax
 q=coffee
@@ -265,6 +283,7 @@ boost=recip(geodist(store_location,$lat,$lon), 0.1, 1, 1)
 Multiplicative decay: closer = higher boost.
 
 #### Combined geo + attributes
+
 ```
 fq={!geofilt sfield=store_location pt=37.7749,-122.4194 d=5}
 fq=open_b:true
@@ -273,6 +292,7 @@ sort=geodist(store_location,37.7749,-122.4194) asc
 ```
 
 Order in `fq` matters for cache use; geofilt is expensive so put cheap filters first or use `cost=100` on geofilt:
+
 ```
 fq={!geofilt sfield=store_location pt=37.7749,-122.4194 d=5 cost=100}
 fq=open_b:true
@@ -282,6 +302,7 @@ fq=cuisine_s:Italian
 ### Heatmaps via JSON Facets
 
 For map-tile aggregation:
+
 ```json
 {
   "facet": {

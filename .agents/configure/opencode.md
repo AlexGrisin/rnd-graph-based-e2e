@@ -12,6 +12,7 @@ OpenCode: Terminal-based AI coding assistant with workspace config files, agents
 **⚠️ CRITICAL: `AGENTS.md` = ROOT CORE RULES FILE**
 
 **Workspace Config Locations:**
+
 - `AGENTS.md` - ROOT INSTRUCTIONS (bootstrap, always applied)
 - `opencode.json` - Project settings/config
 - `.opencode/agent/` - Custom agents
@@ -21,6 +22,7 @@ OpenCode: Terminal-based AI coding assistant with workspace config files, agents
 - `.opencode/plugins/` - Plugins (TS/JS)
 
 **Architecture:** Two-level agent hierarchy
+
 - **Primary agents** - Main assistants (Build, Plan, custom)
 - **Subagents** - Specialized assistants (General, Explore, custom)
 - Primary can spawn subagents. Subagents CANNOT spawn subagents.
@@ -87,10 +89,12 @@ OpenCode: Terminal-based AI coding assistant with workspace config files, agents
 **Format:** Markdown with YAML frontmatter
 
 **Types:**
+
 - `mode: primary` - Main assistants
 - `mode: subagent` - Specialized (invoked by primary or `@mention`)
 
 **Built-in:**
+
 - Primary: **Build** (default, all tools), **Plan** (restricted, analysis)
 - Subagent: **General** (research), **Explore** (fast codebase)
 
@@ -111,6 +115,7 @@ permission:
 ---
 
 Senior code reviewer. Focus on:
+
 - Security vulnerabilities
 - Performance bottlenecks
 - Code quality issues
@@ -120,6 +125,7 @@ Provide severity levels (Critical/High/Medium/Low) with line numbers and actiona
 ```
 
 **Config fields:**
+
 - `description` - Required. Brief purpose.
 - `mode` - Required: primary/subagent/all
 - `model` - Override model
@@ -133,6 +139,7 @@ Provide severity levels (Critical/High/Medium/Low) with line numbers and actiona
 - Additional provider options passed through
 
 **Invocation:**
+
 - Primary: Tab cycles between primary agents
 - Subagent: `@agent-name` syntax or automatic by primary
 
@@ -180,11 +187,13 @@ Analyze: $ARGUMENTS
 ```
 
 **Features:**
+
 - **Args:** `$ARGUMENTS` (all args), `$1`, `$2`, `$3` (positional)
 - **Shell:** `!`command`` (inject output)
 - **Files:** `@filepath` (include content)
 
 **Config fields:**
+
 - `description` - Brief description
 - `template` - Required (JSON config only)
 - `agent` - Which agent executes
@@ -208,15 +217,18 @@ description: Create consistent releases and changelogs
 ---
 
 ## What I do
+
 - Draft release notes from PRs
 - Propose version bump
 - Provide `gh release create` command
 
 ## When to use
+
 Preparing tagged release. Ask if versioning unclear.
 ```
 
 **Config fields:**
+
 - `name` - Required, lowercase alphanumeric with hyphens, < 64 chars, must match dir
 - `description` - Required, < 1024 chars
 - `license` - Optional
@@ -236,18 +248,18 @@ Preparing tagged release. Ask if versioning unclear.
 **Example:** `.opencode/tool/database.ts`
 
 ```typescript
-import { tool } from "@opencode-ai/plugin"
+import { tool } from '@opencode-ai/plugin';
 
 export default tool({
-  description: "Query project database",
+  description: 'Query project database',
   args: {
-    query: tool.schema.string().describe("SQL query"),
+    query: tool.schema.string().describe('SQL query'),
   },
   async execute(args, context) {
     // DB logic
-    return `Executed: ${args.query}`
+    return `Executed: ${args.query}`;
   },
-})
+});
 ```
 
 **Multiple tools:** Export named functions (creates `filename_exportname` tools)
@@ -269,11 +281,11 @@ export default tool({
 ```typescript
 export const MyPlugin = async ({ project, client, $, directory, worktree }) => {
   return {
-    "tool.execute.before": async (input, output) => {
+    'tool.execute.before': async (input, output) => {
       // Hook implementation
     },
-  }
-}
+  };
+};
 ```
 
 ---
@@ -283,6 +295,7 @@ export const MyPlugin = async ({ project, client, $, directory, worktree }) => {
 **Built-in tools:** `bash`, `edit`, `write`, `read`, `grep`, `glob`, `list`, `lsp`, `patch`, `skill`, `todowrite`, `todoread`, `webfetch`, `question`, `multiedit`
 
 **Notes:**
+
 - `edit` permission covers `write`, `patch`, `multiedit`
 - `todowrite`/`todoread` disabled for subagents by default
 - Default `.env` files denied

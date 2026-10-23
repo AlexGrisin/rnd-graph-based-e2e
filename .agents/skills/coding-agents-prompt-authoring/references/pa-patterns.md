@@ -139,7 +139,6 @@
 
 </why-vs-how-loops>
 
-
 <problem-solution-proof>
 
 - Use self-documentation to make rational decisions afterwards

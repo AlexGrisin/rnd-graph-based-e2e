@@ -58,6 +58,7 @@ q=field1:a&field2:b    # & is HTTP separator, not boolean
 ```
 
 `&` separates HTTP query params. Use `AND`:
+
 ```
 q=field1:a AND field2:b
 ```
@@ -69,6 +70,7 @@ q={!child of="type_s:product"}status:approved price:[100 TO 500]
 ```
 
 Default operator (without `q.op=AND`) is OR — this matches docs with `status:approved` OR `price:[100 TO 500]`. Add explicit AND or use `+`:
+
 ```
 q={!child of="type_s:product"}+status:approved +price:[100 TO 500]
 ```
@@ -92,6 +94,7 @@ fq=sku_id:ABC-123/XL    # parses ABC and 123 separately due to /
 ```
 
 Solutions:
+
 - `fq={!term f=sku_id}ABC-123/XL` — bypass parser, handle as one TermQuery
 - `fq=sku_id:ABC\-123\/XL` — backslash-escape
 - `fq=sku_id:"ABC-123/XL"` — quoting works for some chars
@@ -167,6 +170,7 @@ To count unique products from SKU scope, index a `parent_product_id_s` field on 
 ```
 
 After `blockParent`, you're at parent scope. If `color_s` is a child attribute, the facet sees zero. Either:
+
 - Don't transition: facet at child scope (current scope, no `blockParent`)
 - Transition to children if you started at parent: `blockChildren`
 
@@ -177,12 +181,14 @@ If a filter is tagged at one block level and the facet runs at another, the tag/
 ## JSON Facets mistakes
 
 ### `uniqueBlock` as facet type
+
 ```json
 { "type": "uniqueBlock", "field": "_root_" }    # WRONG
 "unique_count": "uniqueBlock(_root_)"            # CORRECT (it's a metric)
 ```
 
 ### `uniqueBlock` as a property
+
 ```json
 { "type": "terms", "field": "color_s", "uniqueBlock": "_root_" }    # WRONG
 { "type": "terms", "field": "color_s",
@@ -190,6 +196,7 @@ If a filter is tagged at one block level and the facet runs at another, the tag/
 ```
 
 ### Wrong `domain` key
+
 ```json
 "domain": { "exclude": ["X"] }           # silently ignored
 "domain": { "excludeFilters": ["X"] }    # silently ignored
@@ -199,6 +206,7 @@ If a filter is tagged at one block level and the facet runs at another, the tag/
 Solr does not warn about unknown `domain` keys.
 
 ### Sort by undefined metric
+
 ```json
 { "type": "terms", "field": "brand_s",
   "sort": "avg_price desc"                     # ERROR if avg_price isn't defined
@@ -209,13 +217,17 @@ Solr does not warn about unknown `domain` keys.
 ## Distributed mode (SolrCloud) mistakes
 
 ### Top-N facets without overrequest
+
 With sharded indexes, facet `limit=10` may miss correct top-10 because each shard returns its top 10 — the global top 10 may be a shard's #11. Use `overrequest=50` minimum, `refine=true` for accuracy.
 
 ### kNN routing
+
 HNSW graph is per-shard. kNN with sharded index searches each shard's graph and merges. Recall depends on per-shard `topK` allocation. For exact recall, route documents intentionally and query specific shards.
 
 ### `_route_` parameter forgotten
+
 For block join with custom routing, ensure `_route_` is set so updates and queries hit the right shard:
+
 ```
 &_route_=p1!
 ```
@@ -225,16 +237,19 @@ Without this, blocks may split across shards and block join queries return wrong
 ## Performance traps
 
 ### Leading wildcard
+
 ```
 q=title_t:*solr*
 ```
 
 Iterates the term dictionary. Slow on large fields. Use:
+
 - `EdgeNGramFilter` for prefix
 - `ReversedWildcardFilterFactory` for suffix
 - N-gram for substring
 
 ### Faceting on tokenized text fields
+
 ```
 facet.field=description_t    # description_t is tokenized text
 ```
@@ -242,11 +257,13 @@ facet.field=description_t    # description_t is tokenized text
 Counts every distinct token in the field across all docs — usually millions of values. Always facet on `_s` (string) fields, not `_t` (text).
 
 ### Deep paging
+
 ```
 start=10000&rows=20
 ```
 
 Solr (without `cursorMark`) sorts and skips. Cost grows linearly with `start`. For deep paging, use `cursorMark`:
+
 ```
 sort=id asc&cursorMark=*&rows=20
 ```
@@ -254,19 +271,23 @@ sort=id asc&cursorMark=*&rows=20
 Then on subsequent requests, pass the returned `nextCursorMark`.
 
 ### `rows=1000000`
+
 Returning a million docs in one request: huge response payload, hash-table overflow, slow JSON serialization. Page or use Streaming Expressions for bulk export.
 
 ### Faceting with `mincount=0`
+
 For high-cardinality fields, returns ALL distinct values, not just matching ones. Use `mincount=1` (default) unless you specifically need empty buckets.
 
 ## Schema/query mismatch
 
 ### Searching tokenized field as exact
+
 ```
 fq=description_t:red running shoes    # tokenized; matches each word independently
 ```
 
 If you want exact phrase match, quote it:
+
 ```
 fq=description_t:"red running shoes"
 ```
@@ -274,11 +295,13 @@ fq=description_t:"red running shoes"
 Or use a `_s` field for exact-match attributes.
 
 ### Wildcard against analyzed field
+
 ```
 fq=name_t:Foo*    # wildcard bypasses analyzer
 ```
 
 If `name_t` is lowercased at index time, indexed terms are `foo`, `bar`, etc. `Foo*` won't match. Lowercase the wildcard term:
+
 ```
 fq=name_t:foo*
 ```
@@ -286,6 +309,7 @@ fq=name_t:foo*
 This is one of the most common sources of "wildcard matches nothing" reports.
 
 ### Searching missing field
+
 ```
 fq=brand_s:Nike    # if brand_s doesn't exist in schema
 ```
@@ -295,11 +319,13 @@ Returns "undefined field: brand_s" error in Solr 9.x by default. In some legacy 
 ## Edge cases
 
 ### Empty query string with eDisMax
+
 ```
 q=
 ```
 
 Returns no results (matches nothing) by default. Set `q.alt=*:*` to fall back:
+
 ```
 q=
 q.alt=*:*
@@ -308,11 +334,13 @@ q.alt=*:*
 This makes empty queries return everything — useful for "show all" pages.
 
 ### Negative-only query
+
 ```
 q=-field:value    # all docs except matching
 ```
 
 In some parsers, this errors. Wrap with `*:*`:
+
 ```
 q=*:* -field:value
 ```
@@ -320,6 +348,7 @@ q=*:* -field:value
 eDisMax handles this better than lucene.
 
 ### Negation inside boolean group
+
 ```
 q=type:product AND -discontinued:true
 ```
@@ -327,6 +356,7 @@ q=type:product AND -discontinued:true
 Works in lucene. Inside `{!parent}` body or other parser-specific contexts, may need explicit positive clause.
 
 ### Quoting a single-word phrase
+
 ```
 fq=name_s:"Nike"    # phrase query of one term — equivalent to fq=name_s:Nike
 ```

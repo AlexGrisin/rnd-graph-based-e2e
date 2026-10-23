@@ -11,6 +11,7 @@
 - If source prompt exists then target prompt structure, ideas, goals must be derived from it
 
 <design_principles>
+
 - SRP always
 - MECE always
 - DRY always
@@ -28,6 +29,6 @@
 - Split large work to reduce cognitive load
 - Slice level of thinking and decision making
 - Progressive disclosure
-</design_principles>
+  </design_principles>
 
 </blueprint>

@@ -80,16 +80,16 @@ Copilot also reads these instruction files from the repository root:
 
 **Frontmatter Fields:**
 
-| Field | Required | Type | Description |
-|-------|----------|------|-------------|
-| `applyTo` | Yes | string | Glob pattern(s) for matching files. Comma-separated for multiple patterns |
-| `excludeAgent` | No | string | `"code-review"` or `"coding-agent"` to exclude from specific agents |
+| Field          | Required | Type   | Description                                                               |
+| -------------- | -------- | ------ | ------------------------------------------------------------------------- |
+| `applyTo`      | Yes      | string | Glob pattern(s) for matching files. Comma-separated for multiple patterns |
+| `excludeAgent` | No       | string | `"code-review"` or `"coding-agent"` to exclude from specific agents       |
 
 **Structure:**
 
 ```markdown
 ---
-applyTo: "src/api/**/*.ts"
+applyTo: 'src/api/**/*.ts'
 ---
 
 # Backend API Guidelines
@@ -119,36 +119,36 @@ applyTo: "src/api/**/*.ts"
 
 **Frontmatter Fields:**
 
-| Field | Required | Type | Description |
-|-------|----------|------|-------------|
-| `description` | Yes | string | Agent purpose and capabilities |
-| `name` | No | string | Display name (defaults to filename without extension) |
-| `tools` | No | list/string | Available tools. Use `<server-name>/*` for all MCP server tools |
-| `model` | No | string/list | Single model or prioritized array (tried in order until available) |
-| `target` | No | string | `"vscode"` or `"github-copilot"` (defaults to both) |
-| `agents` | No | list | Allowed subagents, or `"*"` for all |
-| `user-invocable` | No | boolean | Allow manual selection in dropdown (default: true) |
-| `disable-model-invocation` | No | boolean | Prevent automatic model selection |
-| `mcp-servers` | No | table | Additional MCP servers (cloud agent only) |
-| `handoffs` | No | list | Sequential workflow transitions between agents |
-| `hooks` | No | object | Hook commands scoped to this agent (preview) |
-| `metadata` | No | object | Key-value annotation pairs (cloud agent only) |
+| Field                      | Required | Type        | Description                                                        |
+| -------------------------- | -------- | ----------- | ------------------------------------------------------------------ |
+| `description`              | Yes      | string      | Agent purpose and capabilities                                     |
+| `name`                     | No       | string      | Display name (defaults to filename without extension)              |
+| `tools`                    | No       | list/string | Available tools. Use `<server-name>/*` for all MCP server tools    |
+| `model`                    | No       | string/list | Single model or prioritized array (tried in order until available) |
+| `target`                   | No       | string      | `"vscode"` or `"github-copilot"` (defaults to both)                |
+| `agents`                   | No       | list        | Allowed subagents, or `"*"` for all                                |
+| `user-invocable`           | No       | boolean     | Allow manual selection in dropdown (default: true)                 |
+| `disable-model-invocation` | No       | boolean     | Prevent automatic model selection                                  |
+| `mcp-servers`              | No       | table       | Additional MCP servers (cloud agent only)                          |
+| `handoffs`                 | No       | list        | Sequential workflow transitions between agents                     |
+| `hooks`                    | No       | object      | Hook commands scoped to this agent (preview)                       |
+| `metadata`                 | No       | object      | Key-value annotation pairs (cloud agent only)                      |
 
 **Tool Aliases:**
 
-| Alias | Capability |
-|-------|-----------|
-| `"execute"` | Shell/bash/powershell |
-| `"read"` | File viewing |
-| `"edit"` | File modification |
-| `"search"` | File/text searching |
-| `"agent"` | Invoking other custom agents |
-| `"web"` | URL fetching, web search |
-| `"todo"` | Task management |
-| `"*"` | All tools |
-| `"github/*"` | All GitHub MCP server tools |
-| `"playwright/navigate"` | Specific MCP tool |
-| etc | any new from mcp or new version |
+| Alias                   | Capability                      |
+| ----------------------- | ------------------------------- |
+| `"execute"`             | Shell/bash/powershell           |
+| `"read"`                | File viewing                    |
+| `"edit"`                | File modification               |
+| `"search"`              | File/text searching             |
+| `"agent"`               | Invoking other custom agents    |
+| `"web"`                 | URL fetching, web search        |
+| `"todo"`                | Task management                 |
+| `"*"`                   | All tools                       |
+| `"github/*"`            | All GitHub MCP server tools     |
+| `"playwright/navigate"` | Specific MCP tool               |
+| etc                     | any new from mcp or new version |
 
 **Out-of-box MCP servers:**
 
@@ -156,6 +156,7 @@ applyTo: "src/api/**/*.ts"
 - `playwright` - Browser automation limited to localhost
 
 **Models:**
+
 - (omitted) - Inherits model from parent agent (default)
 - `Claude Opus 4.8` - Anthropic Claude 4.8 Opus (most capable, with extended reasoning)
 - `Claude Opus 4.6` - Anthropic Claude 4.6 Opus prev gen (4.7 existed but was not good)
@@ -172,12 +173,12 @@ applyTo: "src/api/**/*.ts"
 ```markdown
 ---
 description: Expert code reviewer for quality, security, and maintainability
-tools: ["read", "search"]
-model: ["Claude Sonnet 5", "GPT-5.4"]
+tools: ['read', 'search']
+model: ['Claude Sonnet 5', 'GPT-5.4']
 handoffs:
-  - label: "Send to Implementation"
+  - label: 'Send to Implementation'
     agent: implementer
-    prompt: "Implement the suggested fixes"
+    prompt: 'Implement the suggested fixes'
     send: true
 ---
 
@@ -210,14 +211,14 @@ Provide specific, actionable feedback with examples.
 
 **Frontmatter Fields:**
 
-| Field | Required | Type | Description |
-|-------|----------|------|-------------|
-| `description` | No | string | Short explanation shown in chat |
-| `name` | No | string | Display name after `/` (defaults to filename) |
-| `argument-hint` | No | string | Guidance text shown in chat input |
-| `agent` | No | string | Agent type: `"ask"`, `"agent"`, `"plan"`, or custom agent name |
-| `model` | No | string | Language model selection |
-| `tools` | No | list | Available tools (MCP tools, extensions) |
+| Field           | Required | Type   | Description                                                    |
+| --------------- | -------- | ------ | -------------------------------------------------------------- |
+| `description`   | No       | string | Short explanation shown in chat                                |
+| `name`          | No       | string | Display name after `/` (defaults to filename)                  |
+| `argument-hint` | No       | string | Guidance text shown in chat input                              |
+| `agent`         | No       | string | Agent type: `"ask"`, `"agent"`, `"plan"`, or custom agent name |
+| `model`         | No       | string | Language model selection                                       |
+| `tools`         | No       | list   | Available tools (MCP tools, extensions)                        |
 
 **Dynamic Inputs:**
 
@@ -237,7 +238,7 @@ Provide specific, actionable feedback with examples.
 ---
 description: Generate a React component with tests
 agent: agent
-tools: ["codebase", "web/fetch"]
+tools: ['codebase', 'web/fetch']
 ---
 
 # Create React Component
@@ -266,11 +267,11 @@ Create a new React component named ${input:componentName:MyComponent}.
 
 **Storage Locations:**
 
-| Scope | Path | Use Case |
-|-------|------|----------|
-| Workspace | `.github/prompts/` | Shared with team (recommended) |
-| User | VS Code user data directory | Personal prompts |
-| Configurable | `chat.promptFilesLocations` setting | Custom locations |
+| Scope        | Path                                | Use Case                       |
+| ------------ | ----------------------------------- | ------------------------------ |
+| Workspace    | `.github/prompts/`                  | Shared with team (recommended) |
+| User         | VS Code user data directory         | Personal prompts               |
+| Configurable | `chat.promptFilesLocations` setting | Custom locations               |
 
 **Tool Resolution Priority:**
 
@@ -286,23 +287,23 @@ Create a new React component named ${input:componentName:MyComponent}.
 
 **Skill Locations (cross-tool):**
 
-| Path | Tool |
-|------|------|
-| `.github/skills/<name>/` | Copilot |
-| `.agents/skills/<name>/` | Codex |
+| Path                     | Tool        |
+| ------------------------ | ----------- |
+| `.github/skills/<name>/` | Copilot     |
+| `.agents/skills/<name>/` | Codex       |
 | `.claude/skills/<name>/` | Claude Code |
 
 **Format:** Markdown with YAML frontmatter (file must be named `SKILL.md`)
 
 **Frontmatter Fields:**
 
-| Field | Required | Type | Description |
-|-------|----------|------|-------------|
-| `name` | Yes | string | Skill identifier (lowercase-with-hyphens). Must match parent folder name |
-| `description` | Yes | string | What the skill does and when to use it |
-| `license` | No | string | License information |
-| `user-invocable` | No | boolean | `false` = hidden from `/` menu; agent can still auto-load it (default: `true`) |
-| `disable-model-invocation` | No | boolean | `true` = agent will not auto-load; explicit `/` invocation only (default: `false`) |
+| Field                      | Required | Type    | Description                                                                        |
+| -------------------------- | -------- | ------- | ---------------------------------------------------------------------------------- |
+| `name`                     | Yes      | string  | Skill identifier (lowercase-with-hyphens). Must match parent folder name           |
+| `description`              | Yes      | string  | What the skill does and when to use it                                             |
+| `license`                  | No       | string  | License information                                                                |
+| `user-invocable`           | No       | boolean | `false` = hidden from `/` menu; agent can still auto-load it (default: `true`)     |
+| `disable-model-invocation` | No       | boolean | `true` = agent will not auto-load; explicit `/` invocation only (default: `false`) |
 
 **Structure:**
 
@@ -350,26 +351,26 @@ Plugins bundle agents, skills, commands, hooks, MCP servers, and LSP servers int
 
 ### Plugin Management (Copilot CLI)
 
-| Command | Purpose |
-|---------|---------|
-| `copilot plugin install SPECIFICATION` | Install a plugin |
-| `copilot plugin uninstall NAME` | Remove a plugin |
-| `copilot plugin list` | List installed plugins |
-| `copilot plugin update NAME` | Update a plugin |
-| `copilot plugin marketplace add SPECIFICATION` | Register a marketplace |
-| `copilot plugin marketplace list` | List registered marketplaces |
-| `copilot plugin marketplace browse NAME` | Browse marketplace plugins |
-| `copilot plugin marketplace remove NAME` | Unregister a marketplace |
+| Command                                        | Purpose                      |
+| ---------------------------------------------- | ---------------------------- |
+| `copilot plugin install SPECIFICATION`         | Install a plugin             |
+| `copilot plugin uninstall NAME`                | Remove a plugin              |
+| `copilot plugin list`                          | List installed plugins       |
+| `copilot plugin update NAME`                   | Update a plugin              |
+| `copilot plugin marketplace add SPECIFICATION` | Register a marketplace       |
+| `copilot plugin marketplace list`              | List registered marketplaces |
+| `copilot plugin marketplace browse NAME`       | Browse marketplace plugins   |
+| `copilot plugin marketplace remove NAME`       | Unregister a marketplace     |
 
 ### Installation Specification Formats
 
-| Format | Example |
-|--------|---------|
-| Marketplace | `plugin@marketplace` |
-| GitHub repo root | `OWNER/REPO` |
-| GitHub subdirectory | `OWNER/REPO:PATH/TO/PLUGIN` |
-| Git URL | `https://github.com/o/r.git` |
-| Local directory | `./my-plugin` or `/abs/path` |
+| Format              | Example                      |
+| ------------------- | ---------------------------- |
+| Marketplace         | `plugin@marketplace`         |
+| GitHub repo root    | `OWNER/REPO`                 |
+| GitHub subdirectory | `OWNER/REPO:PATH/TO/PLUGIN`  |
+| Git URL             | `https://github.com/o/r.git` |
+| Local directory     | `./my-plugin` or `/abs/path` |
 
 ### Plugin Manifest (plugin.json)
 
@@ -383,14 +384,14 @@ Plugins bundle agents, skills, commands, hooks, MCP servers, and LSP servers int
 
 **Component path fields (all optional, type: `string | string[]`). Paths are relative to the plugin root directory:**
 
-| Field | Default | Description |
-|-------|---------|-------------|
-| `agents` | `agents/` | Path(s) to agent directories (`.agent.md` files) |
-| `skills` | `skills/` | Path(s) to skill directories (`SKILL.md` files) |
-| `commands` | - | Path(s) to command directories |
-| `hooks` | `hooks.json` or `hooks/hooks.json` | Path to hooks config file, or inline hooks object |
+| Field        | Default                                                                                | Description                                           |
+| ------------ | -------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `agents`     | `agents/`                                                                              | Path(s) to agent directories (`.agent.md` files)      |
+| `skills`     | `skills/`                                                                              | Path(s) to skill directories (`SKILL.md` files)       |
+| `commands`   | -                                                                                      | Path(s) to command directories                        |
+| `hooks`      | `hooks.json` or `hooks/hooks.json`                                                     | Path to hooks config file, or inline hooks object     |
 | `mcpServers` | `.mcp.json`, `.vscode/mcp.json`, `.devcontainer/devcontainer.json`, `.github/mcp.json` | Path to MCP config file, or inline server definitions |
-| `lspServers` | `lsp.json` or `.github/lsp.json` | Path to LSP config file, or inline server definitions |
+| `lspServers` | `lsp.json` or `.github/lsp.json`                                                       | Path to LSP config file, or inline server definitions |
 
 **Interface metadata:** `displayName`, `shortDescription`, `longDescription`, `category`, `capabilities`, `defaultPrompt`, `brandColor`
 
@@ -474,9 +475,9 @@ Copilot hooks run scripts at lifecycle events, in TWO formats: [Copilot CLI](htt
 
 ### Hook Locations
 
-| Path | Scope |
-|------|-------|
-| `.github/hooks/*.json` | Workspace (team-shared) |
+| Path                        | Scope                          |
+| --------------------------- | ------------------------------ |
+| `.github/hooks/*.json`      | Workspace (team-shared)        |
 | Plugin `hooks.json` at root | Plugin hooks (auto-discovered) |
 
 ### Registration Format
@@ -486,7 +487,12 @@ Copilot hooks run scripts at lifecycle events, in TWO formats: [Copilot CLI](htt
   "version": 1,
   "hooks": {
     "SessionStart": [
-      { "type": "command", "bash": "path/to/script.sh", "powershell": "path/to/script.ps1", "timeoutSec": 30 }
+      {
+        "type": "command",
+        "bash": "path/to/script.sh",
+        "powershell": "path/to/script.ps1",
+        "timeoutSec": 30
+      }
     ]
   }
 }
@@ -494,38 +500,38 @@ Copilot hooks run scripts at lifecycle events, in TWO formats: [Copilot CLI](htt
 
 ### Supported Events (Rosetta-relevant)
 
-| Event | Trigger |
-|-------|---------|
-| `SessionStart` | First prompt of a new/resumed session |
-| `PreToolUse` | Before tool invocation |
-| `PostToolUse` | After successful tool invocation |
-| `Stop` | Agent session/turn ends |
-| `SubagentStop` | Subagent ends |
-| `PreCompact` | Before context compaction — **Copilot CLI only; VS Code has no compaction hook** |
+| Event          | Trigger                                                                          |
+| -------------- | -------------------------------------------------------------------------------- |
+| `SessionStart` | First prompt of a new/resumed session                                            |
+| `PreToolUse`   | Before tool invocation                                                           |
+| `PostToolUse`  | After successful tool invocation                                                 |
+| `Stop`         | Agent session/turn ends                                                          |
+| `SubagentStop` | Subagent ends                                                                    |
+| `PreCompact`   | Before context compaction — **Copilot CLI only; VS Code has no compaction hook** |
 
 **(!) VS Code ignores matcher values — hooks fire on ALL tool invocations regardless of any matcher; gate inside the hook script itself, not via matcher.**
 
 ### Input shape (differs by runtime — a hook script must handle both)
 
-| Field | Copilot CLI (camelCase fire) | VS Code / Copilot CLI's own PascalCase fire (snake_case) |
-|-------|-------------------------------|-------------------------------------------------------------|
-| event name | *(absent — infer from payload shape)* | `hook_event_name` |
-| tool name | `toolName` | `tool_name` |
-| tool args | `toolArgs` — **JSON string, must be parsed** | `tool_input` — already-parsed object |
-| tool result | `toolResult` (object) | `tool_response` (**string**, VS Code) / `tool_result` (object, Copilot CLI) |
-| session id | `sessionId` | `session_id` |
+| Field       | Copilot CLI (camelCase fire)                 | VS Code / Copilot CLI's own PascalCase fire (snake_case)                    |
+| ----------- | -------------------------------------------- | --------------------------------------------------------------------------- |
+| event name  | _(absent — infer from payload shape)_        | `hook_event_name`                                                           |
+| tool name   | `toolName`                                   | `tool_name`                                                                 |
+| tool args   | `toolArgs` — **JSON string, must be parsed** | `tool_input` — already-parsed object                                        |
+| tool result | `toolResult` (object)                        | `tool_response` (**string**, VS Code) / `tool_result` (object, Copilot CLI) |
+| session id  | `sessionId`                                  | `session_id`                                                                |
 
 ### Output — emit EVERY field at BOTH placements
 
-| Field | Honored by |
-|-------|------------|
-| `additionalContext` (top-level) | **Copilot CLI** — ignored by VS Code |
-| `hookSpecificOutput.additionalContext` (nested) | **VS Code** — ignored by Copilot CLI |
-| `permissionDecision` / `permissionDecisionReason` (top-level) | **Copilot CLI**, `PreToolUse` allow/deny |
-| `hookSpecificOutput.permissionDecision` / `.permissionDecisionReason` (nested) | **VS Code**, same purpose |
-| `decision` / `reason` (top-level, `Stop`) | both — `"block"`; **(!) `reason` REQUIRED when blocking**; ALSO has a nested `hookSpecificOutput.decision`/`.reason` form |
-| `decision` / `reason` (`SubagentStop`) | both — `"block"`; **(!) `reason` REQUIRED when blocking** — **top-level ONLY, no `hookSpecificOutput` wrapper for this event** |
-| `systemMessage` | **(!) USER-facing only (shown in the IDE) — NEVER reaches model context.** Use `additionalContext` for model-visible text |
+| Field                                                                          | Honored by                                                                                                                     |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `additionalContext` (top-level)                                                | **Copilot CLI** — ignored by VS Code                                                                                           |
+| `hookSpecificOutput.additionalContext` (nested)                                | **VS Code** — ignored by Copilot CLI                                                                                           |
+| `permissionDecision` / `permissionDecisionReason` (top-level)                  | **Copilot CLI**, `PreToolUse` allow/deny                                                                                       |
+| `hookSpecificOutput.permissionDecision` / `.permissionDecisionReason` (nested) | **VS Code**, same purpose                                                                                                      |
+| `decision` / `reason` (top-level, `Stop`)                                      | both — `"block"`; **(!) `reason` REQUIRED when blocking**; ALSO has a nested `hookSpecificOutput.decision`/`.reason` form      |
+| `decision` / `reason` (`SubagentStop`)                                         | both — `"block"`; **(!) `reason` REQUIRED when blocking** — **top-level ONLY, no `hookSpecificOutput` wrapper for this event** |
+| `systemMessage`                                                                | **(!) USER-facing only (shown in the IDE) — NEVER reaches model context.** Use `additionalContext` for model-visible text      |
 
 **(!) For `SessionStart`/`PreToolUse`/`PostToolUse`/`Stop`, a single hook script must emit BOTH the top-level AND the nested `hookSpecificOutput.*` form of every field above.** Each runtime honors only its own placement and silently ignores the other — emitting only one means the other runtime never receives it, with no error. **`SubagentStop` is the one exception — top-level only.**
 
@@ -543,11 +549,11 @@ Copilot hooks run scripts at lifecycle events, in TWO formats: [Copilot CLI](htt
 
 ### Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | stdout JSON parsed — deny/context delivered via the JSON body, not the exit code |
-| `2` | blocking error (`PreToolUse` deny; also fail-closed on a crashing/timing-out hook) |
-| other non-zero | non-blocking warning |
+| Code           | Meaning                                                                            |
+| -------------- | ---------------------------------------------------------------------------------- |
+| `0`            | stdout JSON parsed — deny/context delivered via the JSON body, not the exit code   |
+| `2`            | blocking error (`PreToolUse` deny; also fail-closed on a crashing/timing-out hook) |
+| other non-zero | non-blocking warning                                                               |
 
 ### Matchers
 
@@ -688,29 +694,29 @@ project-root/
 
 ### Feature Support by Platform
 
-| Feature | Copilot (VS Code) | Copilot (GitHub.com) | Copilot CLI |
-|---------|-------------------|---------------------|-------------|
-| `.github/copilot-instructions.md` | Yes | Yes | Yes |
-| `.github/instructions/*.instructions.md` | Yes | Yes (cloud agent, code review) | - |
-| `.github/agents/*.agent.md` | Yes | Yes (agents tab) | Yes |
-| `.github/prompts/*.prompt.md` | Yes | - | - |
-| `.github/skills/*/SKILL.md` | Yes | Yes (coding agent) | Yes |
-| Plugins (`plugin.json`) | - | - | Yes |
-| MCP servers | Yes (Agent mode) | Yes (coding agent, tools only) | Yes |
-| `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` | Read | Read | - |
+| Feature                                  | Copilot (VS Code) | Copilot (GitHub.com)           | Copilot CLI |
+| ---------------------------------------- | ----------------- | ------------------------------ | ----------- |
+| `.github/copilot-instructions.md`        | Yes               | Yes                            | Yes         |
+| `.github/instructions/*.instructions.md` | Yes               | Yes (cloud agent, code review) | -           |
+| `.github/agents/*.agent.md`              | Yes               | Yes (agents tab)               | Yes         |
+| `.github/prompts/*.prompt.md`            | Yes               | -                              | -           |
+| `.github/skills/*/SKILL.md`              | Yes               | Yes (coding agent)             | Yes         |
+| Plugins (`plugin.json`)                  | -                 | -                              | Yes         |
+| MCP servers                              | Yes (Agent mode)  | Yes (coding agent, tools only) | Yes         |
+| `AGENTS.md` / `CLAUDE.md` / `GEMINI.md`  | Read              | Read                           | -           |
 
 ### Cross-Tool Directory Compatibility
 
 Copilot reads configuration from other AI coding tools' directories:
 
-| Directory | What Copilot reads | Platform | Notes |
-|-----------|-------------------|----------|-------|
-| `.github/agents/` | Agents (`.agent.md`) | VS Code, GitHub.com, CLI | Primary Copilot location |
-| `.github/skills/` | Skills (`SKILL.md`) | VS Code, GitHub.com, CLI | Primary Copilot location |
-| `.claude/agents/` | Agents (`.agent.md`) | VS Code | Read for Claude Code compatibility |
-| `AGENTS.md` | Instructions | VS Code, GitHub.com | Read for Codex compatibility |
-| `CLAUDE.md` | Instructions | VS Code, GitHub.com | Read for Claude Code compatibility |
-| `GEMINI.md` | Instructions | VS Code, GitHub.com | Read for Gemini compatibility |
+| Directory         | What Copilot reads   | Platform                 | Notes                              |
+| ----------------- | -------------------- | ------------------------ | ---------------------------------- |
+| `.github/agents/` | Agents (`.agent.md`) | VS Code, GitHub.com, CLI | Primary Copilot location           |
+| `.github/skills/` | Skills (`SKILL.md`)  | VS Code, GitHub.com, CLI | Primary Copilot location           |
+| `.claude/agents/` | Agents (`.agent.md`) | VS Code                  | Read for Claude Code compatibility |
+| `AGENTS.md`       | Instructions         | VS Code, GitHub.com      | Read for Codex compatibility       |
+| `CLAUDE.md`       | Instructions         | VS Code, GitHub.com      | Read for Claude Code compatibility |
+| `GEMINI.md`       | Instructions         | VS Code, GitHub.com      | Read for Gemini compatibility      |
 
 **Additional locations** for agents and skills can be configured in VS Code via `chat.agentFilesLocations` and similar settings.
 

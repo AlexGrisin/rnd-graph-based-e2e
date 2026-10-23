@@ -1,7 +1,7 @@
 ---
 name: init-workspace-flow-context
-description: "Phase 1 Context of init-workspace-flow"
-tags: ["init", "workspace", "context", "phase"]
+description: 'Phase 1 Context of init-workspace-flow'
+tags: ['init', 'workspace', 'context', 'phase']
 disable-model-invocation: true
 user-invocable: false
 baseSchema: docs/schemas/phase.md
@@ -14,23 +14,26 @@ Determines workspace state before any changes occur. Without accurate mode detec
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 1 of 9 in init-workspace-flow
 - Input: filesystem, LLM context (bootstrap markers)
 - Output: state.mode, state.plugin_active, state.composite, state.existing_files
 - Prerequisite: state file created by workflow orchestrator (empty template)
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Validate state file exists
 2. Acquire and execute detection skill
 3. Write detection results to state
 4. Report mode to user
-</phase_steps>
+   </phase_steps>
 
 <read_state step="1.1">
+
 1. Read `agents/init-workspace-flow-state.md`
 2. If state file missing, halt — workflow orchestrator must create it first
-</read_state>
+   </read_state>
 
 <detect step="1.2">
 
@@ -39,12 +42,14 @@ Act as a workspace initialization classifier — fast, precise, zero-waste.
 Initialization must behave differently for fresh, existing, or plugin workspaces. Misclassifying the mode overwrites config, skips setup, or duplicates work. This is the first skill in the init flow — runs before all others. Also generates or updates `gain.json` with SDLC tooling configuration collected from the user.
 
 <core_concepts>
+
 - All Rosetta prep steps MUST be FULLY completed, load-project-context skill loaded and fully executed
 - Three modes: install (no files per `bootstrap_rosetta_files` — the roster in SKILL `load-project-context`), upgrade (some files per `bootstrap_rosetta_files` exist), plugin (LLM context already contains "RUNNING AS A PLUGIN")
 - `gain.json` is the single source of truth for SDLC tooling; it wins in conflicts with other files
-</core_concepts>
+  </core_concepts>
 
 <detection_process>
+
 1. Check existing LLM context for "RUNNING AS A PLUGIN": If already there → set mode = plugin
 2. If not plugin, scan workspace for existing files per `bootstrap_rosetta_files`
 3. Any found → mode = upgrade; none → mode = install
@@ -52,7 +57,7 @@ Initialization must behave differently for fresh, existing, or plugin workspaces
 5. Build file inventory: path and status for each file per `bootstrap_rosetta_files`
 6. Generate or update repository root `gain.json` — follow the `gain_json_generation` section below
 7. Return: mode (install|upgrade|plugin), plugin_active, composite, existing_files list, gain_json_status (created|updated|skipped|pending_user_input)
-</detection_process>
+   </detection_process>
 
 <gain_json_generation>
 
@@ -125,20 +130,23 @@ Initialization must behave differently for fresh, existing, or plugin workspaces
 </templates>
 
 Then:
+
 1. Write detection results to `agents/init-workspace-flow-state.md` per output contract
 2. Log gaps identified for Phase 8
-</detect>
+   </detect>
 
 <report_mode step="1.3">
+
 1. Tell user: detected mode, composite status, file inventory summary
 2. No HITL gate — proceed to Phase 2 automatically
-</report_mode>
+   </report_mode>
 
 <validation_checklist>
+
 - State file contains non-empty `mode` field
 - `composite` flag is explicitly set (not left blank)
 - Every file per `bootstrap_rosetta_files` has a status entry in the inventory
-</validation_checklist>
+  </validation_checklist>
 
 <pitfalls>
 - Plugin mode is a context-sentence check, not filesystem detection

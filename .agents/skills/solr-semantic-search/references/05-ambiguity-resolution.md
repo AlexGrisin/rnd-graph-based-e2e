@@ -15,6 +15,7 @@ Tags found:
 ```
 
 All three are "valid". But keeping all three means the downstream query becomes:
+
 ```
 (model_name_concept:wh-1000xm5^8000)
 OR (description_text:wh-1000xm5^2)
@@ -93,6 +94,7 @@ Tags:
 ```
 
 The "key" is `[sony wh-1000xm5]` from 0 to 2 (a complete multi-position match). Other paths from 0 to 2:
+
 - [sony]@0→1 + [wh-1000xm5]@1→2
 - [sony]@0→1 + [wh-1000xm5]@1→2 (different field for wh-1000xm5)
 
@@ -193,6 +195,7 @@ TermKeys:
 ```
 
 Paths from 0 to 2:
+
 - Path A: [K1] — direct, weight=20000
 - Path B: [K2 → K3] — chain, weight=min(2500, 4000)=2500
 
@@ -235,11 +238,13 @@ public static List<StagedTag> resolve(List<StagedTag> tags, StageConfig stageCon
 ```
 
 Order matters:
+
 - `ShingleOverlappingAmbiguityResolver` first (drops within-field shingle redundancy)
 - `PathAmbiguityResolver` second (drops cross-field weaker interpretations)
 - `NopAmbiguityResolver` available for stages that should keep all interpretations
 
 `StageConfig` lists which resolvers to use:
+
 ```yaml
 stages:
   - name: STRICT_CONCEPT
@@ -248,7 +253,7 @@ stages:
     minShouldMatch: 100%
 
   - name: SYNONYM_FALLBACK
-    resolvers: [ShingleOverlapping]   # less strict — keep more
+    resolvers: [ShingleOverlapping] # less strict — keep more
     minPatternScore: 25
     minShouldMatch: 1<-25%
 ```
@@ -256,6 +261,7 @@ stages:
 ## When to skip ambiguity resolution
 
 Use `NopAmbiguityResolver` (no-op) when:
+
 - The stage explicitly wants to OR all interpretations together (rare, but valid for "fallback" stages)
 - You're debugging — disable resolution to see raw graph state
 - Single-tag phrases — resolution is a no-op anyway, but worth being explicit
@@ -264,12 +270,12 @@ Use `NopAmbiguityResolver` (no-op) when:
 
 Per-stage:
 
-| Param | Effect |
-|---|---|
-| `resolvers` | Ordered list of resolver class names |
-| `minPathScore` | Minimum path score (sum of edge weights) for a path to be kept |
-| `minPatternScore` | Minimum boost-product for a single tag's path |
-| `minShouldMatch` | mm formula |
+| Param             | Effect                                                         |
+| ----------------- | -------------------------------------------------------------- |
+| `resolvers`       | Ordered list of resolver class names                           |
+| `minPathScore`    | Minimum path score (sum of edge weights) for a path to be kept |
+| `minPatternScore` | Minimum boost-product for a single tag's path                  |
+| `minShouldMatch`  | mm formula                                                     |
 
 A stage with high `minPathScore` and aggressive resolvers = high precision, may return zero results.
 A stage with low score thresholds and lenient resolvers = high recall, may return noise.
@@ -285,6 +291,7 @@ Symptom: user types "X", expects to match field A, but tagger drops it because f
 Diagnose: run with `dot=true` and inspect the graph BEFORE and AFTER resolution. The resolver's `removedKeys` log entries indicate which tags were dropped and why.
 
 Fixes:
+
 - Adjust field weights — give field A's concepts higher weight in the concept collection
 - Mark field A as `mandatory` so its tags survive resolution regardless of weight
 - Add field A to a dependency group that requires it
@@ -296,6 +303,7 @@ Symptom: tagger keeps a low-weight noisy interpretation alongside the strong one
 Likely cause: the noisy tag is in a different field group, so `ShingleOverlappingAmbiguityResolver` doesn't see them as comparable. Or `PathAmbiguityResolver` sees them as non-overlapping.
 
 Fixes:
+
 - Add cross-field comparison (custom resolver)
 - Lower the noisy field's weight so it's pruned by `filterOutExcessiveEdges` upstream
 - Remove the noisy field from the stage's allowed list
@@ -305,6 +313,7 @@ Fixes:
 If your first stage drops everything via aggressive resolution, you may end up always falling through to lenient stages. Defeats the purpose of staged processing.
 
 Tune by:
+
 - Loosening early-stage resolvers (e.g., raise the threshold for "strong" classification)
 - Lowering early-stage `minPathScore`
 - Adding intermediate stages between strict and lenient
@@ -312,6 +321,7 @@ Tune by:
 ### Performance
 
 `PathAmbiguityResolver` builds a full graph per stage and runs K-shortest. For graphs with 100+ edges, this is non-trivial. If you see resolution dominating latency:
+
 - Pre-filter edges before resolution (raise minimum edge weight)
 - Increase `MAX_NUMBER_OF_PATHS` only when needed
 - Profile and consider caching — the same phrase typed twice should hit a cache; but cache key must include staging context, which is complex

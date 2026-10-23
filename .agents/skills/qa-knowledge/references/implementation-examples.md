@@ -62,8 +62,10 @@ class TestUserEndpoints:
 ```typescript
 // src/test-helpers/auth.ts
 export class AuthHelper {
-  static async getToken(role = "user"): Promise<string> { /* call auth endpoint */ }
-  static async authHeaders(role = "user"): Promise<Record<string, string>> {
+  static async getToken(role = 'user'): Promise<string> {
+    /* call auth endpoint */
+  }
+  static async authHeaders(role = 'user'): Promise<Record<string, string>> {
     return { Authorization: `Bearer ${await AuthHelper.getToken(role)}` };
   }
 }
@@ -71,18 +73,26 @@ export class AuthHelper {
 
 ```typescript
 // tests/api/users.test.ts
-import axios, { AxiosInstance } from "axios";
-import { AuthHelper } from "../../src/test-helpers/auth";
-const BASE_URL = process.env.API_BASE_URL || "http://localhost:8080";
+import axios, { AxiosInstance } from 'axios';
+import { AuthHelper } from '../../src/test-helpers/auth';
+const BASE_URL = process.env.API_BASE_URL || 'http://localhost:8080';
 
-describe("User Endpoints — /api/v1/users", () => {
+describe('User Endpoints — /api/v1/users', () => {
   let client: AxiosInstance;
-  beforeAll(async () => { client = axios.create({ baseURL: BASE_URL, headers: await AuthHelper.authHeaders() }); });
+  beforeAll(async () => {
+    client = axios.create({
+      baseURL: BASE_URL,
+      headers: await AuthHelper.authHeaders(),
+    });
+  });
 
-  test("ATC-001: Create user with valid data returns 201", async () => {
-    const response = await client.post("/api/v1/users", { name: "John Doe", email: "john@example.com" });
+  test('ATC-001: Create user with valid data returns 201', async () => {
+    const response = await client.post('/api/v1/users', {
+      name: 'John Doe',
+      email: 'john@example.com',
+    });
     expect(response.status).toBe(201);
-    expect(response.data.name).toBe("John Doe");
+    expect(response.data.name).toBe('John Doe');
     expect(response.data.id).toBeDefined();
   });
 });
@@ -146,12 +156,12 @@ UI test code matches the project's patterns exactly: import order (framework →
 
 ### Part A (identify) -- 4-tier selector strategy (preference order)
 
-| Tier | Strategy | Example (good) | Example (flag/avoid) |
-|---|---|---|---|
-| 1. Preferred | `data-testid` / `data-test` | `[data-testid="checkout-submit"]` | — |
-| 2. Good | unique non-dynamic `id` | `#search-input` | `#user-42-row-7-cell` (per-record dynamic id) |
-| 3. Acceptable | stable class / ARIA | `.checkout-summary__total`, `[aria-label="Close dialog"]` | `.btn.btn-primary` (non-unique utility class) |
-| 4. Last resort | structural CSS / XPath | `nav > ul > li:nth-child(3) > a` (target has no stable hook AND DOM is stable) | `/html/body/div[3]/div[2]/section/div/button` (deep absolute XPath) |
+| Tier           | Strategy                    | Example (good)                                                                 | Example (flag/avoid)                                                |
+| -------------- | --------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| 1. Preferred   | `data-testid` / `data-test` | `[data-testid="checkout-submit"]`                                              | —                                                                   |
+| 2. Good        | unique non-dynamic `id`     | `#search-input`                                                                | `#user-42-row-7-cell` (per-record dynamic id)                       |
+| 3. Acceptable  | stable class / ARIA         | `.checkout-summary__total`, `[aria-label="Close dialog"]`                      | `.btn.btn-primary` (non-unique utility class)                       |
+| 4. Last resort | structural CSS / XPath      | `nav > ul > li:nth-child(3) > a` (target has no stable hook AND DOM is stable) | `/html/body/div[3]/div[2]/section/div/button` (deep absolute XPath) |
 
 **Good vs fragile pair:**
 
@@ -172,15 +182,19 @@ UI test code matches the project's patterns exactly: import order (framework →
 ## Selector Management
 
 ### Interaction Map
+
 [Step → required interactions]
 
 ### Selector Availability
+
 ✅ [PageObject.selector] — EXISTS
 ❌ [PageObject.selector] — MISSING
 ❌ [PageObject.selector] — UNRESOLVABLE: <reason>
 
 ### Identified Selectors
+
 **[PageName] - [ElementName]**
+
 - Selector: [value]
 - Type: data-testid / id / class / ARIA / XPath
 - Source: Frontend code @ <file:line> | Page source @ <file>
@@ -188,9 +202,11 @@ UI test code matches the project's patterns exactly: import order (framework →
 - Stability: stable | **fragile: <reason>**
 
 ### Fragile Selectors Flagged (require approval before Part B implements)
+
 - [PageName.selector] — <reason> — recommendation: <e.g. request data-testid from frontend team>
 
 ### Implementation (Part B only)
+
 - Page Objects Modified: [list with paths]
 - Page Objects Created: [list with paths]
 - Selectors Added: [count]

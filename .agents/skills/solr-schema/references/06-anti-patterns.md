@@ -13,6 +13,7 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
 ## Field-type misuse
 
 ### `string` for full-text
+
 - **Anti-pattern:** A `description`, `title`, or `body` field declared as `string`.
 - **Why:** A `string` field is a single opaque token — no tokenization, lowercasing,
   or stemming. Partial-word and phrase search silently die; only an exact, whole-value
@@ -22,6 +23,7 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
   `01-field-types.md`.
 
 ### `text_*` for exact-match, facet, or sort
+
 - **Anti-pattern:** `brand`, `category`, `status`, or an id declared as `text_general`
   and then faceted, sorted, or filtered for exact value.
 - **Why:** The analyzer splits the value into tokens. Faceting then counts **per token**
@@ -34,6 +36,7 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
 ## Storage-triad mistakes
 
 ### Missing `docValues` on facet / sort / function fields
+
 - **Anti-pattern:** A field used for `facet.field`, `sort=`, `group`, JSON-facet metrics,
   or a function query, declared without `docValues=true`.
 - **Why:** Without docValues, Solr falls back to the un-inverted fieldCache (heavy heap
@@ -44,6 +47,7 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
   docValues is build-time). See `03-docvalues-stored-indexed.md`.
 
 ### Over-storing
+
 - **Anti-pattern:** `stored=true` on large bodies, blobs, or computed fields that are
   never returned to the user.
 - **Why:** Stored values bloat the index on disk and slow document retrieval, for no
@@ -57,6 +61,7 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
 ## Analyzer-chain mistakes
 
 ### Asymmetric index vs query analyzers
+
 - **Anti-pattern:** A filter present on one analysis chain but not the other (e.g.
   `ASCIIFoldingFilter` or a stemmer at index time only, or a stopword list that differs).
 - **Why:** Index and query produce different terms, so the query term never matches the
@@ -66,6 +71,7 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
   field-by-field. See `02-analyzer-asymmetry.md`.
 
 ### Query-time multi-word synonyms
+
 - **Anti-pattern:** Multi-word synonyms (`"laptop, notebook computer"`) applied at
   **query** time.
 - **Why:** Query-time multi-word expansion injects extra tokens that break phrase queries
@@ -78,6 +84,7 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
 ## Structural / config mistakes
 
 ### No `uniqueKey` (or the wrong field)
+
 - **Anti-pattern:** Schema with no `<uniqueKey>`, or one pointing at a non-unique field.
 - **Why:** Without a correct unique key, re-indexing a document **appends a duplicate**
   instead of replacing it, and atomic / in-place updates and real-time-get break.
@@ -85,6 +92,7 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
   `01-field-types.md`.
 
 ### Unexpected `multiValued`
+
 - **Anti-pattern:** A field left `multiValued=true` (often inherited from a dynamic field
   or schemaless default) that logically holds one value, then sorted or used in a function.
 - **Why:** You cannot sort or run a single-valued function on a multiValued field —
@@ -94,6 +102,7 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
   and schemaless-inferred defaults. See `01-field-types.md`.
 
 ### `copyField` sprawl and loops
+
 - **Anti-pattern:** Dozens of overlapping `copyField` directives, copying into `stored`
   destinations, or two fields copying into each other.
 - **Why:** Sprawl inflates index size and makes relevance impossible to reason about; a
@@ -104,6 +113,7 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
   `stored=false`. See `01-field-types.md`.
 
 ### Oversized `maxBooleanClauses` / shingle explosion
+
 - **Anti-pattern:** Inflating `maxBooleanClauses` to tens of thousands to paper over
   giant OR-queries, or a `ShingleFilter` with a wide `min/maxShingleSize`.
 - **Why:** Each raises term/clause counts dramatically — memory and query latency balloon,
@@ -117,18 +127,18 @@ solrconfig `05-solrconfig-review.md` · live inspection `07-live-inspection.md`.
 
 ## Quick auditor triage (flag these on sight)
 
-| Anti-pattern | One-line tell |
-|---|---|
-| `string` for full-text | searchable prose that won't partial/phrase-match |
-| `text_*` for facet/sort | facet buckets split per word; sort is undefined |
-| Missing `docValues` on facet/sort/function | works in dev, heap spikes under load |
-| Asymmetric analyzers | silent zero hits, no error |
-| Over-storing | `stored=true` on never-returned large fields |
-| No / wrong `uniqueKey` | reindex duplicates instead of replacing |
-| Unexpected `multiValued` | sort/function errors on a "single value" field |
-| `copyField` sprawl/loops | many overlapping or `stored` copy targets |
-| Query-time multi-word synonyms | broken phrases, wrong `mm` |
-| Oversized `maxBooleanClauses` / shingles | latency and memory blowups |
+| Anti-pattern                               | One-line tell                                    |
+| ------------------------------------------ | ------------------------------------------------ |
+| `string` for full-text                     | searchable prose that won't partial/phrase-match |
+| `text_*` for facet/sort                    | facet buckets split per word; sort is undefined  |
+| Missing `docValues` on facet/sort/function | works in dev, heap spikes under load             |
+| Asymmetric analyzers                       | silent zero hits, no error                       |
+| Over-storing                               | `stored=true` on never-returned large fields     |
+| No / wrong `uniqueKey`                     | reindex duplicates instead of replacing          |
+| Unexpected `multiValued`                   | sort/function errors on a "single value" field   |
+| `copyField` sprawl/loops                   | many overlapping or `stored` copy targets        |
+| Query-time multi-word synonyms             | broken phrases, wrong `mm`                       |
+| Oversized `maxBooleanClauses` / shingles   | latency and memory blowups                       |
 
 ---
 
@@ -138,6 +148,7 @@ This skill targets **Solr 9.x**. The compatibility landmines below are the ones 
 turn a "valid" schema from an older release into a broken one after upgrade.
 
 ### `Trie*` field types removed in 9.0 → use `*PointField` (the 8 → 9 landmine)
+
 - **Anti-pattern:** A schema carried over from Solr 7.x/8.x still declaring `TrieIntField`,
   `TrieLongField`, `TrieFloatField`, `TrieDoubleField`, or `TrieDateField`.
 - **Why:** The entire `Trie*` family was **removed in Solr 9.0**. A 9.x core will not load
@@ -145,17 +156,18 @@ turn a "valid" schema from an older release into a broken one after upgrade.
 - **Fix:** Migrate to the point-based equivalents and **reindex** (the on-disk encoding
   differs):
 
-  | Removed (≤ 8.x) | Replacement (9.x) | Common type alias |
-  |---|---|---|
-  | `TrieIntField` | `IntPointField` | `pint` |
-  | `TrieLongField` | `LongPointField` | `plong` |
-  | `TrieFloatField` | `FloatPointField` | `pfloat` |
-  | `TrieDoubleField` | `DoublePointField` | `pdouble` |
-  | `TrieDateField` | `DatePointField` | `pdate` |
+  | Removed (≤ 8.x)   | Replacement (9.x)  | Common type alias |
+  | ----------------- | ------------------ | ----------------- |
+  | `TrieIntField`    | `IntPointField`    | `pint`            |
+  | `TrieLongField`   | `LongPointField`   | `plong`           |
+  | `TrieFloatField`  | `FloatPointField`  | `pfloat`          |
+  | `TrieDoubleField` | `DoublePointField` | `pdouble`         |
+  | `TrieDateField`   | `DatePointField`   | `pdate`           |
 
   Add `docValues=true` to any of these used for range, sort, or function queries.
 
 ### `ManagedIndexSchemaFactory` is the 9.x default
+
 - In Solr 9.x the default `schemaFactory` is **`ManagedIndexSchemaFactory`** — the schema
   is mutable through the Schema REST API and stored as `managed-schema.xml`. Hand-editing a
   classic `schema.xml` alongside a managed factory leads to confusion about which file is
@@ -163,6 +175,7 @@ turn a "valid" schema from an older release into a broken one after upgrade.
   `07-live-inspection.md`.
 
 ### Solr 10 — frame conservatively
+
 - This catalog is verified for **9.x only**. For any **Solr 10** behavior, **verify
   against the official release notes** before asserting a removal, rename, or default
   change. Do **not** assume Solr 10 behaves like 9.x for schema syntax, and do not claim

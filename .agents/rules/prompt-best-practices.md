@@ -2,7 +2,7 @@
 name: prompt-best-practices
 description: Rules for authoring reliable, minimal, and clear prompts for AI agents. Apply when creating, refactoring, reviewing, or validating any prompt artifact.
 alwaysApply: false
-tags: ["prompting", "rules", "best practices"]
+tags: ['prompting', 'rules', 'best practices']
 ---
 
 <prompt_best_practices>

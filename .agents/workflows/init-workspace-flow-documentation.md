@@ -1,7 +1,7 @@
 ---
 name: init-workspace-flow-documentation
-description: "Phase 7 Documentation of init-workspace-flow"
-tags: ["init", "workspace", "documentation", "phase"]
+description: 'Phase 7 Documentation of init-workspace-flow'
+tags: ['init', 'workspace', 'documentation', 'phase']
 disable-model-invocation: true
 user-invocable: false
 baseSchema: docs/schemas/phase.md
@@ -14,23 +14,26 @@ Agents without workspace documentation re-discover facts, repeat mistakes, and m
 </description_and_purpose>
 
 <workflow_context>
+
 - Phase 7 of 9 in init-workspace-flow
 - Input: TECHSTACK, CODEMAP, DEPENDENCIES, source code, PATTERNS, state.file_count, state.mode, state.composite
 - Output: CONTEXT.md, ARCHITECTURE.md, IMPLEMENTATION.md, ASSUMPTIONS.md, AGENT MEMORY.md
 - Prerequisite: Phases 3 and 5 complete
-</workflow_context>
+  </workflow_context>
 
 <phase_steps>
+
 1. Read state and prerequisites
 2. Execute documentation creation
 3. Update state, log gaps
-</phase_steps>
+   </phase_steps>
 
 <read_state step="7.1">
+
 1. Read `agents/init-workspace-flow-state.md`
 2. Confirm Phase 3 complete (TECHSTACK, CODEMAP, DEPENDENCIES exist)
 3. Read state.mode, state.composite, state.file_count
-</read_state>
+   </read_state>
 
 <execute_documentation step="7.2" subagent="built-in" role="Senior technical writer synthesizing workspace documentation" subagent_recommended_model="claude-opus-4-8,gpt-5.5-high,gemini-3.1-pro-preview">
 
@@ -64,6 +67,7 @@ Act as a senior technical writer — recovers intent from code, not transcribes 
 5. Create or update documents:
 
 CONTEXT.md:
+
 - What this doc is for and what it should contain, self-defining style
 - Self-defines purpose, content type, style
 - Bulleted business context, purpose, domain — stakeholder perspective
@@ -71,6 +75,7 @@ CONTEXT.md:
 - Limit to 100 lines, if there is MORE => keep CONTEXT.md with core CONTEXT plus index to per-feature <FEATURE>-CONTEXT.md files with a set of terms what it contains.
 
 ARCHITECTURE.md:
+
 - What this doc is for and what it should contain, self-defining style
 - Self-defines purpose, content type, style
 - Architecture, modules, workspace structure, testing, styling, building blocks
@@ -79,6 +84,7 @@ ARCHITECTURE.md:
 - Limit to 150 lines, if there is MORE => keep ARCHITECTURE.md with core ARCHITECTURE plus index to per-area <AREA>-ARCHITECTURE.md files with a set of terms what it contains.
 
 IMPLEMENTATION.md:
+
 - What this doc is for and what it should contain, self-defining style
 - Self-defines purpose, content type, style
 - Baseline state VERY BRIEFLY (first part, use word "Baseline" in header, not word "current" - misleading later on)
@@ -88,6 +94,7 @@ IMPLEMENTATION.md:
 - If nothing to add - add template
 
 ASSUMPTIONS.md:
+
 - What this doc is for and what it should contain, self-defining style
 - Self-defines purpose, content type, style
 - Each entry: assumption, confidence level, target file when resolved
@@ -95,12 +102,14 @@ ASSUMPTIONS.md:
 - If nothing to add - add template
 
 TODO.md:
+
 - What this doc is for and what it should contain, self-defining style
 - Self-defines purpose, content type, style
 - Each entry comes with header containing "priority when what where" and body with details
 - If nothing to add - add template
 
 AGENT MEMORY.md:
+
 - What this doc is for and what it should contain, self-defining style
 - Self-defines purpose, content type, style
 - Must follow the template exactly - it will be updated during use
@@ -108,6 +117,7 @@ AGENT MEMORY.md:
 - It is for agent operational notes, not a duplicate of CONTEXT.md/ARCHITECTURE.md
 
 README.md:
+
 - Create in workspace and in each repository root README.md files if missing
 
 6. Special cases:
@@ -119,12 +129,13 @@ README.md:
 </documentation_process>
 
 <documentation_validation_checklist>
+
 - Each document contains self-definition of purpose and style
 - Documents complement without repeating each other
 - ASSUMPTIONS.md entries have forward references to target documents
 - Upgrade mode: human content preserved, only gaps filled
 - Files can be grepped by headers for useful information and ToC
-</documentation_validation_checklist>
+  </documentation_validation_checklist>
 
 <templates>
 
@@ -136,28 +147,32 @@ README.md:
 Generalized reusable lessons from agent sessions.
 Root causes converted into preventive rules, not incident-specific notes.
 Entries are h3 headers with [ACTIVE|RETIRED] status.
-Content: brief, grep-friendly, MECE across sections. 
+Content: brief, grep-friendly, MECE across sections.
 Style: one-liner per entry, optional sub-bullets for context.
 Keep template entries so that AI knows how to fill them in later on.
 
 ## Preventive Rules
 
 ### <Generalized Preventive Rule> [ACTIVE|RETIRED]
+
 [Root cause, Reasons, Problems]
 
 ## What Worked
 
 ### <Generalized What Worked> [ACTIVE|RETIRED]
+
 [Root cause, Reasons, Problems]
 
 ## What Failed
 
 ### <Generalized What Failed> [ACTIVE|RETIRED]
+
 [Hypothesis, Root cause, Reasons, Problems]
 
 ## Discoveries
 
 ### <Generalized Discovery> [ACTIVE|RETIRED]
+
 [Usage, Reasons, Problems]
 ```
 
@@ -187,17 +202,19 @@ For detailed change history, use git history and PRs instead of expanding this f
 </execute_documentation>
 
 <update_state step="7.3">
+
 1. Write Phase 7 completion to `agents/init-workspace-flow-state.md`
 2. Update file inventory for CONTEXT, ARCHITECTURE, IMPLEMENTATION, ASSUMPTIONS, AGENT MEMORY
 3. Log gaps identified for Phase 8
-</update_state>
+   </update_state>
 
 <validation_checklist>
+
 - All 7 doc files exist and are non-empty
 - If composite: top-level docs are registries with sub-repo references
 - If upgrade mode: human-added content preserved
 - State file shows Phase 7 complete with per-file status
-</validation_checklist>
+  </validation_checklist>
 
 <pitfalls>
 - AGENT MEMORY.md is for agent operational notes, not a duplicate of CONTEXT.md

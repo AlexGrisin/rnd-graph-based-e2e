@@ -1,8 +1,8 @@
 ---
 name: large-workspace-handling
-description: "To partition large workspaces (100+ files) into scoped subagent tasks when context is insufficient."
+description: 'To partition large workspaces (100+ files) into scoped subagent tasks when context is insufficient.'
 license: Apache-2.0
-tags: ["skill", "workspace", "large-workspace", "delegation"]
+tags: ['skill', 'workspace', 'large-workspace', 'delegation']
 disable-model-invocation: false
 user-invocable: true
 baseSchema: docs/schemas/skill.md
@@ -27,10 +27,12 @@ Large workspaces exceeding single-agent context window. Partitions into write-sc
 - Grep `#` headers of CODEMAP before scoping
 
 Two strategies (mutually exclusive):
+
 - Summarize & Index
 - Work distribution
 
 ## Summarization & Indexing
+
 - Research without changing code, navigable index with module summaries, etc.
 - Assign subagents: scope paths, goal, context, inputs, output format, boundaries, constraints, and level of detail
 - Subagents to USE SKILL `reverse-engineering` if needed for code analysis
@@ -38,12 +40,13 @@ Two strategies (mutually exclusive):
 - Summarize all outputs
 - Subagent: discoverer, explore, etc.
 - Subagent output structure: analysis scope, TLDR answer, quick navigation with relevance, details with subsections per each logical group (globs, purpose, key components, relevant findings, dependencies), cross-group map, follow ups required
-- Subagents to use relevance classification: 
+- Subagents to use relevance classification:
   - High: group directly addresses the research question
   - Medium: group has supporting information or context
   - Low: group tangentially related, included for completeness
 
 ## Work distribution
+
 - Coordinated modifications via contract-scoped parallel subagents with explicit boundaries and success criteria
 - Split work across subagents and provide: scope paths, goal, context, inputs, output format, boundaries, constraints, operations, and success criteria
 - Subagents decide and execute work within declared scope
@@ -53,11 +56,13 @@ Two strategies (mutually exclusive):
 - Subagent: executor, engineer, etc.
 
 ## Task type detection:
+
 - `Summarize & Index` keywords: understand, analyze, investigate, explore, document, explain, find, search, review, audit, learn, overview
 - `Work distribution` keywords: implement, create, add, fix, refactor, update, change, modify, delete, remove, migrate, build, write
 - Tie-breaker: default to `Summarize & Index`
 
 Scoping:
+
 - Partition into independent areas
 - One subagent per area or logical group
 - Group coupled paths and related work into one scope

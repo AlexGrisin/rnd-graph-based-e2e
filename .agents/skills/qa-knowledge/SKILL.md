@@ -1,6 +1,6 @@
 ---
 name: qa-knowledge
-description: "To run QA engineering — requirements/gap analysis, scenario & spec design, test implementation, failure triage — over the QA knowledge base."
+description: 'To run QA engineering — requirements/gap analysis, scenario & spec design, test implementation, failure triage — over the QA knowledge base.'
 license: Apache-2.0
 disable-model-invocation: false
 user-invocable: true
@@ -57,32 +57,32 @@ Pick exactly one mode by deliverable (multi-phase → run the earliest, stop; th
 
 Router -- READ SKILL FILE for the one your current step needs (point-of-use, never all at once):
 
-| When you need to… | Command |
-|---|---|
-| present a correction for approval (API-AQA **or** UI-AQA) (`<correction>` mode) | READ SKILL FILE `assets/proposed-change-template.md` |
-| run the explicit-approval gate for a correction or spec/plan approval (`<correction>` mode) | READ SKILL FILE `assets/approval-gate.md` |
-| emit the QA api-analysis artifact | READ SKILL FILE `assets/api-analysis-template.md` |
-| emit QA test specs (Given-When-Then `ATC-NNN`) | READ SKILL FILE `assets/test-spec-template.md` |
-| record the API-AQA test-implementation | READ SKILL FILE `assets/api-aqa-test-impl-record.md` |
-| emit the API-AQA execution report | READ SKILL FILE `assets/failure-report-template.md` |
-| record QA gap-analysis findings (G/C/A) | READ SKILL FILE `assets/gap-finding-templates.md` |
-| build the UI-AQA test plan | READ SKILL FILE `assets/ui-aqa-plan-template.md` |
-| emit the UI-AQA code-analysis report | READ SKILL FILE `assets/code-analysis-report-template.md` |
-| run UI-AQA clarification (gap entry / questions / typed assertions) | READ SKILL FILE `assets/ui-aqa-clarification-templates.md` |
-| record the UI-AQA test-implementation | READ SKILL FILE `assets/ui-aqa-test-impl-record.md` |
-| emit the UI-AQA failure analysis | READ SKILL FILE `assets/failure-report-template.md` |
-| send the page-source capture message to the user | READ SKILL FILE `assets/page-source-capture-instructions.md` |
-| classify an API-AQA backend-API failure | READ SKILL FILE `references/api-aqa-failure-taxonomy.md` |
-| classify an UI-AQA UI/E2E failure | READ SKILL FILE `references/ui-aqa-failure-taxonomy.md` |
-| synthesize collected sources into a requirements document (`<synthesis>` mode) | READ SKILL FILE `references/synthesis-catalogs.md` |
-| run QA gap-analysis detection (`<gap_analysis>` mode) | READ SKILL FILE `references/gap-analysis-catalogs.md` |
-| design Given-When-Then API specs -- taxonomy + ATC template (`<scenario_design>` mode) | READ SKILL FILE `references/gwt-spec.md` |
-| format test cases for the configured TMS (scenario_design vendor binding) | READ SKILL FILE `references/<vendor>-format.md` (`<vendor>` from project config; TestRail shipped → `testrail-format.md`) |
-| export a case set to the configured TMS (vendor binding + destructive-write gate) | READ SKILL FILE `references/<vendor>-export.md` (`<vendor>` from project config; TestRail shipped → `testrail-export.md`) |
-| fork a TMS format/export binding to another vendor | READ SKILL FILE `references/vendor-fork-guide.md` |
-| implement UI / API / selector tests -- code + selector tables + templates (`<implementation_modes>` mode) | READ SKILL FILE `references/implementation-examples.md` |
-| analyze test-automation architecture or extract API contracts (`<code_analysis>` mode, via reverse-engineering) | READ SKILL FILE `references/analysis-modes.md` |
-| triage automated-test execution failures (`<test_execution_triage>` mode) | READ SKILL FILE `references/test-execution-triage.md` |
+| When you need to…                                                                                               | Command                                                                                                                   |
+| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| present a correction for approval (API-AQA **or** UI-AQA) (`<correction>` mode)                                 | READ SKILL FILE `assets/proposed-change-template.md`                                                                      |
+| run the explicit-approval gate for a correction or spec/plan approval (`<correction>` mode)                     | READ SKILL FILE `assets/approval-gate.md`                                                                                 |
+| emit the QA api-analysis artifact                                                                               | READ SKILL FILE `assets/api-analysis-template.md`                                                                         |
+| emit QA test specs (Given-When-Then `ATC-NNN`)                                                                  | READ SKILL FILE `assets/test-spec-template.md`                                                                            |
+| record the API-AQA test-implementation                                                                          | READ SKILL FILE `assets/api-aqa-test-impl-record.md`                                                                      |
+| emit the API-AQA execution report                                                                               | READ SKILL FILE `assets/failure-report-template.md`                                                                       |
+| record QA gap-analysis findings (G/C/A)                                                                         | READ SKILL FILE `assets/gap-finding-templates.md`                                                                         |
+| build the UI-AQA test plan                                                                                      | READ SKILL FILE `assets/ui-aqa-plan-template.md`                                                                          |
+| emit the UI-AQA code-analysis report                                                                            | READ SKILL FILE `assets/code-analysis-report-template.md`                                                                 |
+| run UI-AQA clarification (gap entry / questions / typed assertions)                                             | READ SKILL FILE `assets/ui-aqa-clarification-templates.md`                                                                |
+| record the UI-AQA test-implementation                                                                           | READ SKILL FILE `assets/ui-aqa-test-impl-record.md`                                                                       |
+| emit the UI-AQA failure analysis                                                                                | READ SKILL FILE `assets/failure-report-template.md`                                                                       |
+| send the page-source capture message to the user                                                                | READ SKILL FILE `assets/page-source-capture-instructions.md`                                                              |
+| classify an API-AQA backend-API failure                                                                         | READ SKILL FILE `references/api-aqa-failure-taxonomy.md`                                                                  |
+| classify an UI-AQA UI/E2E failure                                                                               | READ SKILL FILE `references/ui-aqa-failure-taxonomy.md`                                                                   |
+| synthesize collected sources into a requirements document (`<synthesis>` mode)                                  | READ SKILL FILE `references/synthesis-catalogs.md`                                                                        |
+| run QA gap-analysis detection (`<gap_analysis>` mode)                                                           | READ SKILL FILE `references/gap-analysis-catalogs.md`                                                                     |
+| design Given-When-Then API specs -- taxonomy + ATC template (`<scenario_design>` mode)                          | READ SKILL FILE `references/gwt-spec.md`                                                                                  |
+| format test cases for the configured TMS (scenario_design vendor binding)                                       | READ SKILL FILE `references/<vendor>-format.md` (`<vendor>` from project config; TestRail shipped → `testrail-format.md`) |
+| export a case set to the configured TMS (vendor binding + destructive-write gate)                               | READ SKILL FILE `references/<vendor>-export.md` (`<vendor>` from project config; TestRail shipped → `testrail-export.md`) |
+| fork a TMS format/export binding to another vendor                                                              | READ SKILL FILE `references/vendor-fork-guide.md`                                                                         |
+| implement UI / API / selector tests -- code + selector tables + templates (`<implementation_modes>` mode)       | READ SKILL FILE `references/implementation-examples.md`                                                                   |
+| analyze test-automation architecture or extract API contracts (`<code_analysis>` mode, via reverse-engineering) | READ SKILL FILE `references/analysis-modes.md`                                                                            |
+| triage automated-test execution failures (`<test_execution_triage>` mode)                                       | READ SKILL FILE `references/test-execution-triage.md`                                                                     |
 
 </resources>
 

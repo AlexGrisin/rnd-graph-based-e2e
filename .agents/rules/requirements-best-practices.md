@@ -2,7 +2,7 @@
 name: requirements-best-practices
 description: Rules for authoring reliable, explicit, and traceable requirements with mandatory user back-and-forth and per-unit approval.
 alwaysApply: false
-tags: ["requirements", "rules", "best practices"]
+tags: ['requirements', 'rules', 'best practices']
 ---
 
 <requirements_best_practices>

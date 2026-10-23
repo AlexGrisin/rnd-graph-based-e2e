@@ -1,7 +1,7 @@
 ---
 name: pl-wbs
 description: Template for execution-ready WBS with sequencing, ownership, and quality gates.
-tags: ["planning", "templates"]
+tags: ['planning', 'templates']
 ---
 
 <pl-wbs>
@@ -50,37 +50,43 @@ Persist critical assumptions and unknowns in this file.
 **Where**: [files/folders/services/modules]
 **Description**: [what will be done]
 **AC**:
+
 - [measurable acceptance criterion]
-**NFR**:
+  **NFR**:
 - [performance/security/reliability constraint]
-**EARS FR**:
+  **EARS FR**:
 - [FR-AREA-0001]
-**Prerequisites**:
+  **Prerequisites**:
 - [required precondition]
-**Consequences**:
+  **Consequences**:
 - [if step is wrong or skipped]
-**Watch For**:
+  **Watch For**:
 - [common failure or risk]
-**HITL**:
+  **HITL**:
 - [required approval or "None"]
 
 ## [Testing]
 
 ### [Scenario Design]
+
 - [scenario set]
 
 ### [Test Data]
+
 - [input datasets and edge cases]
 
 ### [Automation / Local Validation]
+
 - [test execution strategy]
 
 ## [Documentation and Git]
 
 ### [Docs Update]
+
 - [files to update]
 
 ### [Git Checkpoints]
+
 - [branch]
 - [commit]
 - [push]

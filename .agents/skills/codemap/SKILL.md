@@ -1,6 +1,6 @@
 ---
 name: codemap
-description: "To generate, populate, and use a project codemap for structural discovery."
+description: 'To generate, populate, and use a project codemap for structural discovery.'
 license: Apache-2.0
 disable-model-invocation: true
 user-invocable: false
@@ -31,6 +31,7 @@ IF LSP tools are already in current context:
 <graphify>
 
 IF graphify is already **REQUESTED** in current context:
+
 - querying the codebase, tracing dependency paths between symbols, or explaining concepts (`graphify query/path/explain`): MUST USE SKILL `graphify`
 - building or incrementally updating the knowledge graph (`/graphify <path>`, `--update`): MUST USE SKILL `graphify`
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost)
@@ -40,6 +41,7 @@ IF graphify is already **REQUESTED** in current context:
 <gitnexus>
 
 IF gitnexus is already **REQUESTED** in current context:
+
 - code graph queries, exploring code, debugging errors, analyzing impact, or refactoring: MUST APPLY SKILL FILE `assets/gitnexus-use.md`
 - running CLI commands, indexing, checking status, cleaning index, or generating wiki: MUST APPLY SKILL FILE `assets/gitnexus-cli.md`
 - Worked examples: READ SKILL FILE `assets/gitnexus-examples.md`

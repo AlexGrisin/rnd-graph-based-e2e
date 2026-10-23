@@ -1,6 +1,6 @@
 ---
 name: solr-schema
-description: "To design and audit Solr schemas: field types, analyzers, docValues, solrconfig."
+description: 'To design and audit Solr schemas: field types, analyzers, docValues, solrconfig.'
 license: Apache-2.0
 tags:
   - solr
@@ -47,16 +47,16 @@ This SKILL.md is a router. For any non-trivial question, read the relevant `refe
 
 <references>
 
-| When the user asks about… | Read |
-|---|---|
-| Field type selection; `string` vs `text_general` vs `text_en`; tokenizers + filter chains | READ SKILL FILE `references/01-field-types.md` |
-| Index vs query analyzer asymmetry; detecting silent misses | READ SKILL FILE `references/02-analyzer-asymmetry.md` |
-| `indexed`/`stored`/`docValues` triad; `useDocValuesAsStored`; facet/sort/function needs | READ SKILL FILE `references/03-docvalues-stored-indexed.md` |
-| Synonyms: `SynonymGraphFilter`, index vs query placement, `synonyms.txt` vs managed | READ SKILL FILE `references/04-synonyms.md` |
-| `solrconfig.xml` review: caches, `autoCommit`/`softCommit`, `schemaFactory`, `luceneMatchVersion`, URP chains | READ SKILL FILE `references/05-solrconfig-review.md` |
-| Anti-pattern catalog + Solr 9.x version-compat | READ SKILL FILE `references/06-anti-patterns.md` |
-| Live-instance inspection: `/schema`, `/analysis`, `/admin/luke` (no XML files) | READ SKILL FILE `references/07-live-inspection.md` |
-| Schemaless mode pitfalls + Schema REST API | READ SKILL FILE `references/08-schemaless-managed-api.md` |
+| When the user asks about…                                                                                     | Read                                                        |
+| ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Field type selection; `string` vs `text_general` vs `text_en`; tokenizers + filter chains                     | READ SKILL FILE `references/01-field-types.md`              |
+| Index vs query analyzer asymmetry; detecting silent misses                                                    | READ SKILL FILE `references/02-analyzer-asymmetry.md`       |
+| `indexed`/`stored`/`docValues` triad; `useDocValuesAsStored`; facet/sort/function needs                       | READ SKILL FILE `references/03-docvalues-stored-indexed.md` |
+| Synonyms: `SynonymGraphFilter`, index vs query placement, `synonyms.txt` vs managed                           | READ SKILL FILE `references/04-synonyms.md`                 |
+| `solrconfig.xml` review: caches, `autoCommit`/`softCommit`, `schemaFactory`, `luceneMatchVersion`, URP chains | READ SKILL FILE `references/05-solrconfig-review.md`        |
+| Anti-pattern catalog + Solr 9.x version-compat                                                                | READ SKILL FILE `references/06-anti-patterns.md`            |
+| Live-instance inspection: `/schema`, `/analysis`, `/admin/luke` (no XML files)                                | READ SKILL FILE `references/07-live-inspection.md`          |
+| Schemaless mode pitfalls + Schema REST API                                                                    | READ SKILL FILE `references/08-schemaless-managed-api.md`   |
 
 </references>
 
@@ -81,16 +81,16 @@ If only a URL is available (no files), pivot to live inspection: READ SKILL FILE
 
 Flag these before answering the literal question.
 
-| Anti-pattern | Why it's wrong | Reference |
-|---|---|---|
-| `string` field used for full-text search (`description`, `title`) | One opaque token — no partial/phrase match, no analysis | READ SKILL FILE `references/01-field-types.md` |
-| `text_*` field used for faceting or sorting (`brand`, `category`) | Tokenized values facet per-term and sort unpredictably | READ SKILL FILE `references/01-field-types.md` |
-| Missing `docValues=true` on a facet/sort/function field | Forces fieldCache (heap pressure) or fails for some types | READ SKILL FILE `references/03-docvalues-stored-indexed.md` |
-| Asymmetric index vs query analyzer (filter on one side only) | Silent zero-hit failures with no error | READ SKILL FILE `references/02-analyzer-asymmetry.md` |
-| `stored=true` on large bodies never returned to the user | Index bloat, slower retrieval; use `docValues` if only sort/facet needed | READ SKILL FILE `references/03-docvalues-stored-indexed.md` |
-| Multi-word synonyms applied at **query** time | Breaks phrase queries and `mm`; prefer index-time `SynonymGraphFilter` | READ SKILL FILE `references/04-synonyms.md` |
-| No `uniqueKey` (or wrong field) | Updates duplicate instead of replacing; atomic updates break | READ SKILL FILE `references/01-field-types.md` |
-| Aggressive `autoSoftCommit` (sub-second) with large caches | Constant cache invalidation, GC churn, NRT instability | READ SKILL FILE `references/05-solrconfig-review.md` |
+| Anti-pattern                                                      | Why it's wrong                                                           | Reference                                                   |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| `string` field used for full-text search (`description`, `title`) | One opaque token — no partial/phrase match, no analysis                  | READ SKILL FILE `references/01-field-types.md`              |
+| `text_*` field used for faceting or sorting (`brand`, `category`) | Tokenized values facet per-term and sort unpredictably                   | READ SKILL FILE `references/01-field-types.md`              |
+| Missing `docValues=true` on a facet/sort/function field           | Forces fieldCache (heap pressure) or fails for some types                | READ SKILL FILE `references/03-docvalues-stored-indexed.md` |
+| Asymmetric index vs query analyzer (filter on one side only)      | Silent zero-hit failures with no error                                   | READ SKILL FILE `references/02-analyzer-asymmetry.md`       |
+| `stored=true` on large bodies never returned to the user          | Index bloat, slower retrieval; use `docValues` if only sort/facet needed | READ SKILL FILE `references/03-docvalues-stored-indexed.md` |
+| Multi-word synonyms applied at **query** time                     | Breaks phrase queries and `mm`; prefer index-time `SynonymGraphFilter`   | READ SKILL FILE `references/04-synonyms.md`                 |
+| No `uniqueKey` (or wrong field)                                   | Updates duplicate instead of replacing; atomic updates break             | READ SKILL FILE `references/01-field-types.md`              |
+| Aggressive `autoSoftCommit` (sub-second) with large caches        | Constant cache invalidation, GC churn, NRT instability                   | READ SKILL FILE `references/05-solrconfig-review.md`        |
 
 </anti_patterns>
 

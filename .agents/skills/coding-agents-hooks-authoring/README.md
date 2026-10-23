@@ -1,16 +1,21 @@
 # coding-agents-hooks-authoring
+
 Reference sheet for authoring, registering, and debugging Rosetta's cross-IDE hooks and their SemanticKind taxonomy.
 
 ## Why it exists
+
 Without this skill a capable model would place a new hook helper file directly at the top level of `src/hooks/src/hooks/`, assume the bundler recurses into subdirectories, forget to add the hook to every plugin's `hooks.json.tmpl`, or widen a JSON matcher without also updating `lookupToolKind`/`toolKinds` — each of these produces a hook that silently never fires (or produces a dead bundle) with no error at authoring time, only a CI regression-test failure or a runtime no-op.
 
 ## When to engage
+
 Triggers: authoring or registering a Rosetta hook, adding a `SemanticKind`, or debugging a hook that won't fire (per `description`). No entry in `bootstrap-alwayson.md`'s engagement lists, so it is not restricted to orchestrator or subagents — `disable-model-invocation: false` + `user-invocable: true` means it both auto-engages on matching context and is directly callable by any agent. No declared `<prerequisites>` (schema section absent here).
 
 ## How it works
+
 Single flat `SKILL.md`; no `assets/` or `references/` subfolders — everything lives under one root `<hooks_authoring>` wrapper (a non-standard tag name; the skill does not use the schema's usual `<role>`/`<when_to_use_skill>`/`<core_concepts>`/`<process>` section split). Body is a sequence of plain `###` subsections: hook entry rule, helper placement, non-recursive build, adding a SemanticKind (4-step procedure), registration paths per plugin, platform-scoped events, tests, sync command, pitfalls, and a reference-files list.
 
 ## Mental hooks & unexpected rules
+
 - "There is **no `{ recursive: true }`**. Subdirectories are invisible to the bundler." — a helper file dropped one level too shallow silently compiles into a dead top-level bundle for all 5 IDEs.
 - "`SemanticKind = keyof typeof TOOL_KINDS` so TypeScript enforces coverage." — adding a kind without updating every IDE column is a compile error, not a runtime surprise.
 - "Matcher passes the event in; `toolKinds` must include the mapped kind or the call is dropped silently." — widening `hooks.json.tmpl`'s matcher alone does nothing; the drop has no log line.
@@ -21,6 +26,7 @@ Single flat `SKILL.md`; no `assets/` or `references/` subfolders — everything 
 - "`buildDenyMessage` echoes `evidence` to transcript by default. Pass `redact=true` for DANGEROUS_CONTENT matches" — evidence logging defaults to unredacted; secrets leak into the transcript unless the flag is passed explicitly.
 
 ## Invariants — do not change
+
 - `name: coding-agents-hooks-authoring` must equal the folder name; registered in `docs/definitions/skills.md` (line 42) — renaming either breaks discovery.
 - `disable-model-invocation: false` / `user-invocable: true` are both explicit per `docs/schemas/skill.md`'s requirement that these two keys always be set even at default values.
 - Root `<hooks_authoring>` open/close tag pair — the schema convention is `<[the_skill_name]>` (matching the skill name), but this skill uses a distinct wrapper name; keep it internally consistent since nothing external parses it, but do not assume it equals the skill name when copying the schema template.
@@ -31,4 +37,5 @@ Single flat `SKILL.md`; no `assets/` or `references/` subfolders — everything 
 - Hook event names (`PreToolUse` and siblings), the `hooks.json`/`hooks.json.tmpl` schema shape, and the `SemanticKind`/`TOOL_KINDS` naming are external IDE contracts shared with `src/hooks/src/runtime/ide-registry.ts` and 5 plugin templates; renaming any of these in prose without renaming them in source produces documentation that no longer matches the code it describes.
 
 ## Editing guide
+
 Safe to change: prose wording inside each `###` subsection, reordering pitfalls, adding new pitfalls. Handle with care: the 4-step SemanticKind procedure (order matters — `toolKinds` gating happens in `run-hook.ts:98` before `run(ctx)`), the exact regex fixes under Pitfalls, and every quoted file:line reference (verify against source before editing, since staleness is silent). New content belongs directly in `SKILL.md`; there is no `assets/`/`references/` split — if per-IDE detail grows, that split (one file per IDE row, or a dedicated `references/semantic-kinds.md`) is the natural place to move it. No other skill or rule file in `instructions/r3/core` references this skill by name (confirmed by repo-wide grep) — it is a standalone reference sheet, not a declared prerequisite of anything else.

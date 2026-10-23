@@ -1,6 +1,6 @@
 ---
 name: requirements-use
-description: "To consume approved requirements for planning, implementation, and validation, with traceability and HITL."
+description: 'To consume approved requirements for planning, implementation, and validation, with traceability and HITL.'
 license: Apache-2.0
 disable-model-invocation: false
 user-invocable: true
@@ -8,9 +8,9 @@ argument-hint: request, requirements-set?, target-scope?, constraints?, delivery
 context: default
 agent: requirements-engineer, reviewer
 metadata:
-  version: "1.0"
-  category: "requirements-engineering"
-  tags: "requirements usage traceability implementation validation hitl"
+  version: '1.0'
+  category: 'requirements-engineering'
+  tags: 'requirements usage traceability implementation validation hitl'
 tags:
   - requirements-use
   - requirements-traceability

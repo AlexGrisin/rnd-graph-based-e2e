@@ -2,9 +2,9 @@
 name: bootstrap-alwayson
 description: Minimal always-required LLM fixes.
 alwaysApply: true
-applyTo: "**"
+applyTo: '**'
 trigger: always_on
-tags: ["rosetta-bootstrap", "policy"]
+tags: ['rosetta-bootstrap', 'policy']
 baseSchema: docs/schemas/rule.md
 ---
 
@@ -41,12 +41,13 @@ Tasks = execution ledger, survives dropped steps & compaction. MUST run everythi
 <reasonable-definition>
 
 Reasonable = apply in chain-of-thought a one-line justification a senior reviewer (architect/security/owner) would accept, naming:
+
 - warrant — explicit basis→action link, case-specific, retrievable (Toulmin)
 - stakes — bar scales with consequence; enterprise = high default (ALARP)
 - undo — reversible; rollback path identified pre-action (Bayesian)
 - limits — uncertainty named, not glossed (Simon)
 - default unreasonable — earn it, else ASK
-Test: sound reasoning survives audit despite bad outcome
+  Test: sound reasoning survives audit despite bad outcome
 
 </reasonable-definition>
 

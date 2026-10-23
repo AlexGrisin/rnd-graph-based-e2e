@@ -74,14 +74,14 @@ The pieces:
 
 Use **Point** field types for all numbers and dates in Solr 9.x:
 
-| Logical type | Field type | Typical use |
-|---|---|---|
-| Integer | `IntPointField` (`pint`) | quantity, count |
-| Long | `LongPointField` (`plong`) | large ids, epoch ms |
-| Float | `FloatPointField` (`pfloat`) | price, rating |
-| Double | `DoublePointField` (`pdouble`) | high-precision measures |
-| Date | `DatePointField` (`pdate`) | created/updated timestamps |
-| Boolean | `BoolField` (`boolean`) | in-stock, featured flags |
+| Logical type | Field type                     | Typical use                |
+| ------------ | ------------------------------ | -------------------------- |
+| Integer      | `IntPointField` (`pint`)       | quantity, count            |
+| Long         | `LongPointField` (`plong`)     | large ids, epoch ms        |
+| Float        | `FloatPointField` (`pfloat`)   | price, rating              |
+| Double       | `DoublePointField` (`pdouble`) | high-precision measures    |
+| Date         | `DatePointField` (`pdate`)     | created/updated timestamps |
+| Boolean      | `BoolField` (`boolean`)        | in-stock, featured flags   |
 
 Add `docValues="true"` to any numeric/date field used for range queries, sorting, faceting, or function queries (see `03-docvalues-stored-indexed.md`).
 
@@ -93,16 +93,16 @@ The old `TrieIntField`, `TrieLongField`, `TrieFloatField`, `TrieDoubleField`, an
 
 ## Decision table
 
-| You need to… | Field type |
-|---|---|
-| Exact match / identifier / `uniqueKey` | `string` (`StrField`) |
-| Facet on a value | `string` + `docValues=true` |
-| Sort or group by a value | `string` + `docValues=true` |
-| Full-text search, language-neutral | `text_general` (`TextField`) |
-| Full-text search, English w/ stemming | `text_en` (`TextField`) |
-| Range / sort / function on a number | `*PointField` + `docValues=true` |
-| Date range / sort | `pdate` (`DatePointField`) + `docValues=true` |
-| True/false flag | `boolean` (`BoolField`) |
+| You need to…                           | Field type                                    |
+| -------------------------------------- | --------------------------------------------- |
+| Exact match / identifier / `uniqueKey` | `string` (`StrField`)                         |
+| Facet on a value                       | `string` + `docValues=true`                   |
+| Sort or group by a value               | `string` + `docValues=true`                   |
+| Full-text search, language-neutral     | `text_general` (`TextField`)                  |
+| Full-text search, English w/ stemming  | `text_en` (`TextField`)                       |
+| Range / sort / function on a number    | `*PointField` + `docValues=true`              |
+| Date range / sort                      | `pdate` (`DatePointField`) + `docValues=true` |
+| True/false flag                        | `boolean` (`BoolField`)                       |
 
 ---
 

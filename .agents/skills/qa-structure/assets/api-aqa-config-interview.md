@@ -45,6 +45,7 @@ Please answer what you know — I can discover the rest from code and docs.
 ```
 
 **After the interview (agent-facing):**
+
 - **Output:** READ SKILL FILE `assets/api-aqa-project-config-template.md`, populate it with the answers (apply its redaction note), then write to `plans/api-aqa-{IDENTIFIER}/api-aqa-project-config.md`.
 
 </api-aqa-config-interview>

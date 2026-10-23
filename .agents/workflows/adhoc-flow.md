@@ -1,11 +1,10 @@
 ---
 name: adhoc-flow
-description: "Workflow for the rest of tasks: lightweight documentation, build, track, synchronize, etc."
-tags: ["workflow"]
+description: 'Workflow for the rest of tasks: lightweight documentation, build, track, synchronize, etc.'
+tags: ['workflow']
 user-invocable: true
 baseSchema: docs/schemas/workflow.md
 ---
-
 
 <adhoc_flow>
 
@@ -55,8 +54,8 @@ Compose any of these (not limited) into plan phases/steps to build any execution
 - **draft-improve**: short core draft → improve one non-conflicting aspect at a time
 - **ralph-loop**: execute → review → update task memory with root causes → loop
 - **use**: use existing skills, agents, workflows
-- **plan-sessions**: create plan (one file, with refs to per-session files) and implementation specs for each session for workhorse model (sonnet 5, gpt-5.4, so you need to provide more details) in multiple files in order of execution, so that it can be given one-by-one in different sessions of subagents. 
-- **Do not duplicate**: existing files, instructions, protocols => instead use references "file-name:line-ranges". 
+- **plan-sessions**: create plan (one file, with refs to per-session files) and implementation specs for each session for workhorse model (sonnet 5, gpt-5.4, so you need to provide more details) in multiple files in order of execution, so that it can be given one-by-one in different sessions of subagents.
+- **Do not duplicate**: existing files, instructions, protocols => instead use references "file-name:line-ranges".
 
 </building_blocks>
 
@@ -67,9 +66,9 @@ Compose any of these (not limited) into plan phases/steps to build any execution
 1. All Rosetta prep steps MUST be FULLY completed
 2. MUST USE SKILL `load-project-context`, `orchestration` (with team manager and execution controller), `hitl`
 3. MUST ALWAYS use todo tasks ledger, ASAP. Phases are sequential. Independent tasks can run in parallel.
-3. MUST use available MCPs, tools, skills and agents.
-4. You will FOR SURE run out of LLM context, leading to loss of information, delegate to subagents!
-5. If `/goal` is set repeat phases 4-5 until goal is met.
+4. MUST use available MCPs, tools, skills and agents.
+5. You will FOR SURE run out of LLM context, leading to loss of information, delegate to subagents!
+6. If `/goal` is set repeat phases 4-5 until goal is met.
 
 </prerequisites>
 

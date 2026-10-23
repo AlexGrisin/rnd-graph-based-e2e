@@ -1,6 +1,6 @@
 ---
 name: modernization-flow-review
-description: "Phase 7 Review of modernization-flow"
+description: 'Phase 7 Review of modernization-flow'
 alwaysApply: false
 disable-model-invocation: true
 user-invocable: false
@@ -12,6 +12,7 @@ baseSchema: docs/schemas/phase.md
 ## Phase Flow
 
 **Phase 7: Final Review**
+
 1. Complete Phase 6 first
 2. Review all specs together
 3. Check pattern consistency
@@ -25,6 +26,7 @@ baseSchema: docs/schemas/phase.md
 **PREREQUISITES:** Complete Phase 6 (all target code specs created)
 
 **OBJECTIVES:**
+
 - Final consistency check across all target specs
 - Ensure all inter-project dependencies accounted for
 - Validate patterns are consistent
@@ -41,7 +43,7 @@ baseSchema: docs/schemas/phase.md
 - **MUST** verify cross-project flows are captured
 - **MUST** update those files as necessary
 - **MUST NOT** create any NEW files!
-- **MUST** check assumptions and unknowns and cleanup those which are addressed (update respective parts of te original document and remove element completely from this section). 
+- **MUST** check assumptions and unknowns and cleanup those which are addressed (update respective parts of te original document and remove element completely from this section).
 - **MUST** Request information from the user that is required for the modernization! Must not proceed if not properly addressed by the user! Remember this is the final check, any unknowns left will lead to problems!
 
 ## Review Focus
@@ -65,10 +67,10 @@ baseSchema: docs/schemas/phase.md
 MUST spawn separate subagent to validate grounding, truthfulness, gaps, consistency, reasoning, and overall completion of the phase.
 
 Before marking as complete, validate in memory! do not write this section!
+
 - [ ] All final documentation phases executed
 - [ ] All inter-project dependencies accounted for
 - [ ] Patterns consistent across projects
 - [ ] Ready for implementation phase
 
 **DEPENDENTS:** Implementation can begin after final review complete
-

@@ -91,11 +91,13 @@ Build the this `IndexConceptsHandler` (or similar) and register on the concepts 
 ```
 
 Test:
+
 ```bash
 curl -X POST 'http://localhost:8983/solr/concepts/indexConcepts?sourceCollection=catalog&sourceType=semantic&clearCollection=true'
 ```
 
 You should get a count back. Spot-check the collection:
+
 ```bash
 curl 'http://localhost:8983/solr/concepts/select?q=field:brand_name_concept+AND+token:nike'
 ```
@@ -129,10 +131,29 @@ Configure stages via a config file (`stages.json` in the conf/ dir). A realistic
       "prefix": false,
       "spell_corrected": false,
       "fields": [
-        { "name": "item_id",          "boost": 100, "type": "concept", "mandatory": true, "full_phrase_match": true },
-        { "name": "sku_id",           "boost": 100, "type": "concept", "mandatory": true },
-        { "name": "manufacturer_pn",  "boost": 100, "type": "concept", "mandatory": true,
-          "do_not_overlap_with": ["category_name:concept", "product_group_name:concept"] }
+        {
+          "name": "item_id",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true,
+          "full_phrase_match": true
+        },
+        {
+          "name": "sku_id",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true
+        },
+        {
+          "name": "manufacturer_pn",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true,
+          "do_not_overlap_with": [
+            "category_name:concept",
+            "product_group_name:concept"
+          ]
+        }
       ]
     },
     {
@@ -148,27 +169,97 @@ Configure stages via a config file (`stages.json` in the conf/ dir). A realistic
         { "regexp": "attr_search_.*", "boost": 80, "type": "concept" }
       ],
       "fields": [
-        { "name": "sku_id",                  "boost": 100, "type": "concept", "mandatory": true },
-        { "name": "manufacturer_pn",         "boost": 100, "type": "concept", "mandatory": true },
-        { "name": "product_title",           "boost": 100, "type": "concept", "mandatory": true },
-        { "name": "product_title_es",        "boost": 100, "type": "concept", "mandatory": true },
+        {
+          "name": "sku_id",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true
+        },
+        {
+          "name": "manufacturer_pn",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true
+        },
+        {
+          "name": "product_title",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true
+        },
+        {
+          "name": "product_title_es",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true
+        },
 
-        { "name": "product_group_name",      "boost": 100, "type": "concept", "mandatory": true },
-        { "name": "product_group_name_es",   "boost": 100, "type": "concept", "mandatory": true },
-        { "name": "category_name",           "boost":  90, "type": "concept", "mandatory": true },
-        { "name": "category_name_es",        "boost":  90, "type": "concept", "mandatory": true },
+        {
+          "name": "product_group_name",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true
+        },
+        {
+          "name": "product_group_name_es",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true
+        },
+        {
+          "name": "category_name",
+          "boost": 90,
+          "type": "concept",
+          "mandatory": true
+        },
+        {
+          "name": "category_name_es",
+          "boost": 90,
+          "type": "concept",
+          "mandatory": true
+        },
 
-        { "name": "brand_name",              "boost": 100, "type": "concept", "mandatory": true },
-        { "name": "brand_name_es",           "boost": 100, "type": "concept", "mandatory": true },
-        { "name": "sub_brand_name",          "boost":  80, "type": "concept", "mandatory": true,
-          "depends_on": ["brand_name:concept"] },
-        { "name": "sub_brand_name_es",       "boost":  80, "type": "concept", "mandatory": true,
-          "depends_on": ["brand_name_es:concept"] },
+        {
+          "name": "brand_name",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true
+        },
+        {
+          "name": "brand_name_es",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": true
+        },
+        {
+          "name": "sub_brand_name",
+          "boost": 80,
+          "type": "concept",
+          "mandatory": true,
+          "depends_on": ["brand_name:concept"]
+        },
+        {
+          "name": "sub_brand_name_es",
+          "boost": 80,
+          "type": "concept",
+          "mandatory": true,
+          "depends_on": ["brand_name_es:concept"]
+        },
 
-        { "name": "position_name",           "boost":  80, "type": "concept", "mandatory": true,
-          "depends_on": ["product_group_name:concept"] },
-        { "name": "position_name_es",        "boost":  80, "type": "concept", "mandatory": true,
-          "depends_on": ["product_group_name_es:concept"] }
+        {
+          "name": "position_name",
+          "boost": 80,
+          "type": "concept",
+          "mandatory": true,
+          "depends_on": ["product_group_name:concept"]
+        },
+        {
+          "name": "position_name_es",
+          "boost": 80,
+          "type": "concept",
+          "mandatory": true,
+          "depends_on": ["product_group_name_es:concept"]
+        }
       ]
     },
     {
@@ -185,22 +276,82 @@ Configure stages via a config file (`stages.json` in the conf/ dir). A realistic
         { "regexp": "attr_search_.*", "boost": 80, "type": "concept" }
       ],
       "fields": [
-        { "name": "sku_id",                  "boost": 100, "type": "concept", "mandatory": false },
-        { "name": "manufacturer_pn",         "boost": 100, "type": "concept", "mandatory": false },
+        {
+          "name": "sku_id",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": false
+        },
+        {
+          "name": "manufacturer_pn",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": false
+        },
 
-        { "name": "brand_name",              "boost": 100, "type": "concept", "mandatory": false },
-        { "name": "brand_name",              "boost":  80, "type": "shingle", "mandatory": false },
-        { "name": "brand_name_es",           "boost": 100, "type": "concept", "mandatory": false },
-        { "name": "brand_name_es",           "boost":  80, "type": "shingle", "mandatory": false },
+        {
+          "name": "brand_name",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": false
+        },
+        {
+          "name": "brand_name",
+          "boost": 80,
+          "type": "shingle",
+          "mandatory": false
+        },
+        {
+          "name": "brand_name_es",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": false
+        },
+        {
+          "name": "brand_name_es",
+          "boost": 80,
+          "type": "shingle",
+          "mandatory": false
+        },
 
-        { "name": "product_title",           "boost": 100, "type": "concept", "mandatory": false },
-        { "name": "product_title_es",        "boost": 100, "type": "concept", "mandatory": false },
+        {
+          "name": "product_title",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": false
+        },
+        {
+          "name": "product_title_es",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": false
+        },
 
-        { "name": "category_name",           "boost": 100, "type": "concept", "mandatory": false },
-        { "name": "category_name",           "boost":  80, "type": "shingle", "mandatory": false },
-        { "name": "category_name",           "boost":  40, "type": "text",    "mandatory": false },
+        {
+          "name": "category_name",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": false
+        },
+        {
+          "name": "category_name",
+          "boost": 80,
+          "type": "shingle",
+          "mandatory": false
+        },
+        {
+          "name": "category_name",
+          "boost": 40,
+          "type": "text",
+          "mandatory": false
+        },
 
-        { "name": "position_name",           "boost":  80, "type": "concept", "mandatory": false }
+        {
+          "name": "position_name",
+          "boost": 80,
+          "type": "concept",
+          "mandatory": false
+        }
       ]
     },
     {
@@ -215,15 +366,60 @@ Configure stages via a config file (`stages.json` in the conf/ dir). A realistic
       "dominant_language_threshold": 0.8,
       "ambiguity_resolver": ["SHINGLES_OVERLAPS", "PATH"],
       "fields": [
-        { "name": "brand_name",              "boost": 100, "type": "concept", "mandatory": false },
-        { "name": "brand_name",              "boost":  80, "type": "shingle", "mandatory": false },
-        { "name": "category_name",           "boost": 100, "type": "concept", "mandatory": false },
-        { "name": "category_name",           "boost":  80, "type": "shingle", "mandatory": false },
-        { "name": "category_name",           "boost":  40, "type": "text",    "mandatory": false },
-        { "name": "product_title",           "boost": 100, "type": "concept", "mandatory": false },
-        { "name": "position_name",           "boost":  80, "type": "concept", "mandatory": false },
-        { "name": "position_name",           "boost":  60, "type": "shingle", "mandatory": false },
-        { "name": "position_name",           "boost":  40, "type": "text",    "mandatory": false }
+        {
+          "name": "brand_name",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": false
+        },
+        {
+          "name": "brand_name",
+          "boost": 80,
+          "type": "shingle",
+          "mandatory": false
+        },
+        {
+          "name": "category_name",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": false
+        },
+        {
+          "name": "category_name",
+          "boost": 80,
+          "type": "shingle",
+          "mandatory": false
+        },
+        {
+          "name": "category_name",
+          "boost": 40,
+          "type": "text",
+          "mandatory": false
+        },
+        {
+          "name": "product_title",
+          "boost": 100,
+          "type": "concept",
+          "mandatory": false
+        },
+        {
+          "name": "position_name",
+          "boost": 80,
+          "type": "concept",
+          "mandatory": false
+        },
+        {
+          "name": "position_name",
+          "boost": 60,
+          "type": "shingle",
+          "mandatory": false
+        },
+        {
+          "name": "position_name",
+          "boost": 40,
+          "type": "text",
+          "mandatory": false
+        }
       ]
     }
   ],
@@ -251,6 +447,7 @@ Configure stages via a config file (`stages.json` in the conf/ dir). A realistic
 **`mm` per stage.** Stage 1+2 require all tokens to match (`100%`). Stage 3 allows 30% of tokens to be unmatched (`mm=70%`). Stage 4 only requires 30% match. Each stage trades precision for recall.
 
 **`type: concept | shingle | text`** picks the catalog field naming convention:
+
 - `type: concept` → indexed via `solr.TaggerRequestHandler`-friendly analyzer; exact tag matches
 - `type: shingle` → catalog field `<name>_shingle` for multi-token sub-matches
 - `type: text` → catalog field `<name>_text` for tokenized full-text match (lowest precision)
@@ -277,11 +474,11 @@ Configure stages via a config file (`stages.json` in the conf/ dir). A realistic
 
 The catalog must have fields named consistently with what stage config references:
 
-| Config reference | Catalog field name expected |
-|---|---|
-| `{"name": "brand_name", "type": "concept"}` | `brand_name_concept` |
-| `{"name": "brand_name", "type": "shingle"}` | `brand_name_shingle` |
-| `{"name": "brand_name", "type": "text"}` | `brand_name_text` |
+| Config reference                            | Catalog field name expected |
+| ------------------------------------------- | --------------------------- |
+| `{"name": "brand_name", "type": "concept"}` | `brand_name_concept`        |
+| `{"name": "brand_name", "type": "shingle"}` | `brand_name_shingle`        |
+| `{"name": "brand_name", "type": "text"}`    | `brand_name_text`           |
 
 The query builder concatenates `name + "_" + type` to derive the actual catalog field. This convention is what lets one stage config drive both concept lookup (in the concept collection — see `02-concept-indexing.md`) and final query construction (against the catalog).
 
@@ -294,6 +491,7 @@ For free-text fields (`*_text`, `description_text`), keep `solr.BM25SimilarityFa
 The `StagesConfigProvider` loads this on handler init. See your custom plugin code.
 
 Test the tagger directly:
+
 ```bash
 curl 'http://localhost:8983/solr/concepts/semanticTagGraph?q=nike+running+shoes&lang=en&debug=true&dot=true'
 ```
@@ -314,6 +512,7 @@ This is the entry point for actual searches. It runs on the **catalog collection
 ```
 
 The handler:
+
 1. Receives user `q`
 2. Calls `concepts/semanticTagGraph` (internally) to get tags
 3. Runs ambiguity resolution + path finding
@@ -322,6 +521,7 @@ The handler:
 6. Returns results
 
 Test:
+
 ```bash
 curl 'http://localhost:8983/solr/catalog/semanticSelect?q=nike+running+shoes'
 ```
@@ -333,22 +533,26 @@ You should get catalog results. With `debug=true`, the response includes which s
 This is the iterative part. Common tuning loops:
 
 **Symptom: noisy results (too many false positives)**
+
 - Lower the field boost for low-precision fields (description_text)
 - Raise minPatternScore for first stage
 - Add stricter ambiguity resolvers
 - Mark high-precision fields as `mandatory=true` so they always become MUST
 
 **Symptom: low recall (no results for valid queries)**
+
 - Add a fuzzy-enabled stage at the end (lowest priority)
 - Lower minShouldMatch in fallback stages
 - Add synonyms for known abbreviations/terms users actually type
 - Check tagger isn't dropping valid concepts (use `dot=true`)
 
 **Symptom: wrong field matched**
+
 - Boost the correct field higher in stage config
 - Add the wrong field to a higher-precision stage that requires more context
 
 **Symptom: latency too high**
+
 - Reduce `maxShingleLength`
 - Reduce stage count
 - Enable filterCache on lang/source filters
@@ -392,6 +596,7 @@ User types "teh" → tagger sees only "the" (typo correction).
 User types "humungous" → tagger sees only "large" (canonicalization).
 
 Common uses:
+
 - **Typo / spelling corrections**: `teh => the`, `sny => sony` (one-way; you don't want the misspelling firing as a tag itself)
 - **Canonicalization**: `colour, color => color` (collapse spelling variants to one canonical)
 - **Brand abbreviation expansion**: `jbl => harman` (only when "jbl" should NOT itself be tagged, just "harman")
@@ -428,6 +633,7 @@ Two update strategies:
 2. **Periodic reloader**. Implement a thread inside `SynonymsStorage` that polls a source (file mtime, DB row, or HTTP endpoint) on a timer (e.g. every 5 minutes). On change, rebuild the in-memory map atomically and swap the reference. No core reload, no cache flush, but added complexity. Use only if your synonym churn is measured in hours-not-days.
 
 For SolrCloud: synonyms file lives in the configset (in ZooKeeper). Update via:
+
 ```bash
 bin/solr zk cp file:./synonyms.txt zk:/configs/concepts/synonyms.txt -z localhost:9983
 curl 'http://localhost:8983/solr/admin/collections?action=RELOAD&name=concepts'
@@ -438,6 +644,7 @@ curl 'http://localhost:8983/solr/admin/collections?action=RELOAD&name=concepts'
 Synonyms are global — applied to every tag lookup. If your synonyms are domain-specific (e.g., different per product category), don't put them in `synonyms.txt` — index them as separate concept docs in the **concept collection** with `field=brand_alias_concept` or similar, scoped via `fq` at request time.
 
 Rule of thumb:
+
 - **Universal aliases** (typos, language-independent abbreviations) → `synonyms.txt`
 - **Domain-specific equivalences** (only-applies-to-headphones synonyms, only-applies-to-speakers) → concept docs scoped by attribute
 
@@ -453,12 +660,14 @@ Most domains need a post-processor analogous to BLM. Examples:
 - **Real estate**: Location+PropertyType+PriceRange combinations
 
 The post-processor:
+
 1. Filters tags that look like the structured entities (e.g., a year, a brand, a model)
 2. Validates the combination against an external source (canonical DB)
 3. Replaces individual tags with a synthetic recognized-entity tag
 4. Adds an explicit filter to the catalog query
 
 Implementation pattern:
+
 ```java
 public class MyDomainProcessor {
     public RecognizedEntity process(List<ProducedTag> tags, EntityProvider provider) {
@@ -477,6 +686,7 @@ Run after tagging, before query building. The recognized entity becomes an addit
 ### Concept rebuild cadence
 
 For a stable catalog, daily is fine. For high-velocity catalogs, consider:
+
 - Hourly partial rebuild (only fields that changed)
 - Dual-collection alias swap to avoid query downtime
 - Streaming concept updates (advanced; not for first pass)
@@ -484,11 +694,13 @@ For a stable catalog, daily is fine. For high-velocity catalogs, consider:
 ### Monitoring
 
 Track per-stage:
+
 - Tagging latency (p50, p95, p99)
 - Stage success rate (which stage fires per query)
 - Zero-hits rate (queries that fall through all stages)
 
 Track concept collection:
+
 - Doc count after rebuild (alarm on big deltas)
 - Per-source breakdown
 - Field coverage (no field with 0 entries)
@@ -496,6 +708,7 @@ Track concept collection:
 ### Scaling
 
 Tagger is the hot path. Scale by:
+
 - Replicate concepts collection (read-only)
 - Cache tagger responses for hot queries (10ms response → 1ms cached)
 - Reduce maxShingleLength if phrases are typically short
@@ -507,6 +720,7 @@ Catalog search scales independently — same patterns as any Solr deployment.
 ### Indexing description_text into concepts
 
 Tempting because description_text contains useful words. But it makes everything match everything. Either:
+
 - Don't include it
 - Include only top-N highest-IDF terms (custom URP filter)
 - Include only with a clearly low boost in stage config

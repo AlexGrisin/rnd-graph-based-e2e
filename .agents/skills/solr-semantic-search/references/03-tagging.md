@@ -42,6 +42,7 @@ Schema (`managed-schema` of the concept collection):
 ```
 
 Two key pieces:
+
 - `postingsFormat="FST50"` on the tag field — enables the FST-based postings format that the tagger needs
 - `ConcatenateGraphFilterFactory` at index time only — concatenates the analyzed tokens of each multi-word entity into a single FST entry. The query-time analyzer skips this filter, so the input text is tokenized normally.
 
@@ -72,19 +73,35 @@ Response:
 
 ```json
 {
-  "responseHeader": {"status": 0, "QTime": 1},
+  "responseHeader": { "status": 0, "QTime": 1 },
   "tagsCount": 3,
   "tags": [
-    {"startOffset": 0,  "endOffset": 4,  "matchText": "sony",       "ids": ["brand_sony"]},
-    {"startOffset": 5,  "endOffset": 15, "matchText": "wh-1000xm5", "ids": ["model_wh_1000xm5"]},
-    {"startOffset": 16, "endOffset": 24, "matchText": "ear pads",   "ids": ["category_ear_pads"]}
+    {
+      "startOffset": 0,
+      "endOffset": 4,
+      "matchText": "sony",
+      "ids": ["brand_sony"]
+    },
+    {
+      "startOffset": 5,
+      "endOffset": 15,
+      "matchText": "wh-1000xm5",
+      "ids": ["model_wh_1000xm5"]
+    },
+    {
+      "startOffset": 16,
+      "endOffset": 24,
+      "matchText": "ear pads",
+      "ids": ["category_ear_pads"]
+    }
   ],
   "response": {
-    "numFound": 3, "start": 0,
+    "numFound": 3,
+    "start": 0,
     "docs": [
-      {"id": "brand_sony",      "name": "Sony",      "weight": 50000},
-      {"id": "model_wh_1000xm5", "name": "WH-1000XM5", "weight": 8000},
-      {"id": "category_ear_pads", "name": "Ear Pads", "weight": 12000}
+      { "id": "brand_sony", "name": "Sony", "weight": 50000 },
+      { "id": "model_wh_1000xm5", "name": "WH-1000XM5", "weight": 8000 },
+      { "id": "category_ear_pads", "name": "Ear Pads", "weight": 12000 }
     ]
   }
 }
@@ -94,27 +111,27 @@ Each tag has `startOffset`/`endOffset` (character positions in the input), `ids`
 
 ### Important parameters
 
-| Param | Purpose |
-|---|---|
-| `field` (required) | the indexed dictionary field |
-| `fq` | filter queries to scope the dictionary (e.g., `fq=lang:en`, `fq=source:catalog`) |
-| `rows` | how many concept docs to return (default 10000 for tag requests; not 10) |
-| `fl` | which fields of the matched concept docs to include in `response.docs` |
-| `matchText` | include the actual matched substring in each tag (very useful for debugging) |
-| `overlaps` | tag overlap resolution algorithm — see below |
-| `tagsLimit` | max tags returned (default 1000) |
-| `subTags` | when overlaps=ALL, include all overlapping tags (otherwise excluded) |
-| `ignoreStopwords` | tag through stopword positions; default auto-detected from analyzer |
+| Param              | Purpose                                                                          |
+| ------------------ | -------------------------------------------------------------------------------- |
+| `field` (required) | the indexed dictionary field                                                     |
+| `fq`               | filter queries to scope the dictionary (e.g., `fq=lang:en`, `fq=source:catalog`) |
+| `rows`             | how many concept docs to return (default 10000 for tag requests; not 10)         |
+| `fl`               | which fields of the matched concept docs to include in `response.docs`           |
+| `matchText`        | include the actual matched substring in each tag (very useful for debugging)     |
+| `overlaps`         | tag overlap resolution algorithm — see below                                     |
+| `tagsLimit`        | max tags returned (default 1000)                                                 |
+| `subTags`          | when overlaps=ALL, include all overlapping tags (otherwise excluded)             |
+| `ignoreStopwords`  | tag through stopword positions; default auto-detected from analyzer              |
 
 ### `overlaps` — overlap resolution
 
 When the dictionary contains "sony", "wh-1000xm5", "sony wh-1000xm5", and the input has "sony wh-1000xm5", which tags do you keep?
 
-| Value | Behavior |
-|---|---|
-| `ALL` | return every match, including subsumed ones (3 tags: sony, wh-1000xm5, sony wh-1000xm5) |
-| `NO_SUB` | drop tags that are entirely contained in another tag (2 tags: sony wh-1000xm5 + nothing else; the shorter ones are sub-tags) |
-| `LONGEST_DOMINANT_RIGHT` | greedy; pick longest non-overlapping span moving left-to-right (most production setups use this) |
+| Value                    | Behavior                                                                                                                     |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `ALL`                    | return every match, including subsumed ones (3 tags: sony, wh-1000xm5, sony wh-1000xm5)                                      |
+| `NO_SUB`                 | drop tags that are entirely contained in another tag (2 tags: sony wh-1000xm5 + nothing else; the shorter ones are sub-tags) |
+| `LONGEST_DOMINANT_RIGHT` | greedy; pick longest non-overlapping span moving left-to-right (most production setups use this)                             |
 
 For semantic search where you want the strongest interpretation: `LONGEST_DOMINANT_RIGHT` or `NO_SUB`. For a graph-based downstream that compares all interpretations: `ALL` (and let your ambiguity resolver pick).
 
@@ -135,7 +152,7 @@ curl -X POST \
 
 These are why most production setups eventually outgrow the built-in tagger:
 
-1. **No fuzzy matching.** The FST does exact (post-analysis) matching only. If the user types "sny" and the concept is "sony", no tag fires. Mitigation: build a separate spellcheck step *before* tagging, OR add fuzzy variants as alternative concept entries at indexing time.
+1. **No fuzzy matching.** The FST does exact (post-analysis) matching only. If the user types "sny" and the concept is "sony", no tag fires. Mitigation: build a separate spellcheck step _before_ tagging, OR add fuzzy variants as alternative concept entries at indexing time.
 
 2. **No prefix / substring matching.** If concept is "wh-1000xm5" and user types "wh-1000", no tag. Mitigation: shingle/n-gram the indexed terms (but see #4).
 
@@ -147,23 +164,23 @@ These are why most production setups eventually outgrow the built-in tagger:
 
 6. **Single-shard requirement.** "The Tagger request handler does not yet support a sharded index. The collection that stores the tag dictionary must be a single-sharded collection." Not normally a problem (concept dictionaries are small), but plan for it: don't auto-shard the concept collection like the catalog.
 
-7. **No graph output.** Returns a flat list of tags with offsets. Building a graph + finding K-shortest paths is *your* job downstream.
+7. **No graph output.** Returns a flat list of tags with offsets. Building a graph + finding K-shortest paths is _your_ job downstream.
 
 8. **No synonym expansion at tag time.** You can index synonym terms as additional concept docs (multiple docs sharing the same `id` or grouped via a key) but you can't dynamically apply a synonyms file. Multi-word synonyms work if you index them as separate concept docs.
 
 ### Decision matrix: built-in vs custom
 
-| Use case | Recommendation |
-|---|---|
-| One-shot tagging for query understanding (e.g., "what brand did they mention?") — return matches and you're done | **Built-in** |
-| Tag for autocomplete or "did you mean" suggestions | **Built-in** |
-| Need fuzzy / prefix / spell-corrected matching as a first-class concept | **Custom** |
-| Need multi-language tagging in one call with per-language analyzer | **Custom** (or two built-in calls + merge in app code) |
-| Need per-match-type scoring (exact 100×, fuzzy 25×, prefix 50×) baked into the tag response | **Custom** |
-| Domain-specific synonym handling beyond what indexed concept docs provide | **Custom** |
-| Need graph output, K-shortest paths, ambiguity resolution downstream | **Custom orchestrator** wrapping either tagger (built-in is a fine source of raw tags) |
-| Real-time synonym reloading from a database without core reload | **Custom** |
-| Concept dictionary < 10M entries, exact-match is enough | **Built-in** |
+| Use case                                                                                                         | Recommendation                                                                         |
+| ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| One-shot tagging for query understanding (e.g., "what brand did they mention?") — return matches and you're done | **Built-in**                                                                           |
+| Tag for autocomplete or "did you mean" suggestions                                                               | **Built-in**                                                                           |
+| Need fuzzy / prefix / spell-corrected matching as a first-class concept                                          | **Custom**                                                                             |
+| Need multi-language tagging in one call with per-language analyzer                                               | **Custom** (or two built-in calls + merge in app code)                                 |
+| Need per-match-type scoring (exact 100×, fuzzy 25×, prefix 50×) baked into the tag response                      | **Custom**                                                                             |
+| Domain-specific synonym handling beyond what indexed concept docs provide                                        | **Custom**                                                                             |
+| Need graph output, K-shortest paths, ambiguity resolution downstream                                             | **Custom orchestrator** wrapping either tagger (built-in is a fine source of raw tags) |
+| Real-time synonym reloading from a database without core reload                                                  | **Custom**                                                                             |
+| Concept dictionary < 10M entries, exact-match is enough                                                          | **Built-in**                                                                           |
 
 A common pragmatic pattern: use the **built-in tagger** as the inner lookup for dictionary terms, and put a **thin custom orchestrator** in front that handles shingles / synonyms / graph building / multi-language. The custom layer doesn't need to do its own FST lookups — it composes calls to the built-in handler.
 
@@ -209,7 +226,7 @@ You inherit FST speed for the dictionary lookup and pay custom-code cost only fo
 If two or more of these are true, the built-in tagger isn't a good fit even as inner lookup:
 
 - Per-match-type scoring needs to influence which tags survive (not just downstream re-ranking)
-- Fuzzy is the *primary* match mode (not a fallback)
+- Fuzzy is the _primary_ match mode (not a fallback)
 - Multi-word synonyms need to interact with multi-language analysis
 - The tagger needs to produce an explicit graph with quasi-positions for synonym alternatives (see `04-graph-paths.md`)
 - You need to run multiple parses (per-language, per-source-type) and merge with deduplication, all within one HTTP request from the client
@@ -235,6 +252,7 @@ Exposed as `/semanticTagGraph` on the **concept collection** (not the catalog).
 ```
 
 Request:
+
 ```
 GET /solr/concepts/semanticTagGraph?
   q=sony+wh-1000xm5+ear+pads&
@@ -250,20 +268,21 @@ GET /solr/concepts/semanticTagGraph?
 
 Parameters:
 
-| Param | Type | Effect |
-|---|---|---|
-| `q` | string | the phrase to tag |
-| `lang` | string | "en", "es", "all" — which language to analyze with |
-| `source` | string | filter concepts by source (e.g., "semantic", "catalog_db") |
-| `fuzzy` | bool | enable fuzzy matching on shingles |
-| `wordBreak` | bool | enable word-break matching |
-| `prefix` | bool | enable prefix matching |
-| `maxShingleLength` | int | max N for N-grams (default 4) |
-| `maxTag` | int | top-N tags to return per shingle (default 50) |
-| `debug` | bool | include parsed lookup queries in response |
-| `dot` | bool | include graphviz DOT dump for visualization |
+| Param              | Type   | Effect                                                     |
+| ------------------ | ------ | ---------------------------------------------------------- |
+| `q`                | string | the phrase to tag                                          |
+| `lang`             | string | "en", "es", "all" — which language to analyze with         |
+| `source`           | string | filter concepts by source (e.g., "semantic", "catalog_db") |
+| `fuzzy`            | bool   | enable fuzzy matching on shingles                          |
+| `wordBreak`        | bool   | enable word-break matching                                 |
+| `prefix`           | bool   | enable prefix matching                                     |
+| `maxShingleLength` | int    | max N for N-grams (default 4)                              |
+| `maxTag`           | int    | top-N tags to return per shingle (default 50)              |
+| `debug`            | bool   | include parsed lookup queries in response                  |
+| `dot`              | bool   | include graphviz DOT dump for visualization                |
 
 Response:
+
 ```json
 {
   "tokens": [
@@ -311,6 +330,7 @@ For tokens at positions 0..N, generate every N-gram of length 1 to `maxShingleLe
 ```
 
 Each shingle has:
+
 - `token` — the joined string ("sony wh-1000xm5")
 - `startPosition` — first token's position
 - `offset` — token count (length of n-gram)
@@ -356,6 +376,7 @@ TopDocs topDocs = searcher.search(query, maxTag);
 `wrapQuery(q, score)` is `new BoostQuery(new ConstantScoreQuery(q), score)` — wraps in constant score so all matches of one type contribute the same boost regardless of intrinsic IDF.
 
 `pow = 2 ^ (originalTokenOffset - 1)`. So:
+
 - 1-token shingle: pow=1, exact=100, prefix=50, fuzzy=25
 - 2-token shingle: pow=2, exact=200, prefix=100, fuzzy=50
 - 3-token shingle: pow=4, exact=400, prefix=200, fuzzy=100
@@ -443,6 +464,7 @@ Then convert tagTypesMap to `ProducedTag` objects (one per (token, relation) com
 ### 7. Spell-check unrecognized
 
 After main tagging, find shingles that produced NO tags:
+
 ```java
 List<ProducedTag> unrecognized = ...;
 ```
@@ -476,6 +498,7 @@ Shingles = just the one token. Synonyms still applied. No multi-word synonyms (n
 ### Very long phrase (10+ tokens)
 
 Shingle generation is O(N × maxShingleLength). For N=20, maxShingleLength=4, that's 80 shingles, each with up to 4 lookup queries (exact + fuzzy + wordbreak + prefix). 320 lookups per language. Performance budget concern. Either:
+
 - Cap maxShingleLength lower (3 or 2)
 - Truncate phrase length upstream
 - Pre-filter phrases through a quick token-count check
@@ -483,6 +506,7 @@ Shingle generation is O(N × maxShingleLength). For N=20, maxShingleLength=4, th
 ### Phrase with gaps
 
 Tokenizer can produce gaps (stopwords filtered, punctuation, etc.):
+
 ```
 phrase: "sony the wh-1000xm5"   →   tokens at positions 0, 2 (gap at 1)
 ```
@@ -492,6 +516,7 @@ phrase: "sony the wh-1000xm5"   →   tokens at positions 0, 2 (gap at 1)
 ### Shingles with digits
 
 Numeric shingles have special rules:
+
 - `prefix=true` doesn't apply to all-digit shingles (would match too broadly)
 - Optional `shortNumericTagsEnabled` adds prefix matching for short numeric (1-2 chars) with constraint: token must be followed by a letter (e.g., "5w" matches "5w30" but not "500")
 
@@ -510,6 +535,7 @@ Concept collection is small (1M-50M docs typical). Queries are fast (under 1ms).
 ### Filter cache
 
 The lang/source filter is the same across all shingle lookups in one request. Make sure it's cached:
+
 - `lang:en AND source:semantic` should hit `filterCache` after first request
 
 ### maxTag threshold
@@ -531,11 +557,13 @@ Includes the actual Lucene queries used for each shingle lookup in the response 
 ### `dot=true`
 
 Returns a graphviz DOT dump under `tagsDot` and `multiwordSynTagsDot`. Pipe to graphviz to render:
+
 ```
 echo "$DOT" | dot -Tpng > tags.png
 ```
 
 The DOT output uses colors:
+
 - Green: CONCEPT (exact match)
 - Red: SYN, MULTI_SYN
 - Blue: SPELL
@@ -564,6 +592,7 @@ If you expect "sony" to tag but it doesn't:
 `debug=true` also includes per-shingle query counts. If one shingle takes 100ms, something's wrong with that lookup specifically (probably regex prefix match against many docs).
 
 For overall request latency:
+
 - Profile `analyzePhrase` (analyzer overhead)
 - Profile `searcher.search` cumulative time across shingles
 - Check filterCache hit rate via `/solr/concepts/admin/mbeans?stats=true`

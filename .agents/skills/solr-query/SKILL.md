@@ -1,6 +1,6 @@
 ---
 name: solr-query
-description: "To build and debug Solr queries: eDisMax, block join, JSON facets, kNN, explain."
+description: 'To build and debug Solr queries: eDisMax, block join, JSON facets, kNN, explain.'
 license: Apache-2.0
 tags:
   - solr
@@ -40,20 +40,20 @@ This SKILL.md is a router. For any non-trivial question, read the relevant `refe
 
 <references>
 
-| When the user asks about… | Read |
-|---|---|
-| Lucene syntax (operators, escaping, wildcards, ranges, fuzzy) | READ SKILL FILE `references/01-lucene-syntax.md` |
-| Local params, parser selection, `{!parser ...}`, `v=$param` deref | READ SKILL FILE `references/02-local-params.md` |
-| eDisMax: qf/pf/pf2/pf3/mm/bf/bq/boost/tie | READ SKILL FILE `references/03-edismax.md` |
-| Block join: `{!parent}`, `{!child}`, `[child]`, 3-level | READ SKILL FILE `references/04-block-join.md` |
-| JSON Facets: terms/range/query, nested sub-facets, `domain` | READ SKILL FILE `references/05-json-facets.md` |
-| Multi-select faceting via `{!tag=}` and `excludeTags` | READ SKILL FILE `references/06-tag-exclude.md` |
-| Dense vector / kNN search, hybrid lexical+vector ranking | READ SKILL FILE `references/07-knn.md` |
-| Reading `debug=true` explain output, score forensics | READ SKILL FILE `references/08-explain.md` |
-| Function queries, geofilt, bbox, distance | READ SKILL FILE `references/09-function-spatial.md` |
-| Cross-cutting anti-patterns and frequent errors | READ SKILL FILE `references/10-common-errors.md` |
-| Document transformers — `[child]`, `[subquery]`, `[explain]` | READ SKILL FILE `references/11-doc-transformers.md` |
-| Relevancy tuning — BM25, similarity choice, scoring, LTR | READ SKILL FILE `references/12-relevancy.md` |
+| When the user asks about…                                         | Read                                                |
+| ----------------------------------------------------------------- | --------------------------------------------------- |
+| Lucene syntax (operators, escaping, wildcards, ranges, fuzzy)     | READ SKILL FILE `references/01-lucene-syntax.md`    |
+| Local params, parser selection, `{!parser ...}`, `v=$param` deref | READ SKILL FILE `references/02-local-params.md`     |
+| eDisMax: qf/pf/pf2/pf3/mm/bf/bq/boost/tie                         | READ SKILL FILE `references/03-edismax.md`          |
+| Block join: `{!parent}`, `{!child}`, `[child]`, 3-level           | READ SKILL FILE `references/04-block-join.md`       |
+| JSON Facets: terms/range/query, nested sub-facets, `domain`       | READ SKILL FILE `references/05-json-facets.md`      |
+| Multi-select faceting via `{!tag=}` and `excludeTags`             | READ SKILL FILE `references/06-tag-exclude.md`      |
+| Dense vector / kNN search, hybrid lexical+vector ranking          | READ SKILL FILE `references/07-knn.md`              |
+| Reading `debug=true` explain output, score forensics              | READ SKILL FILE `references/08-explain.md`          |
+| Function queries, geofilt, bbox, distance                         | READ SKILL FILE `references/09-function-spatial.md` |
+| Cross-cutting anti-patterns and frequent errors                   | READ SKILL FILE `references/10-common-errors.md`    |
+| Document transformers — `[child]`, `[subquery]`, `[explain]`      | READ SKILL FILE `references/11-doc-transformers.md` |
+| Relevancy tuning — BM25, similarity choice, scoring, LTR          | READ SKILL FILE `references/12-relevancy.md`        |
 
 </references>
 

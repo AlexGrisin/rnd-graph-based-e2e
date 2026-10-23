@@ -42,6 +42,7 @@ Order matters: `run-hook.ts:98` gates on `toolKinds` before calling `run(ctx)`. 
 Every new hook must appear in every plugin's `hooks.json`. The canonical source is `plugins/core-claude/hooks/hooks.json.tmpl` (and equivalent templates in other plugins). Direct edits to generated `hooks.json` files are overwritten on the next `npx -y rosettify-plugins@latest` run.
 
 Paths by plugin:
+
 - `plugins/core-claude/hooks/hooks.json.tmpl` → `hooks.json`
 - `plugins/core-copilot/hooks/hooks.json.tmpl` → `hooks/hooks.json`
 - `plugins/core-cursor/.cursor/hooks/hooks.json.tmpl` → `hooks.json`
@@ -74,7 +75,7 @@ This builds CJS bundles, runs full test suite, and runs `npx -y rosettify-plugin
 - **Regex `[rf]{2,}` false positives** — matches `rm -rr` and `rm -ff`. Require both flags with lookaheads: `/\brm\s+-(?=[a-zA-Z]*[rR])(?=[a-zA-Z]*[fF])[a-zA-Z]+\b/`.
 - **`$`-anchor vs trailing slash** — path patterns like `/\.kube\/config$` fail when tested against `filePath` with trailing slash. Always test against `normalizedPath = filePath.replace(/\/+$/, '')`.
 - **Matcher without toolKinds mapping** — adding a name to the JSON matcher but not to `lookupToolKind` and `def.on.toolKinds` is inert.
-- Updating instructions/* and plugins/* which serve completely different purpose.
+- Updating instructions/_ and plugins/_ which serve completely different purpose.
 
 ### Reference files
 

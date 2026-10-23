@@ -1,6 +1,6 @@
 ---
 name: coding
-description: "To implement features, fix bugs, and refactor with KISS/SOLID/DRY and systematic validation."
+description: 'To implement features, fix bugs, and refactor with KISS/SOLID/DRY and systematic validation.'
 license: Apache-2.0
 disable-model-invocation: false
 user-invocable: true
@@ -39,6 +39,7 @@ Principles:
 - Use background terminal when starting services to prevent getting stuck, MUST for copilot. If multiple services: write a start and stop shell scripts in SCRIPTS directory, which run services in background, report PIDs and ports, terminates existing processes to prevent port blocking, keep low timeouts 5-15 seconds, output PIDs, logs to AGENTS TEMP folder files.
 
 Project documentation — MUST keep current in target project:
+
 - `CONTEXT.md`, `ARCHITECTURE.md`, `IMPLEMENTATION.md`, `DEPENDENCIES.md`, `TECHSTACK.md`, `CODEMAP.md`
 
 Validation methodology:
@@ -55,7 +56,7 @@ Validation methodology:
 
 - DO NOT read, query, store, tell, write, log, or distribute any SENSITIVE information (PII, PCI, HIPAA, PHI, GDPR, SOC2, FedRAMP, Secrets, etc).
 - Identify and apply respective guidance for handling data like that
-- Guide user for correct implementation 
+- Guide user for correct implementation
 
 </sensitive-data>
 

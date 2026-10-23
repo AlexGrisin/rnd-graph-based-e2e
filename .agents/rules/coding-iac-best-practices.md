@@ -2,7 +2,7 @@
 name: coding-iac-best-practices
 description: Rules for authoring reliable IaC artifacts.
 alwaysApply: false
-tags: ["coding", "iac", "rules", "best practices"]
+tags: ['coding', 'iac', 'rules', 'best practices']
 ---
 
 <coding_iac_best_practices>

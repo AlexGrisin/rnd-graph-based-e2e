@@ -9,12 +9,40 @@ This file covers the full mental model, syntax, 3-level hierarchies, the `[child
 Block join requires documents to be **indexed as blocks**: a parent immediately followed by its children in a single update batch, with no other documents between. Solr maintains an internal `_root_` field on every doc in a block, pointing to the root parent's ID.
 
 A typical product/sku block:
+
 ```json
 [
-  {"id": "p1", "type_s": "product", "name_t": "Air Max", "brand_s": "Nike", "_root_": "p1"},
-  {"id": "p1-sku-r-9", "type_s": "sku", "color_s": "red", "size_i": 9, "stock_i": 5, "_root_": "p1"},
-  {"id": "p1-sku-b-9", "type_s": "sku", "color_s": "blue", "size_i": 9, "stock_i": 0, "_root_": "p1"},
-  {"id": "p1-sku-r-10", "type_s": "sku", "color_s": "red", "size_i": 10, "stock_i": 3, "_root_": "p1"}
+  {
+    "id": "p1",
+    "type_s": "product",
+    "name_t": "Air Max",
+    "brand_s": "Nike",
+    "_root_": "p1"
+  },
+  {
+    "id": "p1-sku-r-9",
+    "type_s": "sku",
+    "color_s": "red",
+    "size_i": 9,
+    "stock_i": 5,
+    "_root_": "p1"
+  },
+  {
+    "id": "p1-sku-b-9",
+    "type_s": "sku",
+    "color_s": "blue",
+    "size_i": 9,
+    "stock_i": 0,
+    "_root_": "p1"
+  },
+  {
+    "id": "p1-sku-r-10",
+    "type_s": "sku",
+    "color_s": "red",
+    "size_i": 10,
+    "stock_i": 3,
+    "_root_": "p1"
+  }
 ]
 ```
 
@@ -22,17 +50,20 @@ Indexing must be atomic (one update). Updates to any child re-index the entire b
 
 ## The Block Mask concept
 
-A **Block Mask** is a query that matches **all parent documents in your index** at the level you're asking about. It is *not* a filter to narrow which parents you care about. It defines block boundaries.
+A **Block Mask** is a query that matches **all parent documents in your index** at the level you're asking about. It is _not_ a filter to narrow which parents you care about. It defines block boundaries.
 
 For products: `type_s:product` is the Block Mask if every product has `type_s=product` and nothing else does.
 
 This is the source of most block join bugs. You are constantly tempted to write:
+
 ```
 which="type_s:product AND brand_s:Nike"     # WRONG
 ```
+
 to mean "give me Nike products with red children." But this restricts the Block Mask: Solr now only sees Nike products as parent-block boundaries, and child documents from non-Nike products end up grouped with the wrong parent block.
 
 Filter parents through a separate `fq`:
+
 ```
 q={!parent which="type_s:product"}color_s:red
 fq=brand_s:Nike
@@ -49,6 +80,7 @@ q={!parent which="type_s:product"}color_s:red
 Reads: "find children matching `color_s:red`; return the **parent** of each."
 
 Parameters:
+
 - `which=` — the Block Mask (parent filter, **all** parents)
 - `score=` — how to combine matching child scores into parent score: `none` (default; constant 1), `avg`, `max`, `min`, `total`, `sum`
 - `v=` — alternative way to specify the child query (instead of after `}`)
@@ -69,11 +101,13 @@ q={!child of="type_s:product"}brand_s:Nike
 Reads: "find parents matching `brand_s:Nike`; return their **children**."
 
 Parameters:
+
 - `of=` — the Block Mask (parent filter, all parents)
 - `v=` — alternative for the parent query
 - `parentFilter=` — synonym for `of=` (older)
 
 `{!child}` returns ALL children of matching parents — there's no scoring, just a constant. To filter children, layer with another `fq`:
+
 ```
 q={!child of="type_s:product"}brand_s:Nike
 fq=stock_i:[1 TO *]
@@ -94,23 +128,34 @@ fq=type_s:product
 The last `fq=type_s:product` is essential — without it, when `q` returns parents, their children are also candidates for matching against `fq=brand_s:Nike`, which on a child doc returns false.
 
 Alternative — combine inside the parent query body:
+
 ```
 q=+{!parent which="type_s:product" v=$cq} +brand_s:Nike +type_s:product
 &cq=+color_s:red +stock_i:[1 TO *]
 ```
 
 The full BNF gets ugly. JSON Request API is cleaner:
+
 ```json
 {
   "query": {
     "bool": {
       "must": [
-        {"parent": {"which": "type_s:product", "query": {"bool": {"must": [
-          {"lucene": {"query": "color_s:red"}},
-          {"lucene": {"query": "stock_i:[1 TO *]"}}
-        ]}}}},
-        {"lucene": {"query": "brand_s:Nike"}},
-        {"lucene": {"query": "type_s:product"}}
+        {
+          "parent": {
+            "which": "type_s:product",
+            "query": {
+              "bool": {
+                "must": [
+                  { "lucene": { "query": "color_s:red" } },
+                  { "lucene": { "query": "stock_i:[1 TO *]" } }
+                ]
+              }
+            }
+          }
+        },
+        { "lucene": { "query": "brand_s:Nike" } },
+        { "lucene": { "query": "type_s:product" } }
       ]
     }
   }
@@ -126,6 +171,7 @@ By default, `{!parent}` returns parents with score 1 — children's scores are i
 ```
 
 `score` modes:
+
 - `none` (default) — constant 1
 - `avg` — average of all matching child scores
 - `max` — the highest-scoring child's score
@@ -147,6 +193,7 @@ fl=*,[child parentFilter="type_s:product" childFilter="color_s:red" limit=5]
 Returns each parent doc with a `_childDocuments_` field containing matching children.
 
 Parameters:
+
 - `parentFilter=` — REQUIRED, the Block Mask (same as `which=`/`of=` elsewhere)
 - `childFilter=` — optional, restrict which children to include
 - `limit=` — max children per parent (default 10)
@@ -154,7 +201,8 @@ Parameters:
 
 Without `[child]`, even when you query children via `{!parent}`, you only get the parent fields — not the actual SKU info. The transformer is essential for product-listing UIs.
 
-Multi-level: in a 3-level hierarchy, `[child]` returns *all* descendants by default. To get only direct children, set `childFilter` accordingly:
+Multi-level: in a 3-level hierarchy, `[child]` returns _all_ descendants by default. To get only direct children, set `childFilter` accordingly:
+
 ```
 fl=*,[child parentFilter="type_s:collection" childFilter="type_s:product" limit=20]
 ```
@@ -168,6 +216,7 @@ collection (type_s:collection)
 ```
 
 The Block Mask `parentFilter`/`which`/`of` always refers to the **immediate parent level** of what you're transitioning between. So:
+
 - "Find products under collection X that have red SKUs" — two transitions
 
 ```
@@ -179,6 +228,7 @@ q=+{!parent which="type_s:collection" v=$pq}+id:collection-X
 This reads bottom-up: red SKUs → their products → those products' collection.
 
 For 3-level, you also need the explicit child-level filter when constructing block-aware filters:
+
 ```
 {!bool filter=type_s:sku filter=color_s:red}
 ```
@@ -192,23 +242,29 @@ The `_root_` field always points to the **topmost ancestor** (collection in this
 The dreaded "child block lookup found different segments" or duplicate-key errors usually trace to:
 
 ### Plain documents in the index without children
+
 If your index has `type_s:product` blocks AND standalone `type_s:article` documents (no children), Solr's block-walking can mis-identify articles as children of the previous product block.
 
 Fix: use a Block Mask that includes both:
+
 ```
 which="type_s:product OR type_s:article"
 ```
+
 Now Solr knows where blocks end, even if some are "blocks of one."
 
 Or index articles separately, with their own root: ensure `_root_` is set to the article's own ID for standalone docs.
 
 ### Restrictive `which` / `of`
+
 Already covered above. Symptom: missing parents from results, or random-looking child mis-grouping.
 
 ### Reordering / deletes
+
 Block join requires the original block order. If documents are deleted and segments merged in unfortunate ways, block boundaries can become ambiguous. This is rare in practice but worth knowing when seeing strange results after heavy delete activity.
 
 ### Soft commit timing
+
 Block join queries against an index that just had a soft commit may briefly see inconsistent state. Use the explicit commit's response, not auto-soft-commit timing, when block updates immediately precede block queries (e.g., in tests).
 
 ## Performance notes

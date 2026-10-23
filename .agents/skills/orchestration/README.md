@@ -1,16 +1,21 @@
 # orchestration
+
 Turns the top-level agent from a worker into a senior team lead who delegates, sizes, and quality-gates subagent work instead of doing it directly.
 
 ## Why it exists
+
 Without this skill a strong model left alone tends to: do the work itself instead of delegating; write a vague subagent prompt and trust whatever comes back; skip sizing the request (treating a 15-file change like a 1-file one, or over-planning a trivial one); let subagents self-review; and lose the plan state across a long multi-phase session. This skill forces a fixed decision path (size → team/plan → structured prompt → mini-loop review) and a mandatory prompt template so delegation is repeatable and verifiable, and it hands off to a session-level execution controller (external CLI, with a todo-task fallback) once work exceeds ad-hoc tracking.
 
 ## When to engage
+
 Listed in `rules/bootstrap-alwayson.md`'s always-on engagement list for "Orchestrator/top-agent (not subagents)" — i.e. this is orchestrator-only; subagents instead engage `subagent-directives`. `rosetta/SKILL.md` makes it a hard prerequisite (`USE SKILL orchestration` before `hitl` before any workflow) and forbids doing anything else first. `adhoc-flow.md` requires it "FULLY — including BOTH assets." Frontmatter: `disable-model-invocation: false`, `user-invocable: false` — auto-activates on any subagent-spawning need, not user-callable.
 
 ## How it works
-SKILL.md body: `<context>` (opens with `Prerequisites: USE SKILL \`hitl\`, \`load-project-context\``, then senior-team-lead framing, trust-but-verify; the former `<prerequisites>` section dissolved into that line 2026-07-11) → `<request_sizing>` (SMALL/MEDIUM/LARGE bands, each routing to a different mode) → `<process>` (dispatch/routing/quality/plan-mode rules) → `<subagent_prompt_template>` (the mandatory prompt skeleton every subagent dispatch must fill in). Two asset files are pulled in only at the higher bands: `assets/o-team-manager.md` (MEDIUM+) walks a 6-step playbook — Think, Actors, Mini-loops, Tactics, Workflow, Execute; `assets/o-session-execution-controller.md` (LARGE) is the orchestrator-side driver of the `rosettify` plan CLI (phases/steps/status, with a todo-task fallback if the CLI is unavailable). Actors: the orchestrator/top-agent only authors and owns these; subagents receive scoped prompts and never see this skill's content directly (they get `subagent-directives` instead).
+
+SKILL.md body: `<context>` (opens with `Prerequisites: USE SKILL \`hitl\`, \`load-project-context\``, then senior-team-lead framing, trust-but-verify; the former `<prerequisites>`section dissolved into that line 2026-07-11) →`<request_sizing>`(SMALL/MEDIUM/LARGE bands, each routing to a different mode) →`<process>`(dispatch/routing/quality/plan-mode rules) →`<subagent_prompt_template>`(the mandatory prompt skeleton every subagent dispatch must fill in). Two asset files are pulled in only at the higher bands:`assets/o-team-manager.md`(MEDIUM+) walks a 6-step playbook — Think, Actors, Mini-loops, Tactics, Workflow, Execute;`assets/o-session-execution-controller.md`(LARGE) is the orchestrator-side driver of the`rosettify`plan CLI (phases/steps/status, with a todo-task fallback if the CLI is unavailable). Actors: the orchestrator/top-agent only authors and owns these; subagents receive scoped prompts and never see this skill's content directly (they get`subagent-directives` instead).
 
 ## Mental hooks & unexpected rules
+
 - `~1-2 files, one area → SMALL` / `~up to 10 files, one area → MEDIUM` / `10+ files, or several areas → LARGE` — concrete file-count thresholds gate which mode applies; "Complexity may shift one band; re-size as reality changes."
 - `"no longer a worker"` (MEDIUM band) — the explicit line that tells the orchestrator to stop doing hands-on work once a team exists.
 - `"session-level EXECUTION_CONTROLLER (plan ⊃ phases ⊃ steps ⊃ tasks) — execution control, not 'planning'"` — LARGE band is framed as control/tracking, not just an upfront plan.
@@ -23,6 +28,7 @@ SKILL.md body: `<context>` (opens with `Prerequisites: USE SKILL \`hitl\`, \`loa
 - `"plan root status is always derived, never set directly"` and `"upsert follows RFC 7396"` — the plan CLI has its own merge/patch semantics that silently ignore status fields in a patch.
 
 ## Invariants — do not change
+
 - Frontmatter `name: orchestration` — must equal the folder name and matches the registry entry in `docs/definitions/skills.md` (plain list, `- orchestration`).
 - Frontmatter `description` ("To delegate, prompt and manage subagents. MUST activate to spawn subagent with a quality prompt.") — short, keyword-dense, always visible to the model for auto-activation; keep it terse.
 - `disable-model-invocation: false` / `user-invocable: false` — encodes "auto-activates, not user-invoked"; flipping either changes who can trigger this skill.
@@ -34,4 +40,5 @@ SKILL.md body: `<context>` (opens with `Prerequisites: USE SKILL \`hitl\`, \`loa
 - SKILL.md has no `<when_to_use_skill>` section (present only inside the asset `o-session-execution-controller.md`, scoped to the LARGE band) — do not add one to SKILL.md casually; engagement is instead governed by `bootstrap-alwayson.md`'s engagement list plus `rosetta`'s hard prerequisite.
 
 ## Editing guide
+
 Safe to change: wording/prose inside `<context>`, `<process>` bullets, and the two asset playbooks' internal step content, as long as band thresholds, field names, and the CLI/phase contract survive. Handle with care: the SMALL/MEDIUM/LARGE thresholds and the `<subagent_prompt_template>` field list (external skills and asset files key off these). New sizing/process guidance belongs in SKILL.md; new step-by-step playbook detail for a specific band belongs in the matching `assets/*.md` file, not inlined into SKILL.md. Known referrers (from `grep -rn "orchestration" instructions/r3/core --include="*.md"`): `rules/bootstrap-alwayson.md` (engagement list), `workflows/adhoc-flow.md` (hard "FULLY" requirement), `skills/rosetta/SKILL.md` (prerequisite + forbidden-sequence), `skills/hitl/SKILL.md` (rule 17 sizes HITL depth "per `orchestration`" — renaming this skill needs a matching edit there), `skills/subagent-directives/*` (subagent-side mirror of the execution-controller contract and the prompt-template field names), `skills/coding-agents-prompt-authoring/references/pa-rosetta-intro-for-AI.md` ("MUST USE SKILL orchestration for all subagent dispatches"), and `skills/coding-agents-farm/SKILL.md` (tags itself with category/keyword `orchestration`, a taxonomy reference rather than a content dependency).

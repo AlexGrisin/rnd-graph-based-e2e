@@ -7,26 +7,31 @@ Heavier taxonomy + templates.
 For each test case, generate 1-N scenarios across these categories (priority defaults in parentheses):
 
 **Happy Path (P0)**
+
 - Valid request with all required fields → expected success response
 - Valid request with all optional fields → expected success response
 
 **Validation / Negative (P1)**
+
 - Missing required fields → 400/422
 - Invalid field types → 400/422
 - Invalid field values (out of range, wrong format) → 400/422
 - Empty request body when body required → 400
 
 **Auth (P1)**
+
 - No auth token → 401
 - Invalid / expired token → 401
 - Insufficient permissions → 403 (if role-based access applies)
 
 **Resource (P1-P2)**
+
 - Resource not found → 404
 - Duplicate creation (if applicable) → 409
 - Concurrent modification (if applicable) → 409/412
 
 **Edge / Boundary (P2-P3)**
+
 - Boundary values (min/max length, min/max numeric)
 - Special characters in string fields
 - Unicode / internationalization
@@ -49,8 +54,8 @@ For each test case, generate 1-N scenarios across these categories (priority def
 
 ## Decision rules -- apply while filling the ATC template
 
-- **Partial endpoint contract** (some fields known, some absent): author the mappable parts; mark each unknown value `[ASSUMED: …]` (per-value honesty rule); if a *core* field stays unresolved, flag the case in `## Excluded Test Cases`.
-- **Structurally incomplete ATC** -- a required *structural* field (`Endpoint`, `Type`, `Priority`) cannot be determined (e.g. the test case names no API path): write `gap: <field> — <reason>` in that field AND record the ATC in `## Excluded Test Cases` with the missing field listed. Never author it silently or fabricate the field.
+- **Partial endpoint contract** (some fields known, some absent): author the mappable parts; mark each unknown value `[ASSUMED: …]` (per-value honesty rule); if a _core_ field stays unresolved, flag the case in `## Excluded Test Cases`.
+- **Structurally incomplete ATC** -- a required _structural_ field (`Endpoint`, `Type`, `Priority`) cannot be determined (e.g. the test case names no API path): write `gap: <field> — <reason>` in that field AND record the ATC in `## Excluded Test Cases` with the missing field listed. Never author it silently or fabricate the field.
 - **Source field** (traceability): if no source reference is traceable, write `gap: no source reference — <reason>` -- never invent a TC / ticket number.
 - **Duplicate test cases** (same endpoint + intent across the input list): emit ONE ATC, list the merged source ids in `**Source**` -- do not emit near-identical duplicates.
 - **Inapplicable test type** for an endpoint (e.g. no Auth category on a public endpoint): omit that category and record the omission + reason in `## Excluded Test Cases` -- do not invent an auth scenario.
@@ -61,7 +66,7 @@ For each test case, generate 1-N scenarios across these categories (priority def
 
 One entry per scenario, written into the phase's spec artifact.
 
-```markdown
+````markdown
 ### ATC-[NNN]: [Test Case Title]
 
 **Source**: [Original test case reference — TC-1234 / PROJ-123 / Manual]
@@ -70,58 +75,64 @@ One entry per scenario, written into the phase's spec artifact.
 **Endpoint**: [METHOD] [PATH]
 
 **Given**:
-  - [Precondition 1 — e.g., "User exists with ID 42"]
-  - [Auth state — e.g., "Valid Bearer token for admin user"]
-  - [Test data setup — e.g., "Product with ID 1 exists in database"]
+
+- [Precondition 1 — e.g., "User exists with ID 42"]
+- [Auth state — e.g., "Valid Bearer token for admin user"]
+- [Test data setup — e.g., "Product with ID 1 exists in database"]
 
 **When**:
-  - Send [METHOD] request to [PATH]
-  - Headers:
-    ```json
-    {
-      "Authorization": "Bearer {valid_token}",
-      "Content-Type": "application/json"
-    }
-    ```
-  - Query Parameters: [key=value pairs or N/A]
-  - Request Body:
-    ```json
-    {
-      "field1": "exact test value",
-      "field2": 42
-    }
-    ```
+
+- Send [METHOD] request to [PATH]
+- Headers:
+  ```json
+  {
+    "Authorization": "Bearer {valid_token}",
+    "Content-Type": "application/json"
+  }
+  ```
+- Query Parameters: [key=value pairs or N/A]
+- Request Body:
+  ```json
+  {
+    "field1": "exact test value",
+    "field2": 42
+  }
+  ```
 
 **Then**:
-  - Status Code: [Expected status code]
-  - Response Body:
-    ```json
-    {
-      "id": "[non-null integer]",
-      "field1": "exact test value"
-    }
-    ```
-  - Assertions:
-    - Status code equals [code]
-    - Response body contains field "id" of type integer
-    - Response body field "field1" equals "exact test value"
+
+- Status Code: [Expected status code]
+- Response Body:
+  ```json
+  {
+    "id": "[non-null integer]",
+    "field1": "exact test value"
+  }
+  ```
+- Assertions:
+  - Status code equals [code]
+  - Response body contains field "id" of type integer
+  - Response body field "field1" equals "exact test value"
 
 **Test Data**:
-  - Input: [Exact values to send]
-  - Expected Output: [Exact values to assert]
-  - Precondition Data: [Entities that must exist — how to create them]
-  - Cleanup: [What to delete after test]
+
+- Input: [Exact values to send]
+- Expected Output: [Exact values to assert]
+- Precondition Data: [Entities that must exist — how to create them]
+- Cleanup: [What to delete after test]
 
 **Dependencies**:
-  - Auth: [Token acquisition method]
-  - Fixtures: [Data files or factory methods needed]
-  - Setup: [API calls to make before this test]
-  - Teardown: [API calls to make after this test]
+
+- Auth: [Token acquisition method]
+- Fixtures: [Data files or factory methods needed]
+- Setup: [API calls to make before this test]
+- Teardown: [API calls to make after this test]
 
 **Assumptions** (REQUIRED when any value was not derivable from contracts/clarifications):
-  - `[ASSUMED: <field_name> = <value>]` — <one-line reason, e.g., "contract did not specify min length; assumed 8 per common convention">
-  - (If none: write `None — all values derived from endpoint contracts and clarifications.`)
-```
+
+- `[ASSUMED: <field_name> = <value>]` — <one-line reason, e.g., "contract did not specify min length; assumed 8 per common convention">
+- (If none: write `None — all values derived from endpoint contracts and clarifications.`)
+````
 
 ---
 
@@ -133,17 +144,20 @@ Written into the spec artifact's `## Shared Utilities Required` section.
 ## Shared Utilities Required
 
 ### Auth Helper
+
 - Purpose: Acquire and cache auth tokens for test users
 - Input: User credentials or role
 - Output: Valid Bearer token
 - Reused by: [List test scenario IDs]
 
 ### Test Data Factory
+
 - Purpose: Create test entities via API
 - Methods: createUser(overrides), createProduct(overrides), etc.
 - Reused by: [List test scenario IDs]
 
 ### Response Validators
+
 - Purpose: Common response structure validation
 - Methods: validateErrorResponse(), validatePaginatedResponse()
 - Reused by: [List test scenario IDs]
@@ -162,37 +176,43 @@ Written into the spec artifact's `## Shared Utilities Required` section.
 **Endpoint**: GET /api/v1/orders/{orderId}
 
 **Given**:
-  - Authenticated user with role `customer`
-  - Order `o-12345` exists with status `PAID`, customer_id matches the authenticated user
+
+- Authenticated user with role `customer`
+- Order `o-12345` exists with status `PAID`, customer_id matches the authenticated user
 
 **When**:
-  - Send GET request to /api/v1/orders/o-12345
-  - Headers: `Authorization: Bearer {valid_token}`, `Accept: application/json`
-  - Query Parameters: N/A
-  - Request Body: (none)
+
+- Send GET request to /api/v1/orders/o-12345
+- Headers: `Authorization: Bearer {valid_token}`, `Accept: application/json`
+- Query Parameters: N/A
+- Request Body: (none)
 
 **Then**:
-  - Status Code: 200
-  - Assertions:
-    - Status code equals 200
-    - Response body matches schema `Order`
-    - `body.id == "o-12345"`
-    - `body.status == "PAID"`
-    - `body.customer_id == <authenticated user id>`
+
+- Status Code: 200
+- Assertions:
+  - Status code equals 200
+  - Response body matches schema `Order`
+  - `body.id == "o-12345"`
+  - `body.status == "PAID"`
+  - `body.customer_id == <authenticated user id>`
 
 **Test Data**:
-  - Input: orderId = `o-12345`
-  - Expected Output: order object with status `PAID`
-  - Precondition Data: order `o-12345` created via test data factory
-  - Cleanup: delete order `o-12345`
+
+- Input: orderId = `o-12345`
+- Expected Output: order object with status `PAID`
+- Precondition Data: order `o-12345` created via test data factory
+- Cleanup: delete order `o-12345`
 
 **Dependencies**:
-  - Auth: token from Auth Helper for a `customer` user
-  - Setup: create order `o-12345` before test
-  - Teardown: delete order after test
+
+- Auth: token from Auth Helper for a `customer` user
+- Setup: create order `o-12345` before test
+- Teardown: delete order after test
 
 **Assumptions**:
-  - None — all values derived from endpoint contracts and clarifications.
+
+- None — all values derived from endpoint contracts and clarifications.
 ```
 
 ---
@@ -203,6 +223,7 @@ Auth failure -- `Given` = no token; `Then` = 401 with **no resource-body asserti
 
 ```markdown
 ### ATC-014: GET /api/v1/orders/{orderId} rejects an unauthenticated request
+
 **Source**: TC-42 · **Priority**: P1 · **Type**: Auth · **Endpoint**: GET /api/v1/orders/{orderId}
 **Given**: no `Authorization` header present
 **When**: send GET /api/v1/orders/o-12345 with no auth header
@@ -214,6 +235,7 @@ Edge/Boundary -- value at the limit; `Then` asserts boundary handling, not a hap
 
 ```markdown
 ### ATC-022: GET /api/v1/orders/{orderId} handles a max-length order id
+
 **Source**: TC-42 · **Priority**: P3 · **Type**: Edge Case · **Endpoint**: GET /api/v1/orders/{orderId}
 **Given**: orderId at the documented max length
 **When**: send GET with the max-length id

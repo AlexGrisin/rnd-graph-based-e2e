@@ -1,6 +1,6 @@
 # Gap Analysis - Detection Catalogs (qa-knowledge `<gap_analysis>` mode)
 
-The runnable gap-analysis method (variants + process) and the probe catalogs to scan against. Drives *what to look for* and *how to run the analysis*, never *how to format output*. The G/C/A finding-entry **format** lives in the asset -- READ SKILL FILE `assets/gap-finding-templates.md`.
+The runnable gap-analysis method (variants + process) and the probe catalogs to scan against. Drives _what to look for_ and _how to run the analysis_, never _how to format output_. The G/C/A finding-entry **format** lives in the asset -- READ SKILL FILE `assets/gap-finding-templates.md`.
 
 ## Variants
 
@@ -11,9 +11,9 @@ The runnable gap-analysis method (variants + process) and the probe catalogs to 
 ## Process
 
 1. **Load** every source completely -- surface missing/empty/partial, never fabricate.
-2. **Classify** against the probe catalogs below -- one finding per item, each with a verbatim quote + citation, impact, and exactly one risk tier (tiers → *Risk / priority tiers*; per-finding form → *Authoring discipline*, both below).
-3. **Cross-reference** sources against each other (single-source → skip with an explicit note; → *Cross-reference probes*).
-4. **Redact** before quoting (→ USE SKILL `sensitive-data`; → *Authoring discipline*).
+2. **Classify** against the probe catalogs below -- one finding per item, each with a verbatim quote + citation, impact, and exactly one risk tier (tiers → _Risk / priority tiers_; per-finding form → _Authoring discipline_, both below).
+3. **Cross-reference** sources against each other (single-source → skip with an explicit note; → _Cross-reference probes_).
+4. **Redact** before quoting (→ USE SKILL `sensitive-data`; → _Authoring discipline_).
 5. **Emit** findings into the provided artifact -- produce it even when clean (`No issues found` / "all dimensions satisfied"), never pad.
 
 ---

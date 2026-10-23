@@ -46,6 +46,7 @@ alwaysApply: true
 #### Rule File Structure
 
 **YAML Frontmatter:**
+
 - `description`: Brief description of the rule's purpose
 - `globs`: Array of file patterns (glob syntax) where the rule applies, note it is NOT YAML ARRAY
   - Example: `**/*.js, **/*.ts` for all JavaScript and TypeScript files
@@ -53,6 +54,7 @@ alwaysApply: true
 - `alwaysApply`: Boolean - if `true`, the rule is always active; if `false`, it's context-dependent
 
 **Content:**
+
 - Markdown content below the frontmatter
 - Can include bullet points, code examples, or detailed instructions
 - Used by the AI agent to guide code generation and suggestions
@@ -80,6 +82,7 @@ User rules define global preferences that apply across all projects. These are i
 **Location:** Cursor Settings → Rules section (accessed via UI)
 
 **Examples:**
+
 - Preferred communication style (e.g., "Be concise and technical")
 - Language preferences (e.g., "Use British English spelling")
 - Universal coding standards (e.g., "Always use const over let when possible")
@@ -118,6 +121,7 @@ is_background: false
 You are an expert debugger specializing in root cause analysis.
 
 When invoked:
+
 1. Capture error message and stack trace
 2. Identify reproduction steps
 3. Isolate the failure location
@@ -125,6 +129,7 @@ When invoked:
 5. Verify solution works
 
 For each issue, provide:
+
 - Root cause explanation
 - Evidence supporting the diagnosis
 - Specific code fix
@@ -135,17 +140,18 @@ Focus on fixing the underlying issue, not symptoms.
 
 #### Frontmatter Configuration Fields
 
-| Field | Required | Type | Description |
-|-------|----------|------|-------------|
-| `name` | No | string | Unique identifier (lowercase, hyphens). Defaults to filename without extension. |
-| `description` | No | string | Explains when to use this subagent. Agent reads this to decide delegation. |
-| `model` | No | string | Only one specific model to use: `composer-2-fast` or model id below or (omitted). Omitted means `inherit`. See Models section below. Only one model is allowed. |
-| `readonly` | No | boolean | If `true`, subagent runs with restricted write permissions. |
-| `is_background` | No | boolean | If `true`, subagent runs in background without waiting for completion. |
+| Field           | Required | Type    | Description                                                                                                                                                     |
+| --------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`          | No       | string  | Unique identifier (lowercase, hyphens). Defaults to filename without extension.                                                                                 |
+| `description`   | No       | string  | Explains when to use this subagent. Agent reads this to decide delegation.                                                                                      |
+| `model`         | No       | string  | Only one specific model to use: `composer-2-fast` or model id below or (omitted). Omitted means `inherit`. See Models section below. Only one model is allowed. |
+| `readonly`      | No       | boolean | If `true`, subagent runs with restricted write permissions.                                                                                                     |
+| `is_background` | No       | boolean | If `true`, subagent runs in background without waiting for completion.                                                                                          |
 
 #### Models
 
 The `model` field accepts the following model id values:
+
 - (omitted) - Inherits model from parent agent (default)
 - `auto` - Selects cheapest matching model, avoid use of it!
 - `composer-2-fast` - Uses a very fast and cheap model (for simple tasks, like executing a predefined set of scripts and analyzing the output)
@@ -168,6 +174,7 @@ The `model` field accepts the following model id values:
 #### Invocation
 
 Subagents can be invoked:
+
 1. **Automatically:** Based on description matching the task context
 2. **Explicitly:** Using `/subagent-name` syntax in chat
 3. **Naturally:** Mentioning the subagent in conversation
@@ -175,6 +182,7 @@ Subagents can be invoked:
 #### Built-in Subagents
 
 Cursor includes three built-in subagents (no configuration needed):
+
 - **Explore:** Fast parallel codebase searching
 - **Bash:** Runs shell commands, isolates verbose output
 - **Browser:** Browser automation via MCP tools
@@ -249,26 +257,27 @@ Before deploying, run: `python scripts/validate.py`
 
 #### Frontmatter Configuration Fields
 
-| Field | Required | Type | Description |
-|-------|----------|------|-------------|
-| `name` | Yes | string | Skill identifier (lowercase, numbers, hyphens). Must match parent folder name. |
-| `description` | Yes | string | What the skill does and when to use it. Agent uses this to determine relevance. |
-| `license` | No | string | License name or reference to bundled license file. |
-| `compatibility` | No | string | Environment requirements (system packages, network access, etc.). |
-| `metadata` | No | object | Arbitrary key-value mapping for additional metadata. |
-| `disable-model-invocation` | No | boolean | If `true`, skill only included when explicitly invoked via `/skill-name`. Note: on plugin-delivered skills this flag currently makes the skill fully uninvocable (Cursor bug — works correctly for repo-level `.cursor/skills/`). - revalidate |
+| Field                      | Required | Type    | Description                                                                                                                                                                                                                                    |
+| -------------------------- | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                     | Yes      | string  | Skill identifier (lowercase, numbers, hyphens). Must match parent folder name.                                                                                                                                                                 |
+| `description`              | Yes      | string  | What the skill does and when to use it. Agent uses this to determine relevance.                                                                                                                                                                |
+| `license`                  | No       | string  | License name or reference to bundled license file.                                                                                                                                                                                             |
+| `compatibility`            | No       | string  | Environment requirements (system packages, network access, etc.).                                                                                                                                                                              |
+| `metadata`                 | No       | object  | Arbitrary key-value mapping for additional metadata.                                                                                                                                                                                           |
+| `disable-model-invocation` | No       | boolean | If `true`, skill only included when explicitly invoked via `/skill-name`. Note: on plugin-delivered skills this flag currently makes the skill fully uninvocable (Cursor bug — works correctly for repo-level `.cursor/skills/`). - revalidate |
 
 #### Optional Directories
 
-| Directory | Purpose |
-|-----------|---------|
-| `scripts/` | Executable code that agents can run (any language) |
-| `references/` | Additional documentation loaded on demand |
-| `assets/` | Static resources like templates, images, or data files |
+| Directory     | Purpose                                                |
+| ------------- | ------------------------------------------------------ |
+| `scripts/`    | Executable code that agents can run (any language)     |
+| `references/` | Additional documentation loaded on demand              |
+| `assets/`     | Static resources like templates, images, or data files |
 
 #### Invocation
 
 Skills can be invoked:
+
 1. **Automatically:** Agent applies when relevant based on description (unless `disable-model-invocation: true`)
 2. **Explicitly:** Type `/skill-name` in chat (like slash commands)
 
@@ -294,6 +303,7 @@ Custom commands are defined as Markdown files in the `.cursor/commands` director
 #### Creating Custom Commands
 
 1. **Create Commands Directory:**
+
    ```bash
    mkdir -p .cursor/commands
    ```
@@ -310,8 +320,10 @@ Custom commands are defined as Markdown files in the `.cursor/commands` director
 #### Example Command Files
 
 **`.cursor/commands/review-code.md`:**
+
 ```markdown
 Please review the following code for:
+
 - Potential improvements and best practices
 - Security vulnerabilities
 - Performance optimizations
@@ -321,8 +333,10 @@ Provide specific suggestions with code examples.
 ```
 
 **`.cursor/commands/write-tests.md`:**
+
 ```markdown
 Generate comprehensive unit tests for the selected code:
+
 - Test all public methods and functions
 - Include edge cases and error scenarios
 - Follow the project's testing framework conventions
@@ -331,8 +345,10 @@ Generate comprehensive unit tests for the selected code:
 ```
 
 **`.cursor/commands/add-docs.md`:**
+
 ```markdown
 Add comprehensive documentation to the selected code:
+
 - JSDoc/docstring comments for all public APIs
 - Inline comments for complex logic
 - Usage examples
@@ -340,8 +356,10 @@ Add comprehensive documentation to the selected code:
 ```
 
 **`.cursor/commands/refactor.md`:**
+
 ```markdown
 Refactor the selected code to:
+
 - Follow SOLID principles
 - Improve readability and maintainability
 - Reduce code duplication (DRY)
@@ -386,10 +404,10 @@ Cursor hooks run scripts at lifecycle events. Full verified contract: [Cursor Ho
 
 ### Hook Locations
 
-| Path | Scope |
-|------|-------|
-| `.cursor/hooks.json` | Project |
-| `~/.cursor/hooks.json` | User |
+| Path                                                                                          | Scope    |
+| --------------------------------------------------------------------------------------------- | -------- |
+| `.cursor/hooks.json`                                                                          | Project  |
+| `~/.cursor/hooks.json`                                                                        | User     |
 | Enterprise (`/Library/Application Support/Cursor/`, `/etc/cursor/`, `C:\ProgramData\Cursor\`) | Org-wide |
 
 ### Registration Format
@@ -399,7 +417,13 @@ Cursor hooks run scripts at lifecycle events. Full verified contract: [Cursor Ho
   "version": 1,
   "hooks": {
     "<hookName>": [
-      { "type": "command", "command": "path/to/script", "timeout": 60, "failClosed": false, "matcher": "Shell" }
+      {
+        "type": "command",
+        "command": "path/to/script",
+        "timeout": 60,
+        "failClosed": false,
+        "matcher": "Shell"
+      }
     ]
   }
 }
@@ -409,13 +433,13 @@ Cursor hooks run scripts at lifecycle events. Full verified contract: [Cursor Ho
 
 ### Supported Events (Rosetta-relevant)
 
-| Event | Matcher basis | Purpose |
-|-------|---------------|---------|
-| `sessionStart` | — | inject `additional_context`, set session `env` |
-| `preToolUse` (generic) + `beforeShellExecution`/`beforeReadFile`/`beforeMCPExecution` (granular) | tool type (`Shell`, `Read`, `Write`, `Task`, `MCP:<name>`) | deny / rewrite / advise before a tool runs |
-| `postToolUse` (generic) + `afterShellExecution`/`afterFileEdit`/`afterMCPExecution` (granular) | tool type | inject `additional_context` after a tool runs |
-| `subagentStart` / `subagentStop` | subagent type | observe / `followup_message` on completion |
-| `stop` | — | `followup_message` auto-submitted as the agent's next turn |
+| Event                                                                                            | Matcher basis                                              | Purpose                                                    |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- | ---------------------------------------------------------- |
+| `sessionStart`                                                                                   | —                                                          | inject `additional_context`, set session `env`             |
+| `preToolUse` (generic) + `beforeShellExecution`/`beforeReadFile`/`beforeMCPExecution` (granular) | tool type (`Shell`, `Read`, `Write`, `Task`, `MCP:<name>`) | deny / rewrite / advise before a tool runs                 |
+| `postToolUse` (generic) + `afterShellExecution`/`afterFileEdit`/`afterMCPExecution` (granular)   | tool type                                                  | inject `additional_context` after a tool runs              |
+| `subagentStart` / `subagentStop`                                                                 | subagent type                                              | observe / `followup_message` on completion                 |
+| `stop`                                                                                           | —                                                          | `followup_message` auto-submitted as the agent's next turn |
 
 **(!) Cursor fires BOTH the generic and the matching granular hook for one tool call.** Wiring a guard on both `preToolUse` and `beforeShellExecution` double-fires it — pick one layer per guard.
 
@@ -425,35 +449,35 @@ Delivered as snake_case JSON on stdin; `tool_input` is an object. Common (all ev
 
 ### Output (flat snake_case — no `hookSpecificOutput` wrapper)
 
-| Field | Used on | Meaning |
-|-------|---------|---------|
-| `permission` | `preToolUse`/`before*` | `"allow"` \| `"deny"` \| `"ask"`. **(!) `"ask"` is enforced only on `beforeShellExecution`/`beforeMCPExecution`** (schema-accepted but not enforced on `preToolUse`) — and in practice shows no interactive approval UI, behaving like `"deny"`. |
-| `user_message` | deny | shown to the user; **the only deny-reason channel confirmed to reach the model** (via the following `postToolUseFailure.error_message`) |
-| `agent_message` | deny | documented as model-facing, but NOT confirmed to reach the model — do not rely on it for agent-visible content |
-| `additional_context` | `sessionStart` / `postToolUse` | injected into the conversation |
-| `updated_input` | `preToolUse` | replaces tool args before execution |
-| `followup_message` | `stop` / `subagentStop` | auto-submitted as the next turn |
-| `env` | `sessionStart` | sets vars for later **hook script** invocations only — NOT visible in the agent's own shell |
+| Field                | Used on                        | Meaning                                                                                                                                                                                                                                          |
+| -------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `permission`         | `preToolUse`/`before*`         | `"allow"` \| `"deny"` \| `"ask"`. **(!) `"ask"` is enforced only on `beforeShellExecution`/`beforeMCPExecution`** (schema-accepted but not enforced on `preToolUse`) — and in practice shows no interactive approval UI, behaving like `"deny"`. |
+| `user_message`       | deny                           | shown to the user; **the only deny-reason channel confirmed to reach the model** (via the following `postToolUseFailure.error_message`)                                                                                                          |
+| `agent_message`      | deny                           | documented as model-facing, but NOT confirmed to reach the model — do not rely on it for agent-visible content                                                                                                                                   |
+| `additional_context` | `sessionStart` / `postToolUse` | injected into the conversation                                                                                                                                                                                                                   |
+| `updated_input`      | `preToolUse`                   | replaces tool args before execution                                                                                                                                                                                                              |
+| `followup_message`   | `stop` / `subagentStop`        | auto-submitted as the next turn                                                                                                                                                                                                                  |
+| `env`                | `sessionStart`                 | sets vars for later **hook script** invocations only — NOT visible in the agent's own shell                                                                                                                                                      |
 
 ### Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | stdout JSON parsed |
-| `2` | blocks the action. Works standalone with no body. **(!) Pairing it with a JSON body does NOT get parsed — the raw text is shown verbatim instead of the structured fields above. Prefer exit `0` + JSON for denies.** |
-| other non-zero | hook failed — fails OPEN unless `failClosed:true` |
+| Code           | Meaning                                                                                                                                                                                                               |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `0`            | stdout JSON parsed                                                                                                                                                                                                    |
+| `2`            | blocks the action. Works standalone with no body. **(!) Pairing it with a JSON body does NOT get parsed — the raw text is shown verbatim instead of the structured fields above. Prefer exit `0` + JSON for denies.** |
+| other non-zero | hook failed — fails OPEN unless `failClosed:true`                                                                                                                                                                     |
 
 **(!) `failClosed:true` blocks on ANY non-decisive response, not just a crash.** A `failClosed` hook must emit an explicit `permission` on every invocation — including calls where it has nothing to say — or it blocks every action on that event.
 
 ### Matchers
 
-| Hook | Matches against |
-|------|------------------|
+| Hook                                                | Matches against                                           |
+| --------------------------------------------------- | --------------------------------------------------------- |
 | `preToolUse` / `postToolUse` / `postToolUseFailure` | tool type: `Shell`, `Read`, `Write`, `Task`, `MCP:<name>` |
-| `beforeShellExecution` / `afterShellExecution` | the command text |
-| `beforeReadFile` | tool type: `Read`, `TabRead` |
-| `afterFileEdit` | tool type: `Write`, `TabWrite` |
-| `subagentStart` / `subagentStop` | subagent type |
+| `beforeShellExecution` / `afterShellExecution`      | the command text                                          |
+| `beforeReadFile`                                    | tool type: `Read`, `TabRead`                              |
+| `afterFileEdit`                                     | tool type: `Write`, `TabWrite`                            |
+| `subagentStart` / `subagentStop`                    | subagent type                                             |
 
 ---
 
@@ -532,6 +556,7 @@ To share Cursor configuration with your team:
 ### Cross-Tool Compatibility
 
 For compatibility with other AI coding tools:
+
 - `.claude/agents/` and `.claude/skills/` - Claude compatibility
 - `.codex/agents/` and `.codex/skills/` - Codex compatibility
 - `.cursor/` takes precedence when multiple locations exist
@@ -554,4 +579,3 @@ For compatibility with other AI coding tools:
 This guide is based on Cursor 2.4 configuration (January 2026). Check official documentation for latest features and changes.
 
 **Important:** The old `.cursor/modes.json` agent configuration format has been superseded by the new subagents system (`.cursor/agents/*.md`) as of Cursor 2.4.
-
